@@ -66,6 +66,7 @@ class TextArea:
 
         self.sprites = [None] * (width * height)
 
+        self._x = 0
         self._y = 0
 
         if text:
@@ -80,7 +81,7 @@ class TextArea:
             if not glyph:
                 continue
             face = displayio.Sprite(glyph["bitmap"], pixel_shader=self.p,
-                                    position=(x, self._y + self.height - glyph["bounds"][1] - glyph["bounds"][3]))
+                                    position=(self._x + x, self._y + self.height - glyph["bounds"][1] - glyph["bounds"][3]))
             x += glyph["shift"][0]
             self.group.append(face)
             self.sprites[i] = face
@@ -105,9 +106,22 @@ class TextArea:
 
     @y.setter
     def y(self, new_y):
-        self._y = new_y
         for sprite in self.sprites:
             if not sprite:
                 continue
             pos = sprite.position
-            sprite.position = (pos[0], new_y)
+            sprite.position = (pos[0], (pos[1] - self._y) + new_y)
+        self._y = new_y
+
+    @property
+    def x(self):
+        return self._x
+
+    @x.setter
+    def x(self, new_x):
+        for sprite in self.sprites:
+            if not sprite:
+                continue
+            pos = sprite.position
+            sprite.position = ((pos[0] - self._x) + new_x, pos[1])
+        self._x = new_x
