@@ -46,7 +46,7 @@ __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_Display_Text.git"
 
 
 class TextArea:
-    def __init__(self, font, *, text=None, width=None, height=1):
+    def __init__(self, font, *, text=None, width=None, color=0x0, height=1):
         if not width and not text:
             raise RuntimeError("Please provide a width")
         if not width:
@@ -57,7 +57,7 @@ class TextArea:
 
         self.p = displayio.Palette(2)
         self.p.make_transparent(0)
-        self.p[1] = 0xffffff
+        self.p[1] = color
 
         self.group = displayio.Group(max_size=width * height)
 
@@ -90,6 +90,14 @@ class TextArea:
             i += 1
 
             # TODO: support multiple lines by adjusting y
+
+    @property
+    def color(self):
+        return self.p[1]
+
+    @color.setter
+    def color(self, c):
+        self.p[1] = c
 
     @property
     def text(self, t):
