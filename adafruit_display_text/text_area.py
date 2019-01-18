@@ -53,7 +53,7 @@ class TextArea:
             width = len(text)
         self.width = width
         self.font = font
-        self._text = text
+        self._text = None
 
         self.p = displayio.Palette(2)
         self.p.make_transparent(0)
@@ -70,26 +70,36 @@ class TextArea:
         self._y = 0
 
         if text:
-            self._update_text()
+            self._update_text(text)
 
 
-    def _update_text(self):
+    def _update_text(self, new_text):
         x = 0
         i = 0
-        for c in self._text:
+        first_different = self._text is not None
+        for c in new_text:
             glyph = self.font.get_glyph(ord(c))
             if not glyph:
                 continue
-            face = displayio.Sprite(glyph["bitmap"], pixel_shader=self.p,
-                                    position=(self._x + x, self._y + self.height - glyph["bounds"][1] - glyph["bounds"][3]))
+            # Remove any characters that are different
+            if first_different and c != self._text[i]:
+                # TODO(tannewt): Make this smarter when we can remove and add things into the middle
+                # of a group.
+                for _ in range(len(self.sprites) - i):
+                    self.group.pop()
+                first_different = False
+            if not first_different:
+                face = displayio.Sprite(glyph["bitmap"], pixel_shader=self.p,
+                                        position=(self._x + x, self._y + self.height - glyph["bounds"][1] - glyph["bounds"][3]))
+                self.group.append(face)
+                self.sprites[i] = face
             x += glyph["shift"][0]
-            self.group.append(face)
-            self.sprites[i] = face
 
             # TODO skip this for control sequences or non-printables.
             i += 1
 
             # TODO: support multiple lines by adjusting y
+        self._text = new_text
 
     @property
     def color(self):
@@ -105,8 +115,7 @@ class TextArea:
 
     @text.setter
     def text(self, t):
-        self._text = t
-        self._update_text()
+        self._update_text(t)
 
     @property
     def y(self):
