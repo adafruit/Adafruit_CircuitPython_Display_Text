@@ -75,9 +75,14 @@ class TextArea:
 
     def _update_text(self, new_text):
         x = 0
+        y = 0
         i = 0
         first_different = self._text is not None
         for c in new_text:
+            if chr(ord(c)) == '\n':
+                y += int(self.height * 1.5)
+                x = 0
+                continue
             glyph = self.font.get_glyph(ord(c))
             if not glyph:
                 continue
@@ -90,7 +95,7 @@ class TextArea:
                 first_different = False
             if not first_different:
                 face = displayio.Sprite(glyph["bitmap"], pixel_shader=self.p,
-                                        position=(self._x + x, self._y + self.height - glyph["bounds"][1] - glyph["bounds"][3]))
+                                        position=(self._x + x, self._y + y + self.height - glyph["bounds"][1] - glyph["bounds"][3]))
                 self.group.append(face)
                 self.sprites[i] = face
             x += glyph["shift"][0]
