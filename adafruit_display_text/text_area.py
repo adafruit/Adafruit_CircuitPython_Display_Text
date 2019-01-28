@@ -80,7 +80,7 @@ class TextArea:
         first_different = self._text is not None
         for c in new_text:
             if chr(ord(c)) == '\n':
-                y += int(self.height * 1.5)
+                y += int(self.height * 1.25)
                 x = 0
                 continue
             glyph = self.font.get_glyph(ord(c))
