@@ -94,7 +94,7 @@ class TextArea:
                     self.group.pop()
                 first_different = False
             if not first_different:
-                face = displayio.Sprite(glyph["bitmap"], pixel_shader=self.p,
+                face = displayio.TileGrid(glyph["bitmap"], pixel_shader=self.p,
                                         position=(self._x + x, self._y + y + self.height - glyph["bounds"][1] - glyph["bounds"][3]))
                 self.group.append(face)
                 self.sprites[i] = face
