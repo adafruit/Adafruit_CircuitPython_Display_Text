@@ -91,11 +91,17 @@ class TextArea:
                 # TODO(tannewt): Make this smarter when we can remove and add things into the middle
                 # of a group.
                 for _ in range(len(self.sprites) - i):
-                    self.group.pop()
+                    try:
+                        self.group.pop()
+                    except IndexError:
+                        break
                 first_different = False
             if not first_different:
-                face = displayio.TileGrid(glyph["bitmap"], pixel_shader=self.p,
-                                        position=(self._x + x, self._y + y + self.height - glyph["bounds"][1] - glyph["bounds"][3]))
+                position = (self._x + x, self._y + y + self.height - glyph["bounds"][1] - glyph["bounds"][3])
+                try:
+                    face = displayio.TileGrid(glyph["bitmap"], pixel_shader=self.p, position=position)
+                except:
+                    face = displayio.Sprite(glyph["bitmap"], pixel_shader=self.p, position=position)
                 self.group.append(face)
                 self.sprites[i] = face
             x += glyph["shift"][0]
