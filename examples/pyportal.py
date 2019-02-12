@@ -1,15 +1,14 @@
 import os
 import time
 import board
-import displayio
 import pulseio
-
 import microcontroller
+import displayio
 
 from adafruit_bitmap_font import bitmap_font
 from adafruit_display_text.text_area import TextArea
 
-backlight = pulseio.PWMOut(microcontroller.pin.PB21)
+backlight = pulseio.PWMOut(microcontroller.pin.PB21) #pylint: disable=no-member
 
 max_brightness = 2 ** 15
 
