@@ -12,14 +12,20 @@ cache:
     pip: true
 
 deploy:
-  provider: releases
-  api_key: $GITHUB_TOKEN
-  file_glob: true
-  file: $TRAVIS_BUILD_DIR/bundles/*
-  skip_cleanup: true
-  overwrite: true
-  on:
-    tags: true
+  - provider: releases
+    api_key: "$GITHUB_TOKEN"
+    file_glob: true
+    file: "$TRAVIS_BUILD_DIR/bundles/*"
+    skip_cleanup: true
+    overwrite: true
+    on:
+      tags: true
+  - provider: pypi
+    user: adafruit-travis
+    password:
+      secure: "P8vHzlHSkY7aLsGMD12+43hG4eHcxjqFWaKYhvtoUlbTjOtHD+ZlzFG8rSXooUEdJZWYy9SDFShGfNMvws1I5opNFV0HA2Cs14jBeYa9hFi0p/7Box0tAHZbi6aGGcho/WbwQqUgaOkH0QJnsYgZedu65S1SXVkl7zfcORMRw3dXBM5UY5Q7KP8X/62CC78P1dPC/2127vyn98qHVEiT7rtCkBgXUM3WuPz2VadaLodvAD/E0xwqJXqZmDIM2stc223m9n9plXPahUHl9grT9oH8KhJP9Wr6uaRjAOhbFKimKFWTEcc1ugHjH8U+UFRk+OVTDNf5etgiQMs82x2Ssfoz+yi6z/HMQN2uc9TM4kAGrPUZIcZTVaniCtGSfa7HZSj60uxDkTMKuOt5B+ey5bGjpRAsNxTRJtgT8taIWURO4YU9Il3orPr9ByIp1OqjRmHwGF0PXK+U5G6UEP+JP9R8OvS9Q71nOrDZmFAD0krw9ZxO4p4T93bgV4ELkoI8RLbudqh68FG6XYwg2hr+VPT/9eLuYeOGdHB7vNAc1qumOX+e3bbC0BdpexxYyBtgaWsbGZEP9F2uYi20wUWGnM1agFXpua1JiWAqKf14ML5ysOTsyWKJ8+IXNtQIyY9z9gD5TCiNgkyiHbDEg2JA2ATOuWz42UzhdxntXBCuV00="
+    on:
+      tags: true
 
 install:
   - pip install -r requirements.txt
