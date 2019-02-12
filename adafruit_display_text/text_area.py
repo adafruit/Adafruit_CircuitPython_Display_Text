@@ -45,10 +45,11 @@ __version__ = "0.0.0-auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_Display_Text.git"
 
 
-class TextArea:
-    def __init__(self, font, *, text=None, width=None, color=0x0, height=1):
+class TextArea(displayio.Group):
+    def __init__(self, font, *, text=None, width=None, color=0xffffff, height=1):
         if not width and not text:
             raise RuntimeError("Please provide a width")
+        super().__init__(max_size=width * height)
         if not width:
             width = len(text)
         self.width = width
@@ -59,15 +60,8 @@ class TextArea:
         self.p.make_transparent(0)
         self.p[1] = color
 
-        self.group = displayio.Group(max_size=width * height)
-
         bounds = self.font.get_bounding_box()
         self.height = bounds[1]
-
-        self.sprites = [None] * (width * height)
-
-        self._x = 0
-        self._y = 0
 
         if text:
             self._update_text(text)
@@ -86,30 +80,21 @@ class TextArea:
             glyph = self.font.get_glyph(ord(c))
             if not glyph:
                 continue
-            # Remove any characters that are different
-            if first_different and c != self._text[i]:
-                # TODO(tannewt): Make this smarter when we can remove and add things into the middle
-                # of a group.
-                for _ in range(len(self.sprites) - i):
-                    try:
-                        self.group.pop()
-                    except IndexError:
-                        break
-                first_different = False
-            if not first_different:
-                position = (self._x + x, self._y + y + self.height - glyph["bounds"][1] - glyph["bounds"][3])
-                try:
-                    face = displayio.TileGrid(glyph["bitmap"], pixel_shader=self.p, position=position)
-                except:
-                    face = displayio.Sprite(glyph["bitmap"], pixel_shader=self.p, position=position)
-                self.group.append(face)
-                self.sprites[i] = face
-            x += glyph["shift"][0]
+            if not self._text or i >= len(self._text) or c != self._text[i]:
+                face = displayio.TileGrid(glyph.bitmap, pixel_shader=self.p, default_tile=glyph.tile_index,
+                                          tile_width=glyph.width, tile_height=glyph.height,
+                                          position=(x, y + self.height - glyph.height - glyph.dy))
+                if i < len(self):
+                    self[i] = face
+                else:
+                    self.append(face)
+            x += glyph.shift_x
 
             # TODO skip this for control sequences or non-printables.
             i += 1
-
-            # TODO: support multiple lines by adjusting y
+        # Remove the rest
+        while len(self) > i:
+            self.pop()
         self._text = new_text
 
     @property
@@ -127,29 +112,3 @@ class TextArea:
     @text.setter
     def text(self, t):
         self._update_text(t)
-
-    @property
-    def y(self):
-        return self._y
-
-    @y.setter
-    def y(self, new_y):
-        for sprite in self.sprites:
-            if not sprite:
-                continue
-            pos = sprite.position
-            sprite.position = (pos[0], (pos[1] - self._y) + new_y)
-        self._y = new_y
-
-    @property
-    def x(self):
-        return self._x
-
-    @x.setter
-    def x(self, new_x):
-        for sprite in self.sprites:
-            if not sprite:
-                continue
-            pos = sprite.position
-            sprite.position = ((pos[0] - self._x) + new_x, pos[1])
-        self._x = new_x
