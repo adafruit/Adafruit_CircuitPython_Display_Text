@@ -28,8 +28,17 @@ This is easily achieved by downloading
 Usage Example
 =============
 
+For a board with a built-in display.
+
 .. code:: python
 
+    import board
+    import terminalio
+    from adafruit_display_text import text_area
+
+    text = "Hello world"
+    text_area = text_area.TextArea(terminalio.FONT, text=text, width=len(text))
+    board.DISPLAY.show(text_area)
 
 
 Contributing

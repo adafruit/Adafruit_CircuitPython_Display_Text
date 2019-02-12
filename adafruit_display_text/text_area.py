@@ -20,7 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 """
-`adafruit_display_text`
+`adafruit_display_text.text_area`
 ====================================================
 
 Displays text using CircuitPython's displayio.
@@ -44,9 +44,15 @@ import displayio
 __version__ = "0.0.0-auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_Display_Text.git"
 
-
 class TextArea(displayio.Group):
-    def __init__(self, font, *, text=None, width=None, color=0xffffff, height=1):
+    """An area displaying a string of textself.
+
+       :param Font font: A font class that has ``get_bounding_box`` and ``get_glyph``
+       :param str text: Text to display
+       :param int width: Area width in characters
+       :param int height: Area height in characters
+       :param int color: Color of all text in RGB hex"""
+    def __init__(self, font, *, text=None, width=None, height=1, color=0xffffff):
         if not width and not text:
             raise RuntimeError("Please provide a width")
         super().__init__(max_size=width * height)
@@ -56,9 +62,9 @@ class TextArea(displayio.Group):
         self.font = font
         self._text = None
 
-        self.p = displayio.Palette(2)
-        self.p.make_transparent(0)
-        self.p[1] = color
+        self.palette = displayio.Palette(2)
+        self.palette.make_transparent(0)
+        self.palette[1] = color
 
         bounds = self.font.get_bounding_box()
         self.height = bounds[1]
@@ -71,17 +77,17 @@ class TextArea(displayio.Group):
         x = 0
         y = 0
         i = 0
-        first_different = self._text is not None
-        for c in new_text:
-            if chr(ord(c)) == '\n':
+        for character in new_text:
+            if character == '\n':
                 y += int(self.height * 1.25)
                 x = 0
                 continue
-            glyph = self.font.get_glyph(ord(c))
+            glyph = self.font.get_glyph(ord(character))
             if not glyph:
                 continue
-            if not self._text or i >= len(self._text) or c != self._text[i]:
-                face = displayio.TileGrid(glyph.bitmap, pixel_shader=self.p, default_tile=glyph.tile_index,
+            if not self._text or i >= len(self._text) or character != self._text[i]:
+                face = displayio.TileGrid(glyph.bitmap, pixel_shader=self.palette,
+                                          default_tile=glyph.tile_index,
                                           tile_width=glyph.width, tile_height=glyph.height,
                                           position=(x, y + self.height - glyph.height - glyph.dy))
                 if i < len(self):
@@ -99,16 +105,18 @@ class TextArea(displayio.Group):
 
     @property
     def color(self):
+        """Color of the text as an RGB hex number."""
         return self.p[1]
 
     @color.setter
-    def color(self, c):
-        self.p[1] = c
+    def color(self, new_color):
+        self.p[1] = new_color
 
     @property
-    def text(self, t):
-        self._text = t
+    def text(self):
+        """Text to display."""
+        return self._text
 
     @text.setter
-    def text(self, t):
-        self._update_text(t)
+    def text(self, new_text):
+        self._update_text(new_text)
