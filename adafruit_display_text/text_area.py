@@ -105,7 +105,8 @@ class TextArea(displayio.Group):
             i += 1
             old_c += 1
             # skip all non-prinables in the old string
-            while self._text and old_c < len(self._text) and (self._text[old_c] == '\n' or not self.font.get_glyph(ord(self._text[old_c]))):
+            while (self._text and old_c < len(self._text) and
+                   (self._text[old_c] == '\n' or not self.font.get_glyph(ord(self._text[old_c])))):
                 old_c += 1
         # Remove the rest
         while len(self) > i:
