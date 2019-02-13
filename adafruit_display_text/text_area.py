@@ -55,9 +55,9 @@ class TextArea(displayio.Group):
     def __init__(self, font, *, text=None, width=None, height=1, color=0xffffff):
         if not width and not text:
             raise RuntimeError("Please provide a width")
-        super().__init__(max_size=width * height)
         if not width:
             width = len(text)
+        super().__init__(max_size=width * height)
         self.width = width
         self.font = font
         self._text = None
@@ -77,6 +77,7 @@ class TextArea(displayio.Group):
         x = 0
         y = 0
         i = 0
+        old_c = 0
         for character in new_text:
             if character == '\n':
                 y += int(self.height * 1.25)
@@ -85,19 +86,27 @@ class TextArea(displayio.Group):
             glyph = self.font.get_glyph(ord(character))
             if not glyph:
                 continue
-            if not self._text or i >= len(self._text) or character != self._text[i]:
+            position_y = y + self.height - glyph.height - glyph.dy
+            if not self._text or old_c >= len(self._text) or character != self._text[old_c]:
                 face = displayio.TileGrid(glyph.bitmap, pixel_shader=self.palette,
                                           default_tile=glyph.tile_index,
                                           tile_width=glyph.width, tile_height=glyph.height,
-                                          position=(x, y + self.height - glyph.height - glyph.dy))
+                                          position=(x, position_y))
                 if i < len(self):
                     self[i] = face
                 else:
                     self.append(face)
+            elif self._text and character == self._text[old_c]:
+                self[i].position = (x, position_y)
+
             x += glyph.shift_x
 
             # TODO skip this for control sequences or non-printables.
             i += 1
+            old_c += 1
+            # skip all non-prinables in the old string
+            while self._text and old_c < len(self._text) and (self._text[old_c] == '\n' or not self.font.get_glyph(ord(self._text[old_c]))):
+                old_c += 1
         # Remove the rest
         while len(self) > i:
             self.pop()
@@ -106,11 +115,11 @@ class TextArea(displayio.Group):
     @property
     def color(self):
         """Color of the text as an RGB hex number."""
-        return self.p[1]
+        return self.palette[1]
 
     @color.setter
     def color(self, new_color):
-        self.p[1] = new_color
+        self.palette[1] = new_color
 
     @property
     def text(self):
