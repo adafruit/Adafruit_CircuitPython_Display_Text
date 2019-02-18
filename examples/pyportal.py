@@ -1,16 +1,14 @@
-import board
-import displayio
 import os
-import gc
-import pulseio
-import random
 import time
+import board
+import pulseio
 import microcontroller
+import displayio
 
 from adafruit_bitmap_font import bitmap_font
 from adafruit_display_text.text_area import TextArea
 
-backlight = pulseio.PWMOut(microcontroller.pin.PB21)
+backlight = pulseio.PWMOut(microcontroller.pin.PB21) #pylint: disable=no-member
 
 max_brightness = 2 ** 15
 
@@ -35,14 +33,12 @@ for demo_text in demos:
         print("Font load {}".format(font.name))
         area = TextArea(font, text=demo_text)
         area.y = y
-        splash.append(area.group)
+        splash.append(area)
 
         y += area.height
 
         # Wait for the image to load.
         board.DISPLAY.wait_for_frame()
-        gc.collect()
-        print("mem free:", gc.mem_free())
 
 # Wait forever
 time.sleep(600)

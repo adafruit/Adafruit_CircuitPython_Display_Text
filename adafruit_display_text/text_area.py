@@ -20,7 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 """
-`adafruit_display_text`
+`adafruit_display_text.text_area`
 ====================================================
 
 Displays text using CircuitPython's displayio.
@@ -44,30 +44,30 @@ import displayio
 __version__ = "0.0.0-auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_Display_Text.git"
 
+class TextArea(displayio.Group):
+    """An area displaying a string of textself.
 
-class TextArea:
-    def __init__(self, font, *, text=None, width=None, color=0x0, height=1):
+       :param Font font: A font class that has ``get_bounding_box`` and ``get_glyph``
+       :param str text: Text to display
+       :param int width: Area width in characters
+       :param int height: Area height in characters
+       :param int color: Color of all text in RGB hex"""
+    def __init__(self, font, *, text=None, width=None, height=1, color=0xffffff):
         if not width and not text:
             raise RuntimeError("Please provide a width")
         if not width:
             width = len(text)
+        super().__init__(max_size=width * height)
         self.width = width
         self.font = font
         self._text = None
 
-        self.p = displayio.Palette(2)
-        self.p.make_transparent(0)
-        self.p[1] = color
-
-        self.group = displayio.Group(max_size=width * height)
+        self.palette = displayio.Palette(2)
+        self.palette.make_transparent(0)
+        self.palette[1] = color
 
         bounds = self.font.get_bounding_box()
         self.height = bounds[1]
-
-        self.sprites = [None] * (width * height)
-
-        self._x = 0
-        self._y = 0
 
         if text:
             self._update_text(text)
@@ -77,79 +77,56 @@ class TextArea:
         x = 0
         y = 0
         i = 0
-        first_different = self._text is not None
-        for c in new_text:
-            if chr(ord(c)) == '\n':
+        old_c = 0
+        for character in new_text:
+            if character == '\n':
                 y += int(self.height * 1.25)
                 x = 0
                 continue
-            glyph = self.font.get_glyph(ord(c))
+            glyph = self.font.get_glyph(ord(character))
             if not glyph:
                 continue
-            # Remove any characters that are different
-            if first_different and c != self._text[i]:
-                # TODO(tannewt): Make this smarter when we can remove and add things into the middle
-                # of a group.
-                for _ in range(len(self.sprites) - i):
-                    try:
-                        self.group.pop()
-                    except IndexError:
-                        break
-                first_different = False
-            if not first_different:
-                position = (self._x + x, self._y + y + self.height - glyph["bounds"][1] - glyph["bounds"][3])
-                try:
-                    face = displayio.TileGrid(glyph["bitmap"], pixel_shader=self.p, position=position)
-                except:
-                    face = displayio.Sprite(glyph["bitmap"], pixel_shader=self.p, position=position)
-                self.group.append(face)
-                self.sprites[i] = face
-            x += glyph["shift"][0]
+            position_y = y + self.height - glyph.height - glyph.dy
+            if not self._text or old_c >= len(self._text) or character != self._text[old_c]:
+                face = displayio.TileGrid(glyph.bitmap, pixel_shader=self.palette,
+                                          default_tile=glyph.tile_index,
+                                          tile_width=glyph.width, tile_height=glyph.height,
+                                          position=(x, position_y))
+                if i < len(self):
+                    self[i] = face
+                else:
+                    self.append(face)
+            elif self._text and character == self._text[old_c]:
+                self[i].position = (x, position_y)
+
+            x += glyph.shift_x
 
             # TODO skip this for control sequences or non-printables.
             i += 1
-
-            # TODO: support multiple lines by adjusting y
+            old_c += 1
+            # skip all non-prinables in the old string
+            while (self._text and old_c < len(self._text) and
+                   (self._text[old_c] == '\n' or not self.font.get_glyph(ord(self._text[old_c])))):
+                old_c += 1
+        # Remove the rest
+        while len(self) > i:
+            self.pop()
         self._text = new_text
 
     @property
     def color(self):
-        return self.p[1]
+        """Color of the text as an RGB hex number."""
+        return self.palette[1]
 
     @color.setter
-    def color(self, c):
-        self.p[1] = c
+    def color(self, new_color):
+        self.palette[1] = new_color
 
     @property
-    def text(self, t):
-        self._text = t
+    def text(self):
+        """Text to display."""
+        return self._text
 
     @text.setter
-    def text(self, t):
-        self._update_text(t)
-
-    @property
-    def y(self):
-        return self._y
-
-    @y.setter
-    def y(self, new_y):
-        for sprite in self.sprites:
-            if not sprite:
-                continue
-            pos = sprite.position
-            sprite.position = (pos[0], (pos[1] - self._y) + new_y)
-        self._y = new_y
-
-    @property
-    def x(self):
-        return self._x
-
-    @x.setter
-    def x(self, new_x):
-        for sprite in self.sprites:
-            if not sprite:
-                continue
-            pos = sprite.position
-            sprite.position = ((pos[0] - self._x) + new_x, pos[1])
-        self._x = new_x
+    def text(self, new_text):
+        self._update_text(new_text)
