@@ -68,6 +68,7 @@ class TextArea(displayio.Group):
 
         bounds = self.font.get_bounding_box()
         self.height = bounds[1]
+        self.line_spacing = 1.25
 
         if text:
             self._update_text(text)
@@ -80,7 +81,7 @@ class TextArea(displayio.Group):
         old_c = 0
         for character in new_text:
             if character == '\n':
-                y += int(self.height * 1.25)
+                y += int(self.height * self.line_spacing)
                 x = 0
                 continue
             glyph = self.font.get_glyph(ord(character))
@@ -112,6 +113,16 @@ class TextArea(displayio.Group):
         while len(self) > i:
             self.pop()
         self._text = new_text
+
+    @property
+    def line_spacing(self):
+        """The amount of space between lines of text, in multiples of the font's
+        bounding-box height. (E.g. 1.0 is the bounding-box height)"""
+        return self._line_spacing
+
+    @line_spacing.setter
+    def line_spacing(self, spacing):
+        self._line_spacing = spacing
 
     @property
     def color(self):
