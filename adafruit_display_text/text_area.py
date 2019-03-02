@@ -86,7 +86,7 @@ class TextArea(displayio.Group):
             glyph = self.font.get_glyph(ord(character))
             if not glyph:
                 continue
-            position_y = y + self.height - glyph.height - glyph.dy
+            position_y = y - glyph.height - glyph.dy
             if not self._text or old_c >= len(self._text) or character != self._text[old_c]:
                 face = displayio.TileGrid(glyph.bitmap, pixel_shader=self.palette,
                                           default_tile=glyph.tile_index,
