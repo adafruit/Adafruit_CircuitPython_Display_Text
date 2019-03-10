@@ -69,6 +69,7 @@ class TextArea(displayio.Group):
         bounds = self.font.get_bounding_box()
         self.height = bounds[1]
         self.line_spacing = 1.25
+        self._boundingbox = None
 
         if text:
             self._update_text(text)
@@ -79,6 +80,10 @@ class TextArea(displayio.Group):
         y = 0
         i = 0
         old_c = 0
+        lines = new_text.count('\n')
+        y_offset = int( (self.font.get_glyph(ord('M')).height - lines * self.height * self.line_spacing) / 2)
+        #print("y offset from baseline", y_offset)
+        left = right = top = bottom =  0
         for character in new_text:
             if character == '\n':
                 y += int(self.height * self.line_spacing)
@@ -87,7 +92,11 @@ class TextArea(displayio.Group):
             glyph = self.font.get_glyph(ord(character))
             if not glyph:
                 continue
-            position_y = y - glyph.height - glyph.dy
+            right = max(right, x+glyph.width)
+            if y == 0:   # first line, find the Ascender height
+                top = min(top, -glyph.height+y_offset)
+            bottom = max(bottom, y-glyph.dy+y_offset)
+            position_y = y - glyph.height - glyph.dy + y_offset
             if not self._text or old_c >= len(self._text) or character != self._text[old_c]:
                 face = displayio.TileGrid(glyph.bitmap, pixel_shader=self.palette,
                                           default_tile=glyph.tile_index,
@@ -113,6 +122,13 @@ class TextArea(displayio.Group):
         while len(self) > i:
             self.pop()
         self._text = new_text
+        self._boundingbox = (left, top, left+right, bottom-top)
+
+    @property
+    def bounding_box(self):
+        """An (x, y, w, h) tuple that completely covers all glyphs. The
+        first two numbers are offset from the x, y origin of this group"""
+        return tuple(self._boundingbox)
 
     @property
     def line_spacing(self):
