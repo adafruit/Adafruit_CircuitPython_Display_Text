@@ -52,13 +52,13 @@ class TextArea(displayio.Group):
        :param int width: Area width in characters
        :param int height: Area height in characters
        :param int color: Color of all text in RGB hex"""
-    def __init__(self, font, *, text=None, width=None, height=1, color=0xffffff):
-        if not width and not text:
-            raise RuntimeError("Please provide a width")
-        if not width:
-            width = len(text)
-        super().__init__(max_size=width * height)
-        self.width = width
+    def __init__(self, font, *, text=None, max_glyphs=None, color=0xffffff):
+        if not max_glyphs and not text:
+            raise RuntimeError("Please provide a max size, or initial text")
+        if not max_glyphs:
+            max_glyphs = len(text)
+        super().__init__(max_size=max_glyphs)
+        self.width = max_glyphs
         self.font = font
         self._text = None
 
@@ -97,17 +97,18 @@ class TextArea(displayio.Group):
                 top = min(top, -glyph.height+y_offset)
             bottom = max(bottom, y-glyph.dy+y_offset)
             position_y = y - glyph.height - glyph.dy + y_offset
+            position_x = x + glyph.dx
             if not self._text or old_c >= len(self._text) or character != self._text[old_c]:
                 face = displayio.TileGrid(glyph.bitmap, pixel_shader=self.palette,
                                           default_tile=glyph.tile_index,
                                           tile_width=glyph.width, tile_height=glyph.height,
-                                          position=(x, position_y))
+                                          position=(position_x, position_y))
                 if i < len(self):
                     self[i] = face
                 else:
                     self.append(face)
             elif self._text and character == self._text[old_c]:
-                self[i].position = (x, position_y)
+                self[i].position = (position_x, position_y)
 
             x += glyph.shift_x
 
