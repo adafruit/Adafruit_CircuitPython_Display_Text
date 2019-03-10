@@ -68,25 +68,25 @@ class TextArea(displayio.Group):
 
         bounds = self.font.get_bounding_box()
         self.height = bounds[1]
-        self.line_spacing = 1.25
+        self._line_spacing = 1.25
         self._boundingbox = None
 
         if text:
             self._update_text(text)
 
 
-    def _update_text(self, new_text):
+    def _update_text(self, new_text): # pylint: disable=too-many-locals
         x = 0
         y = 0
         i = 0
         old_c = 0
-        lines = new_text.count('\n')
-        y_offset = int( (self.font.get_glyph(ord('M')).height - lines * self.height * self.line_spacing) / 2)
+        y_offset = int((self.font.get_glyph(ord('M')).height -
+                        new_text.count('\n') * self.height * self.line_spacing) / 2)
         #print("y offset from baseline", y_offset)
-        left = right = top = bottom =  0
+        left = right = top = bottom = 0
         for character in new_text:
             if character == '\n':
-                y += int(self.height * self.line_spacing)
+                y += int(self.height * self._line_spacing)
                 x = 0
                 continue
             glyph = self.font.get_glyph(ord(character))
