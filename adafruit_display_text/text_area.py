@@ -49,8 +49,7 @@ class TextArea(displayio.Group):
 
        :param Font font: A font class that has ``get_bounding_box`` and ``get_glyph``
        :param str text: Text to display
-       :param int width: Area width in characters
-       :param int height: Area height in characters
+       :param int max_glyphs: The largest quantity of glyphs we will display
        :param int color: Color of all text in RGB hex"""
     def __init__(self, font, *, text=None, max_glyphs=None, color=0xffffff):
         if not max_glyphs and not text:
