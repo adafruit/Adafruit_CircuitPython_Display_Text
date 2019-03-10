@@ -20,10 +20,10 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 """
-`adafruit_display_text.text_area`
+`adafruit_display_text.label`
 ====================================================
 
-Displays text using CircuitPython's displayio.
+Displays text labels using CircuitPython's displayio.
 
 * Author(s): Scott Shawcroft
 
@@ -44,7 +44,7 @@ import displayio
 __version__ = "0.0.0-auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_Display_Text.git"
 
-class TextArea(displayio.Group):
+class Label(displayio.Group):
     """An area displaying a string of textself.
 
        :param Font font: A font class that has ``get_bounding_box`` and ``get_glyph``
