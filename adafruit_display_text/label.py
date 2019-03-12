@@ -45,18 +45,21 @@ __version__ = "0.0.0-auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_Display_Text.git"
 
 class Label(displayio.Group):
-    """An area displaying a string of textself.
+    """An area displaying a string of textself. The origin point set by ``x`` and ``y``
+       properties will be the left edge of the bounding box, and in the center of a M
+       glyph (if its one line), or the (number of lines * linespacing + M)/2. That is,
+       it will try to have it be center-left as close as possible.
 
        :param Font font: A font class that has ``get_bounding_box`` and ``get_glyph``
        :param str text: Text to display
        :param int max_glyphs: The largest quantity of glyphs we will display
        :param int color: Color of all text in RGB hex"""
-    def __init__(self, font, *, text=None, max_glyphs=None, color=0xffffff):
+    def __init__(self, font, *, text=None, max_glyphs=None, color=0xffffff, **kwargs):
         if not max_glyphs and not text:
             raise RuntimeError("Please provide a max size, or initial text")
         if not max_glyphs:
             max_glyphs = len(text)
-        super().__init__(max_size=max_glyphs)
+        super().__init__(max_size=max_glyphs, **kwargs)
         self.width = max_glyphs
         self.font = font
         self._text = None
