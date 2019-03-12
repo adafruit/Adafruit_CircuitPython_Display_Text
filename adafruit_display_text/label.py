@@ -45,7 +45,7 @@ __version__ = "0.0.0-auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_Display_Text.git"
 
 class Label(displayio.Group):
-    """An area displaying a string of textself. The origin point set by ``x`` and ``y``
+    """A label displaying a string of text. The origin point set by ``x`` and ``y``
        properties will be the left edge of the bounding box, and in the center of a M
        glyph (if its one line), or the (number of lines * linespacing + M)/2. That is,
        it will try to have it be center-left as close as possible.
