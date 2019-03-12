@@ -1,7 +1,7 @@
 import os
 import board
 import displayio
-from adafruit_display_text.text_area import TextArea
+from adafruit_display_text.label import Label
 from adafruit_bitmap_font import bitmap_font
 
 # the current working directory (where this file is)
@@ -37,7 +37,7 @@ font.load_glyphs(DISPLAY_STRING.encode('utf-8'))
 
 print(DISPLAY_STRING)
 
-text = TextArea(font, text=DISPLAY_STRING)
+text = Label(font, text=DISPLAY_STRING)
 text.x = 20
 text.y = 100
 text.color = 0x0
