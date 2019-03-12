@@ -6,7 +6,7 @@ import microcontroller
 import displayio
 
 from adafruit_bitmap_font import bitmap_font
-from adafruit_display_text.text_area import TextArea
+from adafruit_display_text.label import Label
 
 backlight = pulseio.PWMOut(microcontroller.pin.PB21) #pylint: disable=no-member
 
@@ -31,7 +31,7 @@ y = 2
 for demo_text in demos:
     for font in fonts:
         print("Font load {}".format(font.name))
-        area = TextArea(font, text=demo_text)
+        area = Label(font, text=demo_text)
         area.y = y
         splash.append(area)
 
