@@ -101,16 +101,26 @@ class Label(displayio.Group):
             position_y = y - glyph.height - glyph.dy + y_offset
             position_x = x + glyph.dx
             if not self._text or old_c >= len(self._text) or character != self._text[old_c]:
-                face = displayio.TileGrid(glyph.bitmap, pixel_shader=self.palette,
-                                          default_tile=glyph.tile_index,
-                                          tile_width=glyph.width, tile_height=glyph.height,
-                                          position=(position_x, position_y))
+                try:
+                    face = displayio.TileGrid(glyph.bitmap, pixel_shader=self.palette,
+                                              default_tile=glyph.tile_index,
+                                              tile_width=glyph.width, tile_height=glyph.height,
+                                              position=(position_x, position_y))
+                except TypeError:
+                    face = displayio.TileGrid(glyph.bitmap, pixel_shader=self.palette,
+                                              default_tile=glyph.tile_index,
+                                              tile_width=glyph.width, tile_height=glyph.height,
+                                              x=position_x, y=position_y)
                 if i < len(self):
                     self[i] = face
                 else:
                     self.append(face)
             elif self._text and character == self._text[old_c]:
-                self[i].position = (position_x, position_y)
+                try:
+                    self[i].position = (position_x, position_y)
+                except AttributeError:
+                    self[i].x = position_x
+                    self[i].y = position_y
 
             x += glyph.shift_x
 
