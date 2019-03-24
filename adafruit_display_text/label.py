@@ -55,7 +55,8 @@ class Label(displayio.Group):
        :param int max_glyphs: The largest quantity of glyphs we will display
        :param int color: Color of all text in RGB hex
        :param double line_spacing: Line spacing of text to display"""
-    def __init__(self, font, *, text=None, max_glyphs=None, color=0xffffff, line_spacing=1.25, **kwargs):
+    def __init__(self, font, *, text=None, max_glyphs=None, color=0xffffff,
+                 line_spacing=1.25, **kwargs):
         if not max_glyphs and not text:
             raise RuntimeError("Please provide a max size, or initial text")
         if not max_glyphs:
