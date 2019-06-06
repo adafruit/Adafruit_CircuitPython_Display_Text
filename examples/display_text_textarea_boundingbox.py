@@ -28,7 +28,7 @@ color_palette = displayio.Palette(1)
 color_palette[0] = 0xFFFFFF
 bg_sprite = displayio.TileGrid(color_bitmap,
                                pixel_shader=color_palette,
-                               position=(0, 0))
+                               x=0, y=0)
 splash.append(bg_sprite)
 
 # Load the font
@@ -50,7 +50,7 @@ textbg_palette = displayio.Palette(1)
 textbg_palette[0] = 0xFF0000
 textbg_sprite = displayio.TileGrid(textbg_bitmap,
                                    pixel_shader=textbg_palette,
-                                   position=(text.x+dims[0], text.y+dims[1]))
+                                   x=text.x+dims[0], y=text.y+dims[1])
 splash.append(textbg_sprite)
 splash.append(text)
 board.DISPLAY.refresh_soon()
