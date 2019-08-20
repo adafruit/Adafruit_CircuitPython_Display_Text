@@ -1,25 +1,23 @@
+"""
+This example show the use of the backlight as well as using labels to simulate
+a terminal using a font on the PyPortal
+"""
+
 import os
 import time
 import board
-import pulseio
-import microcontroller
 import displayio
 
 from adafruit_bitmap_font import bitmap_font
 from adafruit_display_text.label import Label
 
-backlight = pulseio.PWMOut(microcontroller.pin.PB21) #pylint: disable=no-member
-
-max_brightness = 2 ** 15
-
 fonts = list(filter(lambda x: x.endswith("bdf") and not x.startswith("."), os.listdir("/")))
 fonts = [bitmap_font.load_font(x) for x in fonts]
-
 
 print("fade up")
 # Fade up the backlight
 for b in range(100):
-    backlight.duty_cycle = b * max_brightness // 100
+    board.DISPLAY.brightness = b / 100
     time.sleep(0.01)  # default (0.01)
 
 demos = ["CircuitPython = Code + Community", "accents - üàêùéáçãÍóí", "others - αψ◌"]
@@ -40,14 +38,14 @@ for demo_text in demos:
         # Wait for the image to load.
         board.DISPLAY.wait_for_frame()
 
-# Wait forever
+# Wait for 10 minutes (600 seconds)
 time.sleep(600)
 
 # Fade down the backlight
-for b in range(50, -1, -1):
-    backlight.duty_cycle = b * max_brightness // 100
-    time.sleep(0.005)  # default (0.005)
+for b in range(100, -1, -1):
+    board.DISPLAY.brightness = b / 100
+    time.sleep(0.01)  # default (0.01)
 
 print("fade down")
 
-    # splash.pop()
+time.sleep(10)
