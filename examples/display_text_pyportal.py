@@ -48,5 +48,4 @@ for b in range(100, -1, -1):
 
 print("fade down")
 
-while True:
-    pass
+time.sleep(10)
