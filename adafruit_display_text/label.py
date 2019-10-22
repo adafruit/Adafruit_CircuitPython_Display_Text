@@ -181,7 +181,7 @@ class Label(displayio.Group):
     @property 
     def cy(self):
          """Center Y of the Label """
-        return self.y + self._boundingbox[3]/2
+         return self.y + self._boundingbox[3]/2
 
     @cx.setter
     def cx(self, new_cx):
