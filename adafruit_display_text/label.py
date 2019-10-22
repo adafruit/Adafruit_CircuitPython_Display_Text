@@ -175,16 +175,18 @@ class Label(displayio.Group):
 
     @property
     def cx(self):
+        """Center X of the Label """
         return self.x + self._boundingbox[2]/2
 
     @property 
     def cy(self):
+         """Center Y of the Label """
         return self.y + self._boundingbox[3]/2
 
     @cx.setter
-    def cx(self,new_cx):
+    def cx(self, new_cx):
         self.x = int(new_cx-(self._boundingbox[2]/2))
 
     @cy.setter
-    def cy(self,new_cy):
+    def cy(self, new_cy):
         self.y = int(new_cy-(self._boundingbox[3]/2))
