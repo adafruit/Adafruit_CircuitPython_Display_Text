@@ -74,6 +74,8 @@ class Label(displayio.Group):
         self.height = bounds[1]
         self._line_spacing = line_spacing
         self._boundingbox = None
+        self._cx = None
+        self._cy = None
 
         if text:
             self._update_text(text)
@@ -172,3 +174,19 @@ class Label(displayio.Group):
     @text.setter
     def text(self, new_text):
         self._update_text(new_text)
+
+    @property
+    def cx(self):
+        return self.x + self._boundingbox[2]
+
+    @property 
+    def cy(self):
+        return self.y + self._boundingbox[3]
+
+    @cx.setter
+    def cx(self,new_cx):
+        self.x = int(new_cx-(self._boundingbox[2]/2))
+
+    @cy.setter
+    def cy(self,new_cy):
+        self.y = int(new_cy-(self._boundingbox[3]/2))
