@@ -36,7 +36,10 @@ for demo_text in demos:
         y += area.height
 
         # Wait for the image to load.
-        board.DISPLAY.wait_for_frame()
+        try:
+            board.DISPLAY.refresh(target_frames_per_second=60)
+        except AttributeError:
+            board.DISPLAY.wait_for_frame()
 
 # Wait for 10 minutes (600 seconds)
 time.sleep(600)
