@@ -53,8 +53,11 @@ textbg_sprite = displayio.TileGrid(textbg_bitmap,
                                    x=text.x+dims[0], y=text.y+dims[1])
 splash.append(textbg_sprite)
 splash.append(text)
-board.DISPLAY.refresh_soon()
-board.DISPLAY.wait_for_frame()
+try:
+    board.DISPLAY.refresh(target_frames_per_second=60)
+except AttributeError:
+    board.DISPLAY.refresh_soon()
+    board.DISPLAY.wait_for_frame()
 
 
 while True:
