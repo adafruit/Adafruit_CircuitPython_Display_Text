@@ -9,8 +9,8 @@ Introduction
     :target: https://discord.gg/nBQh6qu
     :alt: Discord
 
-.. image:: https://travis-ci.com/adafruit/Adafruit_CircuitPython_Display_Text.svg?branch=master
-    :target: https://travis-ci.com/adafruit/Adafruit_CircuitPython_Display_Text
+.. image:: https://github.com/adafruit/Adafruit_CircuitPython_Display_Text/workflows/Build%20CI/badge.svg
+    :target: https://github.com/adafruit/Adafruit_CircuitPython_Display_Text/actions/
     :alt: Build Status
 
 Displays text using CircuitPython's displayio.
