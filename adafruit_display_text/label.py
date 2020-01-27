@@ -65,7 +65,8 @@ class Label(displayio.Group):
         self.width = max_glyphs
         self.font = font
         self._text = None
-
+        self._anchor_point = (0, 0)
+        
         self.palette = displayio.Palette(2)
         self.palette.make_transparent(0)
         self.palette[1] = color
