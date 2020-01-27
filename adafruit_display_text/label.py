@@ -65,7 +65,6 @@ class Label(displayio.Group):
         self.width = max_glyphs
         self.font = font
         self._text = None
-        self._anchor_point = (0, 0)
         
         self.palette = displayio.Palette(2)
         self.palette.make_transparent(0)
@@ -189,10 +188,8 @@ class Label(displayio.Group):
     def anchored_position(self):
         """Position relative to the anchor_point. Tuple containing x,y
            pixel coordinates."""
-        _anchored_position = (
-            self.x-self._boundingbox[2]*self._anchor_point[0],
-            self.y-self._boundingbox[3]*self._anchor_point[1])
-        return _anchored_position
+        return (self.x-self._boundingbox[2]*self._anchor_point[0],
+                self.y-self._boundingbox[3]*self._anchor_point[1])
 
     @anchored_position.setter
     def anchored_position(self, new_position):
