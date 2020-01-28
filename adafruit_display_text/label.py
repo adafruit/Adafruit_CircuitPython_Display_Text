@@ -85,8 +85,9 @@ class Label(displayio.Group):
         y = 0
         i = 0
         old_c = 0
-        y_offset = int((self.font.get_glyph(ord('M')).height -
-                        new_text.count('\n') * self.height * self.line_spacing) / 2)
+        y_offset = 0
+        #y_offset = int((self.font.get_glyph(ord('M')).height -
+        #                new_text.count('\n') * self.height * self.line_spacing) / 2)
         #print("y offset from baseline", y_offset)
         left = right = top = bottom = 0
         for character in new_text:
