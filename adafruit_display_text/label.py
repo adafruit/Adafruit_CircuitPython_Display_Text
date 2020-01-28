@@ -66,6 +66,8 @@ class Label(displayio.Group):
         self.font = font
         self._text = None
         self._anchor_point = (0, 0)
+        self.x = 0
+        self.y = 0
 
         self.palette = displayio.Palette(2)
         self.palette.make_transparent(0)
