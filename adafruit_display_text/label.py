@@ -80,7 +80,7 @@ class Label(displayio.Group):
         self._boundingbox = None
 
         if text:
-            self._update_text(text)
+            self._update_text(str(text))
 
 
     def _update_text(self, new_text): # pylint: disable=too-many-locals
@@ -175,7 +175,7 @@ class Label(displayio.Group):
 
     @text.setter
     def text(self, new_text):
-        self._update_text(new_text)
+        self._update_text(str(new_text))
 
     @property
     def anchor_point(self):
