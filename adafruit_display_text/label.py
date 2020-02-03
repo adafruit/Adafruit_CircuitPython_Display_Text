@@ -79,7 +79,7 @@ class Label(displayio.Group):
         self._line_spacing = line_spacing
         self._boundingbox = None
 
-        if text:
+        if text is not None:
             self._update_text(str(text))
 
 
