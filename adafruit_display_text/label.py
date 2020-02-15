@@ -56,7 +56,7 @@ class Label(displayio.Group):
        :param int max_glyphs: The largest quantity of glyphs we will display
        :param int color: Color of all text in RGB hex
        :param double line_spacing: Line spacing of text to display"""
-    def __init__(self, font, *, text=None, max_glyphs=None, color=0xffffff,
+    def __init__(self, font, *, x=0, y=0, text=None, max_glyphs=None, color=0xffffff,
                  line_spacing=1.25, **kwargs):
         if not max_glyphs and not text:
             raise RuntimeError("Please provide a max size, or initial text")
@@ -67,8 +67,8 @@ class Label(displayio.Group):
         self.font = font
         self._text = None
         self._anchor_point = (0, 0)
-        self.x = 0
-        self.y = 0
+        self.x = x
+        self.y = y
 
         self.palette = displayio.Palette(2)
         self.palette.make_transparent(0)
@@ -79,8 +79,8 @@ class Label(displayio.Group):
         self._line_spacing = line_spacing
         self._boundingbox = None
 
-        if text:
-            self._update_text(text)
+        if text is not None:
+            self._update_text(str(text))
 
 
     def _update_text(self, new_text): # pylint: disable=too-many-locals
@@ -175,7 +175,7 @@ class Label(displayio.Group):
 
     @text.setter
     def text(self, new_text):
-        self._update_text(new_text)
+        self._update_text(str(new_text))
 
     @property
     def anchor_point(self):
