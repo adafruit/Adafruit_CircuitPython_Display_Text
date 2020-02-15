@@ -44,6 +44,7 @@ import displayio
 __version__ = "0.0.0-auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_Display_Text.git"
 
+
 class Label(displayio.Group):
     """A label displaying a string of text. The origin point set by ``x`` and ``y``
        properties will be the left edge of the bounding box, and in the center of a M
@@ -56,8 +57,9 @@ class Label(displayio.Group):
        :param int max_glyphs: The largest quantity of glyphs we will display
        :param int color: Color of all text in RGB hex
        :param double line_spacing: Line spacing of text to display"""
+
     def __init__(self, font, *, x=0, y=0, text=None, max_glyphs=None, color=0xffffff,
-                 line_spacing=1.25, **kwargs):
+                 backgroud_color=False, line_spacing=1.25, **kwargs):
         if not max_glyphs and not text:
             raise RuntimeError("Please provide a max size, or initial text")
         if not max_glyphs:
@@ -71,7 +73,10 @@ class Label(displayio.Group):
         self.y = y
 
         self.palette = displayio.Palette(2)
-        self.palette.make_transparent(0)
+        if not backgroud_color:
+            self.palette.make_transparent(0)
+        else:
+            self.palette[0] = backgroud_color
         self.palette[1] = color
 
         bounds = self.font.get_bounding_box()
@@ -82,15 +87,14 @@ class Label(displayio.Group):
         if text is not None:
             self._update_text(str(text))
 
-
-    def _update_text(self, new_text): # pylint: disable=too-many-locals
+    def _update_text(self, new_text):  # pylint: disable=too-many-locals
         x = 0
         y = 0
         i = 0
         old_c = 0
         y_offset = int((self.font.get_glyph(ord('M')).height -
                         new_text.count('\n') * self.height * self.line_spacing) / 2)
-        #print("y offset from baseline", y_offset)
+        # print("y offset from baseline", y_offset)
         left = right = top = bottom = 0
         for character in new_text:
             if character == '\n':
@@ -100,10 +104,10 @@ class Label(displayio.Group):
             glyph = self.font.get_glyph(ord(character))
             if not glyph:
                 continue
-            right = max(right, x+glyph.width)
-            if y == 0:   # first line, find the Ascender height
-                top = min(top, -glyph.height+y_offset)
-            bottom = max(bottom, y-glyph.dy+y_offset)
+            right = max(right, x + glyph.width)
+            if y == 0:  # first line, find the Ascender height
+                top = min(top, -glyph.height + y_offset)
+            bottom = max(bottom, y - glyph.dy + y_offset)
             position_y = y - glyph.height - glyph.dy + y_offset
             position_x = x + glyph.dx
             if not self._text or old_c >= len(self._text) or character != self._text[old_c]:
@@ -141,7 +145,7 @@ class Label(displayio.Group):
         while len(self) > i:
             self.pop()
         self._text = new_text
-        self._boundingbox = (left, top, left+right, bottom-top)
+        self._boundingbox = (left, top, left + right, bottom - top)
 
     @property
     def bounding_box(self):
@@ -192,10 +196,10 @@ class Label(displayio.Group):
     def anchored_position(self):
         """Position relative to the anchor_point. Tuple containing x,y
            pixel coordinates."""
-        return (self.x-self._boundingbox[2]*self._anchor_point[0],
-                self.y-self._boundingbox[3]*self._anchor_point[1])
+        return (self.x - self._boundingbox[2] * self._anchor_point[0],
+                self.y - self._boundingbox[3] * self._anchor_point[1])
 
     @anchored_position.setter
     def anchored_position(self, new_position):
-        self.x = int(new_position[0]-(self._boundingbox[2]*self._anchor_point[0]))
-        self.y = int(new_position[1]-(self._boundingbox[3]*self._anchor_point[1]))
+        self.x = int(new_position[0] - (self._boundingbox[2] * self._anchor_point[0]))
+        self.y = int(new_position[1] - (self._boundingbox[3] * self._anchor_point[1]))
