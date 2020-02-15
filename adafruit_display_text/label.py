@@ -172,6 +172,19 @@ class Label(displayio.Group):
         self.palette[1] = new_color
 
     @property
+    def background_color(self):
+        """Color of the background as an RGB hex number."""
+        return self.palette[0]
+
+    @background_color.setter
+    def background_color(self, new_color):
+        if new_color:
+            self.palette[0] = new_color
+            self.palette.make_opaque(0)
+        else:
+            self.palette.make_transparent(0)
+
+    @property
     def text(self):
         """Text to display."""
         return self._text
