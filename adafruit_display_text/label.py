@@ -72,10 +72,10 @@ class Label(displayio.Group):
 
         self.palette = displayio.Palette(2)
         if not background_color:
-            self.transparent_background = True
+            self._transparent_background = True
             self.palette.make_transparent(0)
         else:
-            self.transparent_background = False
+            self._transparent_background = False
             self.palette[0] = background_color
         self.palette[1] = color
 
@@ -176,7 +176,7 @@ class Label(displayio.Group):
     @property
     def background_color(self):
         """Color of the background as an RGB hex number."""
-        if not self.transparent_background:
+        if not self._transparent_background:
             return self.palette[0]
         return None
 
@@ -185,11 +185,11 @@ class Label(displayio.Group):
         if new_color or new_color == 0x000000:
             self.palette[0] = new_color
             self.palette.make_opaque(0)
-            self.transparent_background = False
+            self._transparent_background = False
         else:
             self.palette[0] = 0
             self.palette.make_transparent(0)
-            self.transparent_background = True
+            self._transparent_background = True
 
     @property
     def text(self):
