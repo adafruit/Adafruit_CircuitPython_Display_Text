@@ -182,7 +182,7 @@ class Label(displayio.Group):
 
     @background_color.setter
     def background_color(self, new_color):
-        if new_color:
+        if new_color or new_color == 0x000000:
             self.palette[0] = new_color
             self.palette.make_opaque(0)
             self.transparent_background = False
