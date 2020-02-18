@@ -71,12 +71,14 @@ class Label(displayio.Group):
         self.y = y
 
         self.palette = displayio.Palette(2)
-        if not background_color:
-            self._transparent_background = True
-            self.palette.make_transparent(0)
-        else:
+        if background_color or background_color == 0x000000:
+            self.palette[0] = new_color
+            self.palette.make_opaque(0)
             self._transparent_background = False
-            self.palette[0] = background_color
+        else:
+            self.palette[0] = 0
+            self.palette.make_transparent(0)
+            self._transparent_background = True
         self.palette[1] = color
 
         bounds = self.font.get_bounding_box()
