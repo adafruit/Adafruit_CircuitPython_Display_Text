@@ -178,8 +178,7 @@ class Label(displayio.Group):
         """Color of the background as an RGB hex number."""
         if not self.transparent_background:
             return self.palette[0]
-        else:
-            return None
+        return None
 
     @background_color.setter
     def background_color(self, new_color):
