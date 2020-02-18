@@ -57,7 +57,7 @@ class Label(displayio.Group):
        :param int color: Color of all text in RGB hex
        :param double line_spacing: Line spacing of text to display"""
     def __init__(self, font, *, x=0, y=0, text=None, max_glyphs=None, color=0xffffff,
-                 background_color=False, line_spacing=1.25, **kwargs):
+                 background_color=None, line_spacing=1.25, **kwargs):
         if not max_glyphs and not text:
             raise RuntimeError("Please provide a max size, or initial text")
         if not max_glyphs:
@@ -72,8 +72,10 @@ class Label(displayio.Group):
 
         self.palette = displayio.Palette(2)
         if not background_color:
+            self.transparent_background = True
             self.palette.make_transparent(0)
         else:
+            self.transparent_background = False
             self.palette[0] = background_color
         self.palette[1] = color
 
@@ -174,15 +176,21 @@ class Label(displayio.Group):
     @property
     def background_color(self):
         """Color of the background as an RGB hex number."""
-        return self.palette[0]
+        if not self.transparent_background:
+            return self.palette[0]
+        else:
+            return None
 
     @background_color.setter
     def background_color(self, new_color):
         if new_color:
             self.palette[0] = new_color
             self.palette.make_opaque(0)
+            self.transparent_background = False
         else:
+            self.palette[0] = 0
             self.palette.make_transparent(0)
+            self.transparent_background = True
 
     @property
     def text(self):
