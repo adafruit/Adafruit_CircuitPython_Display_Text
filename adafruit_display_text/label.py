@@ -72,7 +72,7 @@ class Label(displayio.Group):
 
         self.palette = displayio.Palette(2)
         if background_color or background_color == 0x000000:
-            self.palette[0] = new_color
+            self.palette[0] = background_color
             self.palette.make_opaque(0)
             self._transparent_background = False
         else:
