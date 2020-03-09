@@ -7,7 +7,9 @@ import terminalio
 from adafruit_display_text import label
 
 text = " Color Background Hello world"
-text_area = label.Label(terminalio.FONT, text=text, color=0x0000FF, background_color=0xFFAA00)
+text_area = label.Label(
+    terminalio.FONT, text=text, color=0x0000FF, background_color=0xFFAA00
+)
 text_area.x = 10
 text_area.y = 10
 
