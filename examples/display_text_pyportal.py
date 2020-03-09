@@ -11,7 +11,9 @@ import displayio
 from adafruit_bitmap_font import bitmap_font
 from adafruit_display_text.label import Label
 
-fonts = list(filter(lambda x: x.endswith("bdf") and not x.startswith("."), os.listdir("/")))
+fonts = list(
+    filter(lambda x: x.endswith("bdf") and not x.startswith("."), os.listdir("/"))
+)
 fonts = [bitmap_font.load_font(x) for x in fonts]
 
 print("fade up")
