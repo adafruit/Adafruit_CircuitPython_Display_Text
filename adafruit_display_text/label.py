@@ -32,7 +32,6 @@ Implementation Notes
   https://github.com/adafruit/circuitpython/releases
 """
 
-
 import displayio
 
 __version__ = "0.0.0-auto.0"
