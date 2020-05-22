@@ -22,22 +22,17 @@
 """
 `adafruit_display_text.label`
 ====================================================
-
 Displays text labels using CircuitPython's displayio.
-
 * Author(s): Scott Shawcroft
-
 Implementation Notes
 --------------------
-
 **Hardware:**
-
 **Software and Dependencies:**
-
 * Adafruit CircuitPython firmware for the supported boards:
   https://github.com/adafruit/circuitpython/releases
-
 """
+
+print('loading label.py Yay!')
 
 import displayio
 
@@ -50,7 +45,6 @@ class Label(displayio.Group):
        properties will be the left edge of the bounding box, and in the center of a M
        glyph (if its one line), or the (number of lines * linespacing + M)/2. That is,
        it will try to have it be center-left as close as possible.
-
        :param Font font: A font class that has ``get_bounding_box`` and ``get_glyph``.
          Must include a capital M for measuring character size.
        :param str text: Text to display
@@ -77,7 +71,7 @@ class Label(displayio.Group):
             max_glyphs = len(text)
         super().__init__(max_size=max_glyphs, **kwargs)
         self.width = max_glyphs
-        self.font = font
+        self._font = font
         self._text = None
         self._anchor_point = (0, 0)
         self.x = x
@@ -94,7 +88,7 @@ class Label(displayio.Group):
             self._transparent_background = True
         self.palette[1] = color
 
-        bounds = self.font.get_bounding_box()
+        bounds = self._font.get_bounding_box()
         self.height = bounds[1]
         self._line_spacing = line_spacing
         self._boundingbox = None
@@ -107,9 +101,11 @@ class Label(displayio.Group):
         y = 0
         i = 0
         old_c = 0
+        bounds = self._font.get_bounding_box() # moved here ***
+        self.height = bounds[1] # moved here ***
         y_offset = int(
             (
-                self.font.get_glyph(ord("M")).height
+                self._font.get_glyph(ord("M")).height
                 - new_text.count("\n") * self.height * self.line_spacing
             )
             / 2
@@ -121,7 +117,7 @@ class Label(displayio.Group):
                 y += int(self.height * self._line_spacing)
                 x = 0
                 continue
-            glyph = self.font.get_glyph(ord(character))
+            glyph = self._font.get_glyph(ord(character))
             if not glyph:
                 continue
             right = max(right, x + glyph.width)
@@ -176,7 +172,7 @@ class Label(displayio.Group):
                 and old_c < len(self._text)
                 and (
                     self._text[old_c] == "\n"
-                    or not self.font.get_glyph(ord(self._text[old_c]))
+                    or not self._font.get_glyph(ord(self._text[old_c]))
                 )
             ):
                 old_c += 1
@@ -237,6 +233,17 @@ class Label(displayio.Group):
     @text.setter
     def text(self, new_text):
         self._update_text(str(new_text))
+
+    @property
+    def font(self):
+        return self._font
+
+    @font.setter
+    def font(self, newFont):
+        old_text=self._text
+        self._text=''
+        self._font=newFont
+        self._update_text(str(old_text))
 
     @property
     def anchor_point(self):
