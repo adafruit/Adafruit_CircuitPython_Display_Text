@@ -236,13 +236,12 @@ class Label(displayio.Group):
 
     @font.setter
     def font(self, new_font):
-        old_text=self._text
-        self._text=''
-        self._font=new_font
+        old_text = self._text
+        self._text = ""
+        self._font = new_font
         bounds = self._font.get_bounding_box()
-        self.height = bounds[1] 
+        self.height = bounds[1]
         self._update_text(str(old_text))
-
 
     @property
     def anchor_point(self):
