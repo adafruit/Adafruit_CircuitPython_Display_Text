@@ -232,6 +232,7 @@ class Label(displayio.Group):
 
     @property
     def font(self):
+        """Font to use for text."""
         return self._font
 
     @font.setter
