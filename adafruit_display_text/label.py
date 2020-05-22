@@ -100,8 +100,6 @@ class Label(displayio.Group):
         y = 0
         i = 0
         old_c = 0
-        bounds = self._font.get_bounding_box() # moved here ***
-        self.height = bounds[1] # moved here ***
         y_offset = int(
             (
                 self._font.get_glyph(ord("M")).height
@@ -238,9 +236,11 @@ class Label(displayio.Group):
 
     @font.setter
     def font(self, newFont):
-        old_text=self._text
-        self._text=''
-        self._font=newFont
+        old_text = self._text
+        self._text = ""
+        self._font = newFont
+        bounds = self._font.get_bounding_box()
+        self.height = bounds[1]
         self._update_text(str(old_text))
 
     @property
