@@ -32,7 +32,6 @@ Implementation Notes
   https://github.com/adafruit/circuitpython/releases
 """
 
-print('loading label.py Yay!')
 
 import displayio
 
@@ -110,7 +109,6 @@ class Label(displayio.Group):
             )
             / 2
         )
-        # print("y offset from baseline", y_offset)
         left = right = top = bottom = 0
         for character in new_text:
             if character == "\n":
@@ -163,7 +161,7 @@ class Label(displayio.Group):
 
             x += glyph.shift_x
 
-            # TODO skip this for control sequences or non-printables.
+            # TODO skip this for control sequences or non-qables.
             i += 1
             old_c += 1
             # skip all non-prinables in the old string
