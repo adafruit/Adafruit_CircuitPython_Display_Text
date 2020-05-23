@@ -58,6 +58,10 @@ class Label(displayio.Group):
        :param int color: Color of all text in RGB hex
        :param double line_spacing: Line spacing of text to display"""
 
+    # pylint: disable=too-many-instance-attributes
+    # This has a lot of getters/setters, maybe it needs cleanup.
+
+
     def __init__(
         self,
         font,
