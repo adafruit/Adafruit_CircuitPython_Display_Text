@@ -252,7 +252,9 @@ class Label(displayio.Group):
 
     @anchor_point.setter
     def anchor_point(self, new_anchor_point):
+        current_anchored_position = self.anchored_position
         self._anchor_point = new_anchor_point
+        self.anchored_position = current_anchored_position
 
     @property
     def anchored_position(self):
