@@ -169,10 +169,10 @@ class Label(displayio.Group):
 
             x += glyph.shift_x
 
-            # TODO skip this for control sequences or non-qables.
+            # TODO skip this for control sequences or non-printables.
             i += 1
             old_c += 1
-            # skip all non-prinables in the old string
+            # skip all non-printables in the old string
             while (
                 self._text
                 and old_c < len(self._text)
