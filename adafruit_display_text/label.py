@@ -31,6 +31,7 @@ Implementation Notes
 --------------------
 
 **Hardware:**
+
 **Software and Dependencies:**
 
 * Adafruit CircuitPython firmware for the supported boards:
