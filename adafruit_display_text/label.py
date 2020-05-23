@@ -259,11 +259,11 @@ class Label(displayio.Group):
         """Position relative to the anchor_point. Tuple containing x,y
            pixel coordinates."""
         return (
-            self.x - self._boundingbox[2] * self._anchor_point[0],
-            self.y - self._boundingbox[3] * self._anchor_point[1],
+            int(self.x + self._boundingbox[0] + self._anchor_point[0] * self._boundingbox[2]),
+            int(self.y + self._boundingbox[1] + self._anchor_point[1] * self._boundingbox[3]),
         )
 
     @anchored_position.setter
     def anchored_position(self, new_position):
-        self.x = int(new_position[0] - (self._boundingbox[2] * self._anchor_point[0]))
-        self.y = int(new_position[1] - (self._boundingbox[3] * self._anchor_point[1]))
+        self.x = int(new_position[0] - self._boundingbox[0] - self._anchor_point[0] * self._boundingbox[2])
+        self.y = int(new_position[1] - self._boundingbox[1] - self._anchor_point[1] * self._boundingbox[3])
