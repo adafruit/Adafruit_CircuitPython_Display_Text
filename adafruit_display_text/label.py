@@ -61,7 +61,6 @@ class Label(displayio.Group):
     # pylint: disable=too-many-instance-attributes
     # This has a lot of getters/setters, maybe it needs cleanup.
 
-
     def __init__(
         self,
         font,
