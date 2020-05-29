@@ -169,10 +169,10 @@ class Label(displayio.Group):
 
             x += glyph.shift_x
 
-            # TODO skip this for control sequences or non-qables.
+            # TODO skip this for control sequences or non-printables.
             i += 1
             old_c += 1
-            # skip all non-prinables in the old string
+            # skip all non-printables in the old string
             while (
                 self._text
                 and old_c < len(self._text)
@@ -238,7 +238,9 @@ class Label(displayio.Group):
 
     @text.setter
     def text(self, new_text):
+        current_anchored_position = self.anchored_position
         self._update_text(str(new_text))
+        self.anchored_position = current_anchored_position
 
     @property
     def font(self):
@@ -248,11 +250,13 @@ class Label(displayio.Group):
     @font.setter
     def font(self, new_font):
         old_text = self._text
+        current_anchored_position = self.anchored_position
         self._text = ""
         self._font = new_font
         bounds = self._font.get_bounding_box()
         self.height = bounds[1]
         self._update_text(str(old_text))
+        self.anchored_position = current_anchored_position
 
     @property
     def anchor_point(self):
@@ -263,18 +267,36 @@ class Label(displayio.Group):
 
     @anchor_point.setter
     def anchor_point(self, new_anchor_point):
+        current_anchored_position = self.anchored_position
         self._anchor_point = new_anchor_point
+        self.anchored_position = current_anchored_position
 
     @property
     def anchored_position(self):
         """Position relative to the anchor_point. Tuple containing x,y
            pixel coordinates."""
         return (
-            self.x - self._boundingbox[2] * self._anchor_point[0],
-            self.y - self._boundingbox[3] * self._anchor_point[1],
+            int(
+                self.x
+                + self._boundingbox[0]
+                + self._anchor_point[0] * self._boundingbox[2]
+            ),
+            int(
+                self.y
+                + self._boundingbox[1]
+                + self._anchor_point[1] * self._boundingbox[3]
+            ),
         )
 
     @anchored_position.setter
     def anchored_position(self, new_position):
-        self.x = int(new_position[0] - (self._boundingbox[2] * self._anchor_point[0]))
-        self.y = int(new_position[1] - (self._boundingbox[3] * self._anchor_point[1]))
+        self.x = int(
+            new_position[0]
+            - self._boundingbox[0]
+            - self._anchor_point[0] * self._boundingbox[2]
+        )
+        self.y = int(
+            new_position[1]
+            - self._boundingbox[1]
+            - self._anchor_point[1] * self._boundingbox[3]
+        )
