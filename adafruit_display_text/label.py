@@ -67,7 +67,7 @@ class Label(displayio.Group):
         *,
         x=0,
         y=0,
-        text=None,
+        text="",
         max_glyphs=None,
         color=0xFFFFFF,
         background_color=None,
