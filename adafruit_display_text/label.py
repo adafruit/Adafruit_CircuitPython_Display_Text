@@ -126,7 +126,7 @@ class Label(displayio.Group):
             glyph = self._font.get_glyph(ord(character))
             if not glyph:
                 continue
-            right = max(right, x + glyph.width)
+            right = max(right, x + glyph.width + glyph.shift_x)
             if y == 0:  # first line, find the Ascender height
                 top = min(top, -glyph.height + y_offset)
             bottom = max(bottom, y - glyph.dy + y_offset)
