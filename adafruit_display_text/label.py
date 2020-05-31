@@ -238,9 +238,12 @@ class Label(displayio.Group):
 
     @text.setter
     def text(self, new_text):
-        current_anchored_position = self.anchored_position
-        self._update_text(str(new_text))
-        self.anchored_position = current_anchored_position
+        try:
+            current_anchored_position = self.anchored_position
+            self._update_text(str(new_text))
+            self.anchored_position = current_anchored_position
+        except RuntimeError:
+            raise RuntimeError("Text length exceeds max_glyphs")
 
     @property
     def font(self):
