@@ -77,7 +77,7 @@ class Label(displayio.Group):
         if not max_glyphs and not text:
             raise RuntimeError("Please provide a max size, or initial text")
         if not max_glyphs:
-            max_glyphs = len(text)
+            max_glyphs = len(text) + 1  # add one for the background bitmap tileGrid
         super().__init__(max_size=max_glyphs, **kwargs)
         self.width = max_glyphs
         self._font = font
@@ -187,6 +187,18 @@ class Label(displayio.Group):
             self.pop()
         self._text = new_text
         self._boundingbox = (left, top, left + right, bottom - top)
+
+        background_bitmap = displayio.Bitmap(
+            self._boundingbox[2], self._boundingbox[3], 1
+        )
+
+        tile_grid = displayio.TileGrid(
+            background_bitmap, pixel_shader=self.palette, x=left, y=top
+        )
+
+        self.insert(
+            0, tile_grid
+        )  # add background bitmaps to the bottom layer of the group
 
     @property
     def bounding_box(self):
