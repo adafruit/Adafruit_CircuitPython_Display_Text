@@ -123,6 +123,51 @@ class Label(displayio.Group):
         if text is not None:
             self._update_text(str(text))
 
+    def _create_background_box(self, lines, left, y_offset):
+
+        if self._background_tight:  # draw a tight bounding box
+            box_width = self._boundingbox[2]
+            box_height = self._boundingbox[3]
+            x_box_offset = 0
+            y_box_offset = top
+
+        else:  # draw a "loose" bounding box to include any ascenders/descenders.
+
+            # check a few glyphs for maximum ascender and descender height
+            # Enhancement: it would be preferred to access the font "FONT_ASCENT" and
+            # "FONT_DESCENT" in the imported BDF file
+            glyphs = "M j'"  # choose glyphs with highest ascender and lowest
+            # descender, will depend upon font used
+            ascender_max = descender_max = 0
+            for char in glyphs:
+                this_glyph = self._font.get_glyph(ord(char))
+                ascender_max = max(ascender_max, this_glyph.height + this_glyph.dy)
+                descender_max = max(descender_max, -this_glyph.dy)
+
+            box_width = self._boundingbox[2] + self._padding_left + self._padding_right
+            x_box_offset = -self._padding_left
+            box_height = (
+                (ascender_max + descender_max)
+                + int((lines - 1) * self.height * self._line_spacing)
+                + self._padding_top
+                + self._padding_bottom
+            )
+            y_box_offset = -ascender_max + y_offset - self._padding_top
+
+        self._update_background_color(self._background_color)
+        box_width = max(0, box_width)  # remove any negative values
+        box_height = max(0, box_height)  # remove any negative values
+
+        background_bitmap = displayio.Bitmap(box_width, box_height, 1)
+        tile_grid = displayio.TileGrid(
+            background_bitmap,
+            pixel_shader=self._background_palette,
+            x=left + x_box_offset,
+            y=y_box_offset,
+        )
+
+        return tile_grid
+
     def _update_background_color(self, new_color):
 
         if new_color is None:
@@ -219,47 +264,49 @@ class Label(displayio.Group):
         self._text = new_text
         self._boundingbox = (left, top, left + right, bottom - top)
 
-        if self._background_tight:  # draw a tight bounding box
-            box_width = self._boundingbox[2]
-            box_height = self._boundingbox[3]
-            x_box_offset = 0
-            y_box_offset = top
+        # if self._background_tight:  # draw a tight bounding box
+        #     box_width = self._boundingbox[2]
+        #     box_height = self._boundingbox[3]
+        #     x_box_offset = 0
+        #     y_box_offset = top
 
-        else:  # draw a "loose" bounding box to include any ascenders/descenders.
+        # else:  # draw a "loose" bounding box to include any ascenders/descenders.
 
-            # check a few glyphs for maximum ascender and descender height
-            # Enhancement: it would be preferred to access the font "FONT_ASCENT" and
-            # "FONT_DESCENT" in the imported BDF file
-            glyphs = "M j'"  # choose glyphs with highest ascender and lowest
-            # descender, will depend upon font used
-            ascender_max = descender_max = 0
-            for char in glyphs:
-                this_glyph = self._font.get_glyph(ord(char))
-                ascender_max = max(ascender_max, this_glyph.height + this_glyph.dy)
-                descender_max = max(descender_max, -this_glyph.dy)
+        #     # check a few glyphs for maximum ascender and descender height
+        #     # Enhancement: it would be preferred to access the font "FONT_ASCENT" and
+        #     # "FONT_DESCENT" in the imported BDF file
+        #     glyphs = "M j'"  # choose glyphs with highest ascender and lowest
+        #     # descender, will depend upon font used
+        #     ascender_max = descender_max = 0
+        #     for char in glyphs:
+        #         this_glyph = self._font.get_glyph(ord(char))
+        #         ascender_max = max(ascender_max, this_glyph.height + this_glyph.dy)
+        #         descender_max = max(descender_max, -this_glyph.dy)
 
-            box_width = self._boundingbox[2] + self._padding_left + self._padding_right
-            x_box_offset = -self._padding_left
-            box_height = (
-                (ascender_max + descender_max)
-                + int((lines - 1) * self.height * self._line_spacing)
-                + self._padding_top
-                + self._padding_bottom
-            )
-            y_box_offset = -ascender_max + y_offset - self._padding_top
+        #     box_width = self._boundingbox[2] + self._padding_left + self._padding_right
+        #     x_box_offset = -self._padding_left
+        #     box_height = (
+        #         (ascender_max + descender_max)
+        #         + int((lines - 1) * self.height * self._line_spacing)
+        #         + self._padding_top
+        #         + self._padding_bottom
+        #     )
+        #     y_box_offset = -ascender_max + y_offset - self._padding_top
 
-        self._update_background_color(self._background_color)
-        box_width = max(0, box_width)  # remove any negative values
-        box_height = max(0, box_height)  # remove any negative values
+        # self._update_background_color(self._background_color)
+        # box_width = max(0, box_width)  # remove any negative values
+        # box_height = max(0, box_height)  # remove any negative values
 
-        background_bitmap = displayio.Bitmap(box_width, box_height, 1)
-        tile_grid = displayio.TileGrid(
-            background_bitmap,
-            pixel_shader=self._background_palette,
-            x=left + x_box_offset,
-            y=y_box_offset,
-        )
-        self[0] = tile_grid  # update the background bitmap in first item of the group
+        # background_bitmap = displayio.Bitmap(box_width, box_height, 1)
+        # tile_grid = displayio.TileGrid(
+        #     background_bitmap,
+        #     pixel_shader=self._background_palette,
+        #     x=left + x_box_offset,
+        #     y=y_box_offset,
+        # )
+        # self[0] = tile_grid  # update the background bitmap in first item of the group
+
+        self[0] = self._create_background_box(lines, left, y_offset)
 
     @property
     def bounding_box(self):
