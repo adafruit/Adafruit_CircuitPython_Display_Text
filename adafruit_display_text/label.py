@@ -103,17 +103,23 @@ class Label(displayio.Group):
         self._transparent_background = True
         self.palette[1] = color
 
-        self._background_color=background_color
+        self._background_color = background_color
 
         bounds = self._font.get_bounding_box()
         self.height = bounds[1]
         self._line_spacing = line_spacing
         self._boundingbox = None
 
-        self.background_tight = background_tight # sets padding status for text background
+        self.background_tight = (
+            background_tight  # sets padding status for text background
+        )
         self._background_palette = displayio.Palette(1)
-        #self._background_present = False
-        self.append(displayio.TileGrid(displayio.Bitmap(0, 0, 1), pixel_shader=self._background_palette)) # initialize with a blank tilegrid placeholder for background
+        # self._background_present = False
+        self.append(
+            displayio.TileGrid(
+                displayio.Bitmap(0, 0, 1), pixel_shader=self._background_palette
+            )
+        )  # initialize with a blank tilegrid placeholder for background
 
         self.padding_top = padding_top
         self.padding_bottom = padding_bottom
@@ -129,19 +135,18 @@ class Label(displayio.Group):
             self._background_palette.make_transparent(0)
         else:
             self._background_palette.make_opaque(0)
-            self._background_palette[0]=new_color
-        self._background_color=new_color
-
+            self._background_palette[0] = new_color
+        self._background_color = new_color
 
     def _update_text(self, new_text):  # pylint: disable=too-many-locals
-        #if self._background_present:
+        # if self._background_present:
         #    i=1
-        #else:
+        # else:
         #    i=0
         x = 0
         y = 0
-        #i = 0
-        i=1
+        # i = 0
+        i = 1
         old_c = 0
         y_offset = int(
             (
@@ -161,11 +166,13 @@ class Label(displayio.Group):
             glyph = self._font.get_glyph(ord(character))
             if not glyph:
                 continue
-            #right = max(right, x + glyph.width + glyph.shift_x)
-            right = max(right, x + glyph.shift_x) # studied the docs! This is the correct spacing
+            # right = max(right, x + glyph.width + glyph.shift_x)
+            right = max(
+                right, x + glyph.shift_x
+            )  # studied the docs! This is the correct spacing
             if y == 0:  # first line, find the Ascender height
-                #top = min(top, -glyph.height + y_offset)
-                top = min(top, - glyph.height - glyph.dy + y_offset)
+                # top = min(top, -glyph.height + y_offset)
+                top = min(top, -glyph.height - glyph.dy + y_offset)
             bottom = max(bottom, y - glyph.dy + y_offset)
             position_y = y - glyph.height - glyph.dy + y_offset
             position_x = x + glyph.dx
@@ -225,17 +232,17 @@ class Label(displayio.Group):
         self._text = new_text
         self._boundingbox = (left, top, left + right, bottom - top)
 
-        if self.background_tight: # draw a tight bounding box
+        if self.background_tight:  # draw a tight bounding box
             box_width = self._boundingbox[2]
             box_height = self._boundingbox[3]
             x_box_offset = 0
             y_box_offset = top
 
-        else: # draw a "loose" bounding box to include any ascenders/descenders.
+        else:  # draw a "loose" bounding box to include any ascenders/descenders.
 
             # check a few glyphs for maximum ascender and descender height
             # Enhancement: it would be preferred to access the font "FONT_ASCENT" and "FONT_DESCENT" in the imported BDF file
-            glyphs = 'M j\'' # choose glyphs with highest ascender and lowest descender, will depend upon font used
+            glyphs = "M j'"  # choose glyphs with highest ascender and lowest descender, will depend upon font used
             ascender_max = descender_max = 0
             for char in glyphs:
                 thisGlyph = self._font.get_glyph(ord(char))
@@ -244,19 +251,26 @@ class Label(displayio.Group):
 
             box_width = self._boundingbox[2] + self.padding_left + self.padding_right
             x_box_offset = -self.padding_left
-            box_height = (ascender_max + descender_max) + int((lines-1) * self.height * self._line_spacing) + self.padding_top + self.padding_bottom
+            box_height = (
+                (ascender_max + descender_max)
+                + int((lines - 1) * self.height * self._line_spacing)
+                + self.padding_top
+                + self.padding_bottom
+            )
             y_box_offset = -ascender_max + y_offset - self.padding_top
 
-
         self._update_background_color(self._background_color)
-        box_width=max(0, box_width) # remove any negative values
-        box_height=max(0, box_height) # remove any negative values
+        box_width = max(0, box_width)  # remove any negative values
+        box_height = max(0, box_height)  # remove any negative values
 
         background_bitmap = displayio.Bitmap(box_width, box_height, 1)
         tile_grid = displayio.TileGrid(
-            background_bitmap, pixel_shader=self._background_palette, x=left+x_box_offset, y=y_box_offset
+            background_bitmap,
+            pixel_shader=self._background_palette,
+            x=left + x_box_offset,
+            y=y_box_offset,
         )
-        self[0]=tile_grid  # update the background bitmap in first item of the group
+        self[0] = tile_grid  # update the background bitmap in first item of the group
 
     @property
     def bounding_box(self):
