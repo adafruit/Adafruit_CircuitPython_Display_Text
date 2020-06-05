@@ -228,10 +228,10 @@ class Label(displayio.Group):
         else:  # draw a "loose" bounding box to include any ascenders/descenders.
 
             # check a few glyphs for maximum ascender and descender height
-            # Enhancement: it would be preferred to access the font "FONT_ASCENT" and 
+            # Enhancement: it would be preferred to access the font "FONT_ASCENT" and
             # "FONT_DESCENT" in the imported BDF file
-            glyphs = "M j'" # choose glyphs with highest ascender and lowest 
-                            # descender, will depend upon font used
+            glyphs = "M j'"  # choose glyphs with highest ascender and lowest
+            # descender, will depend upon font used
             ascender_max = descender_max = 0
             for char in glyphs:
                 this_glyph = self._font.get_glyph(ord(char))
