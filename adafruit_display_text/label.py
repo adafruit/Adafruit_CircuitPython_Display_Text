@@ -125,7 +125,7 @@ class Label(displayio.Group):
 
     def _update_background_color(self, new_color):
 
-        if new_color == None:
+        if new_color is None:
             self._background_palette.make_transparent(0)
         else:
             self._background_palette.make_opaque(0)
@@ -228,13 +228,15 @@ class Label(displayio.Group):
         else:  # draw a "loose" bounding box to include any ascenders/descenders.
 
             # check a few glyphs for maximum ascender and descender height
-            # Enhancement: it would be preferred to access the font "FONT_ASCENT" and "FONT_DESCENT" in the imported BDF file
-            glyphs = "M j'"  # choose glyphs with highest ascender and lowest descender, will depend upon font used
+            # Enhancement: it would be preferred to access the font "FONT_ASCENT" and 
+            # "FONT_DESCENT" in the imported BDF file
+            glyphs = "M j'" # choose glyphs with highest ascender and lowest 
+                            # descender, will depend upon font used
             ascender_max = descender_max = 0
             for char in glyphs:
-                thisGlyph = self._font.get_glyph(ord(char))
-                ascender_max = max(ascender_max, thisGlyph.height + thisGlyph.dy)
-                descender_max = max(descender_max, -thisGlyph.dy)
+                this_glyph = self._font.get_glyph(ord(char))
+                ascender_max = max(ascender_max, this_glyph.height + this_glyph.dy)
+                descender_max = max(descender_max, -this_glyph.dy)
 
             box_width = self._boundingbox[2] + self._padding_left + self._padding_right
             x_box_offset = -self._padding_left
