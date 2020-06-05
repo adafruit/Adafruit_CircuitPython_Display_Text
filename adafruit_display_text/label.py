@@ -95,7 +95,6 @@ class Label(displayio.Group):
         self.palette = displayio.Palette(2)
         self.palette[0] = 0
         self.palette.make_transparent(0)
-        self._transparent_background = True
         self.palette[1] = color
 
         self._background_color = background_color
