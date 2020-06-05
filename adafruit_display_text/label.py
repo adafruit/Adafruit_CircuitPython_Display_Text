@@ -123,13 +123,14 @@ class Label(displayio.Group):
         if text is not None:
             self._update_text(str(text))
 
-    def _create_background_box(self, lines, left, y_offset):
+    def _create_background_box(self, lines, y_offset):
 
         if self._background_tight:  # draw a tight bounding box
             box_width = self._boundingbox[2]
             box_height = self._boundingbox[3]
             x_box_offset = 0
-            y_box_offset = top
+            y_box_offset = self._bounding_box[1]
+            left = self._bounding_box[0]
 
         else:  # draw a "loose" bounding box to include any ascenders/descenders.
 
@@ -306,7 +307,7 @@ class Label(displayio.Group):
         # )
         # self[0] = tile_grid  # update the background bitmap in first item of the group
 
-        self[0] = self._create_background_box(lines, left, y_offset)
+        self[0] = self._create_background_box(lines, y_offset)
 
     @property
     def bounding_box(self):
