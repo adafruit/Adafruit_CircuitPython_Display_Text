@@ -115,22 +115,24 @@ class Label(displayio.Group):
             )
         )  # initialize with a blank tilegrid placeholder for background
 
-        self._padding_top = padding_top
-        self._padding_bottom = padding_bottom
-        self._padding_left = padding_left
-        self._padding_right = padding_right
+        self._padding = (padding_left, padding_top, padding_right, padding_bottom)
+        # self._padding_top = padding_top
+        # self._padding_bottom = padding_bottom
+        # self._padding_left = padding_left
+        # self._padding_right = padding_right
 
         if text is not None:
             self._update_text(str(text))
 
     def _create_background_box(self, lines, y_offset):
 
+        left = self._boundingbox[0]
+
         if self._background_tight:  # draw a tight bounding box
             box_width = self._boundingbox[2]
             box_height = self._boundingbox[3]
             x_box_offset = 0
-            y_box_offset = self._bounding_box[1]
-            left = self._bounding_box[0]
+            y_box_offset = self._boundingbox[1]
 
         else:  # draw a "loose" bounding box to include any ascenders/descenders.
 
@@ -145,15 +147,17 @@ class Label(displayio.Group):
                 ascender_max = max(ascender_max, this_glyph.height + this_glyph.dy)
                 descender_max = max(descender_max, -this_glyph.dy)
 
-            box_width = self._boundingbox[2] + self._padding_left + self._padding_right
-            x_box_offset = -self._padding_left
+            box_width = (
+                self._boundingbox[2] + self._padding[0] + self._padding[3]
+            )  # left + right padding
+            x_box_offset = -self._padding[0]  # left padding
             box_height = (
                 (ascender_max + descender_max)
                 + int((lines - 1) * self.height * self._line_spacing)
-                + self._padding_top
-                + self._padding_bottom
+                + self._padding[1]  # top padding
+                + self._padding[2]  # bottom padding
             )
-            y_box_offset = -ascender_max + y_offset - self._padding_top
+            y_box_offset = -ascender_max + y_offset - self._padding[1]  # top padding
 
         self._update_background_color(self._background_color)
         box_width = max(0, box_width)  # remove any negative values
