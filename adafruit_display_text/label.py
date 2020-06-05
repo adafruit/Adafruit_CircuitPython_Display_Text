@@ -116,10 +116,10 @@ class Label(displayio.Group):
         )  # initialize with a blank tilegrid placeholder for background
 
         self._padding = (padding_left, padding_top, padding_right, padding_bottom)
-        # self._padding_top = padding_top
-        # self._padding_bottom = padding_bottom
-        # self._padding_left = padding_left
-        # self._padding_right = padding_right
+        self._padding_top = padding_top
+        self._padding_bottom = padding_bottom
+        self._padding_left = padding_left
+        self._padding_right = padding_right
 
         if text is not None:
             self._update_text(str(text))
