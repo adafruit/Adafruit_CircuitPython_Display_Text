@@ -104,8 +104,10 @@ class Label(displayio.Group):
         self._line_spacing = line_spacing
         self._boundingbox = None
 
-        self._background_tight = background_tight  # sets padding status for text background
-        
+        self._background_tight = (
+            background_tight  # sets padding status for text background
+        )
+
         self._background_palette = displayio.Palette(1)
         self.append(
             displayio.TileGrid(
