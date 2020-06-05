@@ -99,8 +99,8 @@ class Label(displayio.Group):
 
         self._background_color = background_color
 
-        bounds = self._font.get_bounding_box()
-        self.height = bounds[1]
+        #bounds = self._font.get_bounding_box()
+        self.height = self._font.get_bounding_box()[1]
         self._line_spacing = line_spacing
         self._boundingbox = None
 
@@ -115,7 +115,6 @@ class Label(displayio.Group):
             )
         )  # initialize with a blank tilegrid placeholder for background
 
-        self._padding = (padding_left, padding_top, padding_right, padding_bottom)
         self._padding_top = padding_top
         self._padding_bottom = padding_bottom
         self._padding_left = padding_left
@@ -148,16 +147,16 @@ class Label(displayio.Group):
                 descender_max = max(descender_max, -this_glyph.dy)
 
             box_width = (
-                self._boundingbox[2] + self._padding[0] + self._padding[3]
+                self._boundingbox[2] + self._padding_left + self._padding_right
             )  # left + right padding
-            x_box_offset = -self._padding[0]  # left padding
+            x_box_offset = -self._padding_left  
             box_height = (
                 (ascender_max + descender_max)
                 + int((lines - 1) * self.height * self._line_spacing)
-                + self._padding[1]  # top padding
-                + self._padding[2]  # bottom padding
+                + self._padding_top  
+                + self._padding_bottom
             )
-            y_box_offset = -ascender_max + y_offset - self._padding[1]  # top padding
+            y_box_offset = -ascender_max + y_offset - self._padding_top
 
         self._update_background_color(self._background_color)
         box_width = max(0, box_width)  # remove any negative values
@@ -369,8 +368,8 @@ class Label(displayio.Group):
         current_anchored_position = self.anchored_position
         self._text = ""
         self._font = new_font
-        bounds = self._font.get_bounding_box()
-        self.height = bounds[1]
+        #bounds = self._font.get_bounding_box()
+        self.height = self._font.get_bounding_box()[1]
         self._update_text(str(old_text))
         self.anchored_position = current_anchored_position
 
