@@ -93,11 +93,6 @@ class Label(displayio.Group):
         self.y = y
 
         self.palette = displayio.Palette(2)
-        # if background_color is not None:
-        #     self.palette[0] = background_color
-        #     self.palette.make_opaque(0)
-        #     self._transparent_background = False
-        # else:
         self.palette[0] = 0
         self.palette.make_transparent(0)
         self._transparent_background = True
@@ -114,7 +109,6 @@ class Label(displayio.Group):
             background_tight  # sets padding status for text background
         )
         self._background_palette = displayio.Palette(1)
-        # self._background_present = False
         self.append(
             displayio.TileGrid(
                 displayio.Bitmap(0, 0, 1), pixel_shader=self._background_palette
@@ -139,13 +133,8 @@ class Label(displayio.Group):
         self._background_color = new_color
 
     def _update_text(self, new_text):  # pylint: disable=too-many-locals
-        # if self._background_present:
-        #    i=1
-        # else:
-        #    i=0
         x = 0
         y = 0
-        # i = 0
         i = 1
         old_c = 0
         y_offset = int(
@@ -166,12 +155,10 @@ class Label(displayio.Group):
             glyph = self._font.get_glyph(ord(character))
             if not glyph:
                 continue
-            # right = max(right, x + glyph.width + glyph.shift_x)
             right = max(
                 right, x + glyph.shift_x
             )  # studied the docs! This is the correct spacing
             if y == 0:  # first line, find the Ascender height
-                # top = min(top, -glyph.height + y_offset)
                 top = min(top, -glyph.height - glyph.dy + y_offset)
             bottom = max(bottom, y - glyph.dy + y_offset)
             position_y = y - glyph.height - glyph.dy + y_offset
