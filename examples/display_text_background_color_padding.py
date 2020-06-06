@@ -1,9 +1,10 @@
 """
 This examples shows the use color and background_color
 """
+import time
 import board
 import displayio
-import time
+
 
 # from adafruit_st7789 import ST7789
 from adafruit_ili9341 import ILI9341
