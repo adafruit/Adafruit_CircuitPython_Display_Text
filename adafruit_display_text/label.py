@@ -99,7 +99,7 @@ class Label(displayio.Group):
 
         self._background_color = background_color
 
-        #bounds = self._font.get_bounding_box()
+        # bounds = self._font.get_bounding_box()
         self.height = self._font.get_bounding_box()[1]
         self._line_spacing = line_spacing
         self._boundingbox = None
@@ -149,11 +149,11 @@ class Label(displayio.Group):
             box_width = (
                 self._boundingbox[2] + self._padding_left + self._padding_right
             )  # left + right padding
-            x_box_offset = -self._padding_left  
+            x_box_offset = -self._padding_left
             box_height = (
                 (ascender_max + descender_max)
                 + int((lines - 1) * self.height * self._line_spacing)
-                + self._padding_top  
+                + self._padding_top
                 + self._padding_bottom
             )
             y_box_offset = -ascender_max + y_offset - self._padding_top
@@ -368,7 +368,7 @@ class Label(displayio.Group):
         current_anchored_position = self.anchored_position
         self._text = ""
         self._font = new_font
-        #bounds = self._font.get_bounding_box()
+        # bounds = self._font.get_bounding_box()
         self.height = self._font.get_bounding_box()[1]
         self._update_text(str(old_text))
         self.anchored_position = current_anchored_position
