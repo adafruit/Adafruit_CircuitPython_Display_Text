@@ -319,7 +319,6 @@ class Label(displayio.Group):
         current_anchored_position = self.anchored_position
         self._text = ""
         self._font = new_font
-        # bounds = self._font.get_bounding_box()
         self.height = self._font.get_bounding_box()[1]
         self._update_text(str(old_text))
         self.anchored_position = current_anchored_position
