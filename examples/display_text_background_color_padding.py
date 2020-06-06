@@ -4,14 +4,11 @@ This examples shows the use color and background_color
 import board
 import displayio
 import time
-import terminalio
-import fontio
-import sys
-import busio
 
 # from adafruit_st7789 import ST7789
 from adafruit_ili9341 import ILI9341
 from adafruit_display_text import label
+from adafruit_bitmap_font import bitmap_font
 
 #  Setup the SPI display
 
@@ -27,7 +24,6 @@ tft_reset = board.D11
 
 while not spi.try_lock():
     spi.configure(baudrate=32000000)
-    pass
 spi.unlock()
 
 display_bus = displayio.FourWire(
@@ -56,9 +52,7 @@ display = ILI9341(
 
 display.show(None)
 
-# font=terminalio.FONT
-
-from adafruit_bitmap_font import bitmap_font
+# font=terminalio.FONT # this is the Builtin fixed dimension font
 
 font = bitmap_font.load_font("fonts/BitstreamVeraSans-Roman-24.bdf")
 
@@ -105,9 +99,9 @@ print("background color is {}".format(text_area[0].background_color))
 
 while True:
     time.sleep(2)
-    text_area[
-        0
-    ].text = "text"  # change some text in an existing text box (must fit within existing # of characters)
+    text_area[0].text = "text"  # change some text in an existing text box
+    # Note: changed text must fit within existing number of characters
+    # when the Label was created
 
     for area in text_area:
         area.background_color = 0xFF0000
