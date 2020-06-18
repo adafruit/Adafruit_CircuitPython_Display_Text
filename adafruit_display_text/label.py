@@ -141,8 +141,9 @@ class Label(displayio.Group):
             ascender_max = descender_max = 0
             for char in glyphs:
                 this_glyph = self._font.get_glyph(ord(char))
-                ascender_max = max(ascender_max, this_glyph.height + this_glyph.dy)
-                descender_max = max(descender_max, -this_glyph.dy)
+                if this_glyph:
+                    ascender_max = max(ascender_max, this_glyph.height + this_glyph.dy)
+                    descender_max = max(descender_max, -this_glyph.dy)
 
             box_width = self._boundingbox[2] + self._padding_left + self._padding_right
             x_box_offset = -self._padding_left
