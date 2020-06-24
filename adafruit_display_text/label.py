@@ -213,6 +213,7 @@ class Label(displayio.Group):
                 or character != self._text[old_c]
             ):
                 try:
+                    # pylint: disable=unexpected-keyword-arg
                     face = displayio.TileGrid(
                         glyph.bitmap,
                         pixel_shader=self.palette,
