@@ -46,5 +46,5 @@ setup(
     keywords="adafruit blinka circuitpython micropython bitmap fonts text display tft lcd displayio",
     # You can just specify the packages manually here if your project is
     # simple. Or you can use find_packages().
-    py_modules=["adafruit_display_text"],
+    packages=["adafruit_display_text"],
 )
