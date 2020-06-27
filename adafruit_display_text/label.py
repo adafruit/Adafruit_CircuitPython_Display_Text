@@ -82,8 +82,9 @@ class Label(displayio.Group):
         if not max_glyphs and not text:
             raise RuntimeError("Please provide a max size, or initial text")
         if not max_glyphs:
-            max_glyphs = len(text) + 1  # add one for the background bitmap tileGrid
-        super().__init__(max_size=max_glyphs, **kwargs)
+            max_glyphs = len(text)
+        # add one to max_size for the background bitmap tileGrid
+        super().__init__(max_size=max_glyphs + 1, **kwargs)
 
         self.width = max_glyphs
         self._font = font
