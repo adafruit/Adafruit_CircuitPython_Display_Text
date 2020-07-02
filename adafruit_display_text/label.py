@@ -67,18 +67,29 @@ class Label(displayio.Group):
         *,
         x=0,
         y=0,
-        text=None,
+        text="",
         max_glyphs=None,
         color=0xFFFFFF,
         background_color=None,
         line_spacing=1.25,
+        background_tight=False,
+        padding_top=0,
+        padding_bottom=0,
+        padding_left=0,
+        padding_right=0,
         **kwargs
     ):
+        if "scale" in kwargs.keys():
+            self._scale = kwargs["scale"]
+        else:
+            self._scale = 1
         if not max_glyphs and not text:
             raise RuntimeError("Please provide a max size, or initial text")
         if not max_glyphs:
             max_glyphs = len(text)
-        super().__init__(max_size=max_glyphs, **kwargs)
+        # add one to max_size for the background bitmap tileGrid
+        super().__init__(max_size=max_glyphs + 1, **kwargs)
+
         self.width = max_glyphs
         self._font = font
         self._text = None
@@ -87,28 +98,95 @@ class Label(displayio.Group):
         self.y = y
 
         self.palette = displayio.Palette(2)
-        if background_color is not None:
-            self.palette[0] = background_color
-            self.palette.make_opaque(0)
-            self._transparent_background = False
-        else:
-            self.palette[0] = 0
-            self.palette.make_transparent(0)
-            self._transparent_background = True
+        self.palette[0] = 0
+        self.palette.make_transparent(0)
         self.palette[1] = color
 
-        bounds = self._font.get_bounding_box()
-        self.height = bounds[1]
+        self.height = self._font.get_bounding_box()[1]
         self._line_spacing = line_spacing
         self._boundingbox = None
+
+        self._background_tight = (
+            background_tight  # sets padding status for text background box
+        )
+
+        self._background_color = background_color
+        self._background_palette = displayio.Palette(1)
+        self.append(
+            displayio.TileGrid(
+                displayio.Bitmap(0, 0, 1), pixel_shader=self._background_palette
+            )
+        )  # initialize with a blank tilegrid placeholder for background
+
+        self._padding_top = padding_top
+        self._padding_bottom = padding_bottom
+        self._padding_left = padding_left
+        self._padding_right = padding_right
 
         if text is not None:
             self._update_text(str(text))
 
+    def _create_background_box(self, lines, y_offset):
+
+        left = self._boundingbox[0]
+
+        if self._background_tight:  # draw a tight bounding box
+            box_width = self._boundingbox[2]
+            box_height = self._boundingbox[3]
+            x_box_offset = 0
+            y_box_offset = self._boundingbox[1]
+
+        else:  # draw a "loose" bounding box to include any ascenders/descenders.
+
+            # check a few glyphs for maximum ascender and descender height
+            # Enhancement: it would be preferred to access the font "FONT_ASCENT" and
+            # "FONT_DESCENT" in the imported BDF file
+            glyphs = "M j'"  # choose glyphs with highest ascender and lowest
+            # descender, will depend upon font used
+            ascender_max = descender_max = 0
+            for char in glyphs:
+                this_glyph = self._font.get_glyph(ord(char))
+                if this_glyph:
+                    ascender_max = max(ascender_max, this_glyph.height + this_glyph.dy)
+                    descender_max = max(descender_max, -this_glyph.dy)
+
+            box_width = self._boundingbox[2] + self._padding_left + self._padding_right
+            x_box_offset = -self._padding_left
+            box_height = (
+                (ascender_max + descender_max)
+                + int((lines - 1) * self.height * self._line_spacing)
+                + self._padding_top
+                + self._padding_bottom
+            )
+            y_box_offset = -ascender_max + y_offset - self._padding_top
+
+        self._update_background_color(self._background_color)
+        box_width = max(0, box_width)  # remove any negative values
+        box_height = max(0, box_height)  # remove any negative values
+
+        background_bitmap = displayio.Bitmap(box_width, box_height, 1)
+        tile_grid = displayio.TileGrid(
+            background_bitmap,
+            pixel_shader=self._background_palette,
+            x=left + x_box_offset,
+            y=y_box_offset,
+        )
+
+        return tile_grid
+
+    def _update_background_color(self, new_color):
+
+        if new_color is None:
+            self._background_palette.make_transparent(0)
+        else:
+            self._background_palette.make_opaque(0)
+            self._background_palette[0] = new_color
+        self._background_color = new_color
+
     def _update_text(self, new_text):  # pylint: disable=too-many-locals
         x = 0
         y = 0
-        i = 0
+        i = 1
         old_c = 0
         y_offset = int(
             (
@@ -118,17 +196,19 @@ class Label(displayio.Group):
             / 2
         )
         left = right = top = bottom = 0
+        lines = 1
         for character in new_text:
             if character == "\n":
                 y += int(self.height * self._line_spacing)
                 x = 0
+                lines += 1
                 continue
             glyph = self._font.get_glyph(ord(character))
             if not glyph:
                 continue
-            right = max(right, x + glyph.width)
+            right = max(right, x + glyph.shift_x)
             if y == 0:  # first line, find the Ascender height
-                top = min(top, -glyph.height + y_offset)
+                top = min(top, -glyph.height - glyph.dy + y_offset)
             bottom = max(bottom, y - glyph.dy + y_offset)
             position_y = y - glyph.height - glyph.dy + y_offset
             position_x = x + glyph.dx
@@ -138,6 +218,7 @@ class Label(displayio.Group):
                 or character != self._text[old_c]
             ):
                 try:
+                    # pylint: disable=unexpected-keyword-arg
                     face = displayio.TileGrid(
                         glyph.bitmap,
                         pixel_shader=self.palette,
@@ -161,6 +242,7 @@ class Label(displayio.Group):
                 else:
                     self.append(face)
             elif self._text and character == self._text[old_c]:
+
                 try:
                     self[i].position = (position_x, position_y)
                 except AttributeError:
@@ -168,7 +250,6 @@ class Label(displayio.Group):
                     self[i].y = position_y
 
             x += glyph.shift_x
-
             # TODO skip this for control sequences or non-printables.
             i += 1
             old_c += 1
@@ -187,6 +268,7 @@ class Label(displayio.Group):
             self.pop()
         self._text = new_text
         self._boundingbox = (left, top, left + right, bottom - top)
+        self[0] = self._create_background_box(lines, y_offset)
 
     @property
     def bounding_box(self):
@@ -216,20 +298,11 @@ class Label(displayio.Group):
     @property
     def background_color(self):
         """Color of the background as an RGB hex number."""
-        if not self._transparent_background:
-            return self.palette[0]
-        return None
+        return self._background_color
 
     @background_color.setter
     def background_color(self, new_color):
-        if new_color is not None:
-            self.palette[0] = new_color
-            self.palette.make_opaque(0)
-            self._transparent_background = False
-        else:
-            self.palette[0] = 0
-            self.palette.make_transparent(0)
-            self._transparent_background = True
+        self._update_background_color(new_color)
 
     @property
     def text(self):
@@ -238,9 +311,12 @@ class Label(displayio.Group):
 
     @text.setter
     def text(self, new_text):
-        current_anchored_position = self.anchored_position
-        self._update_text(str(new_text))
-        self.anchored_position = current_anchored_position
+        try:
+            current_anchored_position = self.anchored_position
+            self._update_text(str(new_text))
+            self.anchored_position = current_anchored_position
+        except RuntimeError:
+            raise RuntimeError("Text length exceeds max_glyphs")
 
     @property
     def font(self):
@@ -253,8 +329,7 @@ class Label(displayio.Group):
         current_anchored_position = self.anchored_position
         self._text = ""
         self._font = new_font
-        bounds = self._font.get_bounding_box()
-        self.height = bounds[1]
+        self.height = self._font.get_bounding_box()[1]
         self._update_text(str(old_text))
         self.anchored_position = current_anchored_position
 
@@ -290,13 +365,15 @@ class Label(displayio.Group):
 
     @anchored_position.setter
     def anchored_position(self, new_position):
-        self.x = int(
+        new_x = int(
             new_position[0]
-            - self._boundingbox[0]
-            - self._anchor_point[0] * self._boundingbox[2]
+            - self._anchor_point[0] * (self._boundingbox[2] * self._scale)
         )
-        self.y = int(
+        new_y = self.y = int(
             new_position[1]
-            - self._boundingbox[1]
-            - self._anchor_point[1] * self._boundingbox[3]
+            - self._anchor_point[1] * (self._boundingbox[3] * self._scale)
+            + (self._boundingbox[3] * self._scale) / 2
         )
+        self._boundingbox = (new_x, new_y, self._boundingbox[2], self._boundingbox[3])
+        self.x = new_x
+        self.y = new_y

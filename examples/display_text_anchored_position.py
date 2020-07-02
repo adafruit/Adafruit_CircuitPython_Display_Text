@@ -3,8 +3,8 @@ This examples shows the use of anchor_point and anchored_position.
 """
 import board
 import terminalio
-from adafruit_display_text import label
 import displayio
+from adafruit_display_text import label
 
 DISPLAY_WIDTH = 320
 DISPLAY_HEIGHT = 240
