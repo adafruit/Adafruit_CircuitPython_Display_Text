@@ -114,7 +114,7 @@ class Label(displayio.Group):
         self._background_palette = displayio.Palette(1)
         self.append(
             displayio.TileGrid(
-                displayio.Bitmap(0, 0, 1), pixel_shader=self._background_palette
+                displayio.Bitmap(1, 1, 1), pixel_shader=self._background_palette
             )
         )  # initialize with a blank tilegrid placeholder for background
 
