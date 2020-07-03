@@ -164,17 +164,14 @@ class Label(displayio.Group):
         box_width = max(0, box_width)  # remove any negative values
         box_height = max(0, box_height)  # remove any negative values
 
-        if box_width > 0 and box_height > 0:
-            background_bitmap = displayio.Bitmap(box_width, box_height, 1)
-            tile_grid = displayio.TileGrid(
-                background_bitmap,
-                pixel_shader=self._background_palette,
-                x=left + x_box_offset,
-                y=y_box_offset,
-            )
-            return tile_grid
-        else:
-            return None
+        background_bitmap = displayio.Bitmap(box_width, box_height, 1)
+        tile_grid = displayio.TileGrid(
+            background_bitmap,
+            pixel_shader=self._background_palette,
+            x=left + x_box_offset,
+            y=y_box_offset,
+        )
+        return tile_grid
 
     def _update_background_color(self, new_color):
 
