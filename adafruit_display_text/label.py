@@ -164,15 +164,17 @@ class Label(displayio.Group):
         box_width = max(0, box_width)  # remove any negative values
         box_height = max(0, box_height)  # remove any negative values
 
-        background_bitmap = displayio.Bitmap(box_width, box_height, 1)
-        tile_grid = displayio.TileGrid(
-            background_bitmap,
-            pixel_shader=self._background_palette,
-            x=left + x_box_offset,
-            y=y_box_offset,
-        )
-
-        return tile_grid
+        if box_width > 0 and box_height > 0:
+            background_bitmap = displayio.Bitmap(box_width, box_height, 1)
+            tile_grid = displayio.TileGrid(
+                background_bitmap,
+                pixel_shader=self._background_palette,
+                x=left + x_box_offset,
+                y=y_box_offset,
+            )
+            return tile_grid
+        else:
+            return None
 
     def _update_background_color(self, new_color):
 
@@ -270,6 +272,7 @@ class Label(displayio.Group):
         self._boundingbox = (left, top, left + right, bottom - top)
         self[0] = self._create_background_box(lines, y_offset)
 
+
     @property
     def bounding_box(self):
         """An (x, y, w, h) tuple that completely covers all glyphs. The
@@ -313,8 +316,11 @@ class Label(displayio.Group):
     def text(self, new_text):
         try:
             current_anchored_position = self.anchored_position
+            print('start anchored_position: {}'.format(self.anchored_position))
+            print('self.y: {}, self._scale: {}'.format(self.y, self._scale))
             self._update_text(str(new_text))
             self.anchored_position = current_anchored_position
+            print('end anchored_position: {}'.format(self.anchored_position))
         except RuntimeError:
             raise RuntimeError("Text length exceeds max_glyphs")
 
@@ -351,10 +357,10 @@ class Label(displayio.Group):
         """Position relative to the anchor_point. Tuple containing x,y
            pixel coordinates."""
         return (
-            int(self.x + self._anchor_point[0] * self._boundingbox[2] * self._scale ),
-            int(self.y + self._anchor_point[1] * self._boundingbox[3] * self._scale 
-                    - (self._boundingbox[3] * self._scale)/2 )
-                )
+            int(self.x + (self._anchor_point[0] * self._boundingbox[2] * self._scale) ),
+            int(self.y + (self._anchor_point[1] * self._boundingbox[3] * self._scale) 
+                    - round( (self._boundingbox[3] * self._scale)/2.0 ))
+                )              
 
     @anchored_position.setter
     def anchored_position(self, new_position):
@@ -362,11 +368,14 @@ class Label(displayio.Group):
             new_position[0]
             - self._anchor_point[0] * (self._boundingbox[2] * self._scale)
         )
-        new_y = self.y = int(
+        new_y = int(
             new_position[1]
-            - self._anchor_point[1] * (self._boundingbox[3] * self._scale)
-            + (self._boundingbox[3] * self._scale)/2
+            - ( self._anchor_point[1] * self._boundingbox[3] * self._scale)
+            + round( (self._boundingbox[3] * self._scale)/2.0 )
         )
+
+        print('new_y: {}, new_position[1]: {}, self._anchor_point[1]: {}, self._boundingbox[3]: {}'.format(new_y, new_position[1], self._anchor_point[1], self._boundingbox[3]))
+
         self._boundingbox = (new_x, new_y, self._boundingbox[2], self._boundingbox[3])
         self.x = new_x
         self.y = new_y
