@@ -200,7 +200,9 @@ class Label(displayio.Group):
         else:
             self[0] = self._create_background_box(lines, y_offset)
 
-    def _update_text(self, new_text):  # pylint: disable=too-many-locals ,too-many-branches, too-many-statements
+    def _update_text(
+        self, new_text
+    ):  # pylint: disable=too-many-locals ,too-many-branches, too-many-statements
         x = 0
         y = 0
         if self._added_background_tilegrid:
