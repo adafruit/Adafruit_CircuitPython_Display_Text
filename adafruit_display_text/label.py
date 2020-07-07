@@ -190,8 +190,13 @@ class Label(displayio.Group):
         )
         lines = self.text.count("\n") + 1
         if not self._added_background_tilegrid:
-            self._added_background_tilegrid = True
-            self.insert(0, self._create_background_box(lines, y_offset))
+            # only if we have text or padding
+            if len(self.text) + self._padding_left + self._padding_right > 0:
+                if len(self) > 0:
+                    self.insert(0, self._create_background_box(lines, y_offset))
+                else:
+                    self.append(self._create_background_box(lines, y_offset))
+                self._added_background_tilegrid = True
         else:
             self[0] = self._create_background_box(lines, y_offset)
 
@@ -294,6 +299,11 @@ class Label(displayio.Group):
                 self.insert(0, self._create_background_box(lines, y_offset))
             else:
                 self[0] = self._create_background_box(lines, y_offset)
+        else:
+            self._background_palette.make_transparent(0)
+            if self._added_background_tilegrid:
+                self.pop(0)
+                self._added_background_tilegrid = False
 
     @property
     def bounding_box(self):
