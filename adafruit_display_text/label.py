@@ -173,8 +173,9 @@ class Label(displayio.Group):
 
         if new_color is None:
             self._background_palette.make_transparent(0)
-            self.pop(0)
-            self._added_background_tilegrid = False
+            if self._added_background_tilegrid:
+                self.pop(0)
+                self._added_background_tilegrid = False
         else:
             self._background_palette.make_opaque(0)
             self._background_palette[0] = new_color
