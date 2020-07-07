@@ -113,13 +113,6 @@ class Label(displayio.Group):
         self._background_color = background_color
         self._background_palette = displayio.Palette(1)
         self._added_background_tilegrid = False
-        if self._background_color:
-            self.append(
-                displayio.TileGrid(
-                    displayio.Bitmap(1, 1, 1), pixel_shader=self._background_palette
-                )
-            )  # initialize with a blank tilegrid placeholder for background
-            self._added_background_tilegrid = True
 
         self._padding_top = padding_top
         self._padding_bottom = padding_bottom
@@ -180,6 +173,8 @@ class Label(displayio.Group):
 
         if new_color is None:
             self._background_palette.make_transparent(0)
+            self.pop(0)
+            self._added_background_tilegrid = False
         else:
             self._background_palette.make_opaque(0)
             self._background_palette[0] = new_color
@@ -194,7 +189,6 @@ class Label(displayio.Group):
         )
         lines = self.text.count("\n") + 1
         if not self._added_background_tilegrid:
-
             self._added_background_tilegrid = True
             self.insert(0, self._create_background_box(lines, y_offset))
         else:
@@ -295,7 +289,6 @@ class Label(displayio.Group):
             and len(new_text) + self._padding_left + self._padding_right > 0
         ):
             if not self._added_background_tilegrid:
-
                 self._added_background_tilegrid = True
                 self.insert(0, self._create_background_box(lines, y_offset))
             else:
