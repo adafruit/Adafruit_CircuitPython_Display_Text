@@ -206,6 +206,7 @@ class Label(displayio.Group):
                 else:
                     self.append(self._create_background_box(lines, y_offset))
                 self._added_background_tilegrid = True
+
         else:  # a bitmap is present in the self Group
             # update bitmap if text is present and bitmap sizes > 0 pixels
             if (
@@ -312,6 +313,7 @@ class Label(displayio.Group):
             self.pop()
         self._text = new_text
         self._boundingbox = (left, top, left + right, bottom - top)
+
         self._update_background_color(self._background_color)
 
     @property
