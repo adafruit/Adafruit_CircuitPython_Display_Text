@@ -190,23 +190,35 @@ class Label(displayio.Group):
         )
         lines = self.text.count("\n") + 1
 
-        if not self._added_background_tilegrid: # no bitmap is in the self Group
+        if not self._added_background_tilegrid:  # no bitmap is in the self Group
             # add bitmap if text is present and bitmap sizes > 0 pixels
-            if ((len(self._text) > 0) 
-                and (self._boundingbox[2] + self._padding_left + self._padding_right > 0) 
-                and (self._boundingbox[3] + self._padding_top + self._padding_bottom > 0)):
+            if (
+                (len(self._text) > 0)
+                and (
+                    self._boundingbox[2] + self._padding_left + self._padding_right > 0
+                )
+                and (
+                    self._boundingbox[3] + self._padding_top + self._padding_bottom > 0
+                )
+            ):
                 if len(self) > 0:
                     self.insert(0, self._create_background_box(lines, y_offset))
                 else:
                     self.append(self._create_background_box(lines, y_offset))
                 self._added_background_tilegrid = True
-        else: # a bitmap is present in the self Group
+        else:  # a bitmap is present in the self Group
             # update bitmap if text is present and bitmap sizes > 0 pixels
-            if ((len(self._text) > 0) 
-                and (self._boundingbox[2] + self._padding_left + self._padding_right > 0) 
-                and (self._boundingbox[3] + self._padding_top + self._padding_bottom > 0)):
+            if (
+                (len(self._text) > 0)
+                and (
+                    self._boundingbox[2] + self._padding_left + self._padding_right > 0
+                )
+                and (
+                    self._boundingbox[3] + self._padding_top + self._padding_bottom > 0
+                )
+            ):
                 self[0] = self._create_background_box(lines, y_offset)
-            else: # delete the existing bitmap
+            else:  # delete the existing bitmap
                 self.pop(0)
                 self._added_background_tilegrid = False
 
