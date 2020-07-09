@@ -232,7 +232,6 @@ class Label(displayio.Group):
             i = 1
         else:
             i = 0
-        old_c = 0
         y_offset = int(
             (
                 self._font.get_glyph(ord("M")).height
@@ -257,11 +256,7 @@ class Label(displayio.Group):
             bottom = max(bottom, y - glyph.dy + y_offset)
             position_y = y - glyph.height - glyph.dy + y_offset
             position_x = x + glyph.dx
-            if (
-                not self._text
-                or old_c >= len(self._text)
-                or character != self._text[old_c]
-            ) and (glyph.width > 0 and glyph.height > 0):
+            if glyph.width > 0 and glyph.height > 0:
                 try:
                     # pylint: disable=unexpected-keyword-arg
                     face = displayio.TileGrid(
@@ -286,28 +281,8 @@ class Label(displayio.Group):
                     self[i] = face
                 else:
                     self.append(face)
-            elif self._text and character == self._text[old_c]:
-
-                try:
-                    self[i].position = (position_x, position_y)
-                except AttributeError:
-                    self[i].x = position_x
-                    self[i].y = position_y
-
             x += glyph.shift_x
-            # TODO skip this for control sequences or non-printables.
             i += 1
-            old_c += 1
-            # skip all non-printables in the old string
-            while (
-                self._text
-                and old_c < len(self._text)
-                and (
-                    self._text[old_c] == "\n"
-                    or not self._font.get_glyph(ord(self._text[old_c]))
-                )
-            ):
-                old_c += 1
         # Remove the rest
         while len(self) > i:
             self.pop()
