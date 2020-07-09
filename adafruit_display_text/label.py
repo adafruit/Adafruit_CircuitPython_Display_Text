@@ -261,7 +261,7 @@ class Label(displayio.Group):
                 not self._text
                 or old_c >= len(self._text)
                 or character != self._text[old_c]
-            ):
+            ) and (glyph.width > 0 and glyph.height > 0):
                 try:
                     # pylint: disable=unexpected-keyword-arg
                     face = displayio.TileGrid(
