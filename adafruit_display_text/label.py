@@ -232,6 +232,7 @@ class Label(displayio.Group):
             i = 1
         else:
             i = 0
+        tilegrid_count = i
         y_offset = int(
             (
                 self._font.get_glyph(ord("M")).height
@@ -277,14 +278,16 @@ class Label(displayio.Group):
                         x=position_x,
                         y=position_y,
                     )
-                if i < len(self):
-                    self[i] = face
+                if tilegrid_count < len(self):
+                    self[tilegrid_count] = face
                 else:
                     self.append(face)
+                tilegrid_count += 1
             x += glyph.shift_x
             i += 1
         # Remove the rest
-        while len(self) > i:
+
+        while len(self) > tilegrid_count:  # i:
             self.pop()
         self._text = new_text
         self._boundingbox = (left, top, left + right, bottom - top)
