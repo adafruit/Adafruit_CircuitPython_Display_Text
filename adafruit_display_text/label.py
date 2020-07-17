@@ -40,6 +40,7 @@ Implementation Notes
 """
 
 import displayio
+from fontio import BuiltinFont
 
 __version__ = "0.0.0-auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_Display_Text.git"
@@ -98,8 +99,12 @@ class Label(displayio.Group):
         self.y = y
 
         self.palette = displayio.Palette(2)
-        self.palette[0] = 0
-        self.palette.make_transparent(0)
+        if not background_color:
+            self.palette[0] = 0
+            self.palette.make_transparent(0)
+        else:
+            self.palette[0] = background_color
+            self.palette.make_opaque(0)
         self.palette[1] = color
 
         self.height = self._font.get_bounding_box()[1]
@@ -170,58 +175,65 @@ class Label(displayio.Group):
         return tile_grid
 
     def _update_background_color(self, new_color):
-
-        if new_color is None:
-            self._background_palette.make_transparent(0)
-            if self._added_background_tilegrid:
-                self.pop(0)
-                self._added_background_tilegrid = False
+        if isinstance(self.font, BuiltinFont):
+            if new_color is not None:
+                self.palette[0] = new_color
+                self.palette.make_opaque(0)
+            else:
+                self.palette[0] = 0
+                self.palette.make_transparent(0)
         else:
-            self._background_palette.make_opaque(0)
-            self._background_palette[0] = new_color
-        self._background_color = new_color
+            if new_color is None:
+                self._background_palette.make_transparent(0)
+                if self._added_background_tilegrid:
+                    self.pop(0)
+                    self._added_background_tilegrid = False
+            else:
+                self._background_palette.make_opaque(0)
+                self._background_palette[0] = new_color
+            self._background_color = new_color
 
-        y_offset = int(
-            (
-                self._font.get_glyph(ord("M")).height
-                - self.text.count("\n") * self.height * self.line_spacing
+            y_offset = int(
+                (
+                    self._font.get_glyph(ord("M")).height
+                    - self.text.count("\n") * self.height * self.line_spacing
+                )
+                / 2
             )
-            / 2
-        )
-        lines = self.text.count("\n") + 1
+            lines = self.text.count("\n") + 1
 
-        if not self._added_background_tilegrid:  # no bitmap is in the self Group
-            # add bitmap if text is present and bitmap sizes > 0 pixels
-            if (
-                (len(self._text) > 0)
-                and (
-                    self._boundingbox[2] + self._padding_left + self._padding_right > 0
-                )
-                and (
-                    self._boundingbox[3] + self._padding_top + self._padding_bottom > 0
-                )
-            ):
-                if len(self) > 0:
-                    self.insert(0, self._create_background_box(lines, y_offset))
-                else:
-                    self.append(self._create_background_box(lines, y_offset))
-                self._added_background_tilegrid = True
+            if not self._added_background_tilegrid:  # no bitmap is in the self Group
+                # add bitmap if text is present and bitmap sizes > 0 pixels
+                if (
+                    (len(self._text) > 0)
+                    and (
+                        self._boundingbox[2] + self._padding_left + self._padding_right > 0
+                    )
+                    and (
+                        self._boundingbox[3] + self._padding_top + self._padding_bottom > 0
+                    )
+                ):
+                    if len(self) > 0:
+                        self.insert(0, self._create_background_box(lines, y_offset))
+                    else:
+                        self.append(self._create_background_box(lines, y_offset))
+                    self._added_background_tilegrid = True
 
-        else:  # a bitmap is present in the self Group
-            # update bitmap if text is present and bitmap sizes > 0 pixels
-            if (
-                (len(self._text) > 0)
-                and (
-                    self._boundingbox[2] + self._padding_left + self._padding_right > 0
-                )
-                and (
-                    self._boundingbox[3] + self._padding_top + self._padding_bottom > 0
-                )
-            ):
-                self[0] = self._create_background_box(lines, y_offset)
-            else:  # delete the existing bitmap
-                self.pop(0)
-                self._added_background_tilegrid = False
+            else:  # a bitmap is present in the self Group
+                # update bitmap if text is present and bitmap sizes > 0 pixels
+                if (
+                    (len(self._text) > 0)
+                    and (
+                        self._boundingbox[2] + self._padding_left + self._padding_right > 0
+                    )
+                    and (
+                        self._boundingbox[3] + self._padding_top + self._padding_bottom > 0
+                    )
+                ):
+                    self[0] = self._create_background_box(lines, y_offset)
+                else:  # delete the existing bitmap
+                    self.pop(0)
+                    self._added_background_tilegrid = False
 
     def _update_text(
         self, new_text
@@ -292,7 +304,8 @@ class Label(displayio.Group):
         self._text = new_text
         self._boundingbox = (left, top, left + right, bottom - top)
 
-        self._update_background_color(self._background_color)
+        if not isinstance(self.font, BuiltinFont):
+            self._update_background_color(self._background_color)
 
     @property
     def bounding_box(self):
