@@ -175,6 +175,7 @@ class Label(displayio.Group):
         return tile_grid
 
     def _update_background_color(self, new_color):
+        # pylint: disable=too-many-branches
         if isinstance(self.font, BuiltinFont):
             if new_color is not None:
                 self.palette[0] = new_color
@@ -207,10 +208,12 @@ class Label(displayio.Group):
                 if (
                     (len(self._text) > 0)
                     and (
-                        self._boundingbox[2] + self._padding_left + self._padding_right > 0
+                        self._boundingbox[2] + self._padding_left + self._padding_right
+                        > 0
                     )
                     and (
-                        self._boundingbox[3] + self._padding_top + self._padding_bottom > 0
+                        self._boundingbox[3] + self._padding_top + self._padding_bottom
+                        > 0
                     )
                 ):
                     if len(self) > 0:
@@ -224,10 +227,12 @@ class Label(displayio.Group):
                 if (
                     (len(self._text) > 0)
                     and (
-                        self._boundingbox[2] + self._padding_left + self._padding_right > 0
+                        self._boundingbox[2] + self._padding_left + self._padding_right
+                        > 0
                     )
                     and (
-                        self._boundingbox[3] + self._padding_top + self._padding_bottom > 0
+                        self._boundingbox[3] + self._padding_top + self._padding_bottom
+                        > 0
                     )
                 ):
                     self[0] = self._create_background_box(lines, y_offset)
