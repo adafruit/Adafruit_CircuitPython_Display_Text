@@ -103,8 +103,9 @@ class Label(displayio.Group):
             self.palette[0] = 0
             self.palette.make_transparent(0)
         else:
-            self.palette[0] = background_color
-            self.palette.make_opaque(0)
+            if isinstance(self.font, BuiltinFont):
+                self.palette[0] = background_color
+                self.palette.make_opaque(0)
         self.palette[1] = color
 
         self.height = self._font.get_bounding_box()[1]
