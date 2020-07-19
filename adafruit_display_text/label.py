@@ -99,13 +99,12 @@ class Label(displayio.Group):
         self.y = y
 
         self.palette = displayio.Palette(2)
-        if not background_color:
+        if isinstance(self.font, BuiltinFont) and (background_color is not None):
+            self.palette[0] = background_color
+            self.palette.make_opaque(0)
+        else:
             self.palette[0] = 0
             self.palette.make_transparent(0)
-        else:
-            if isinstance(self.font, BuiltinFont):
-                self.palette[0] = background_color
-                self.palette.make_opaque(0)
         self.palette[1] = color
 
         self.height = self._font.get_bounding_box()[1]
@@ -368,6 +367,21 @@ class Label(displayio.Group):
 
     @font.setter
     def font(self, new_font):
+        if (
+            isinstance(new_font, BuiltinFont)
+            or not isinstance(new_font, BuiltinFont)
+            and self.background_color is None
+        ):
+            if self._added_background_tilegrid:
+                self.pop(0)
+                self._added_background_tilegrid = False
+        if isinstance(new_font, BuiltinFont) and (self.background_color is not None):
+            self.palette[0] = self.background_color
+            self.palette.make_opaque(0)
+        else:
+            self.palette[0] = 0
+            self.palette.make_transparent(0)
+
         old_text = self._text
         current_anchored_position = self.anchored_position
         self._text = ""
