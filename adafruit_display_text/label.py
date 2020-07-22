@@ -310,7 +310,8 @@ class Label(displayio.Group):
         self._boundingbox = (left, top, left + right, bottom - top)
 
         if not isinstance(self.font, BuiltinFont):
-            self._update_background_color(self._background_color)
+            if self._background_color:
+                self._update_background_color(self._background_color)
 
     @property
     def bounding_box(self):
