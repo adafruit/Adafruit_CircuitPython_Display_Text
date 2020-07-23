@@ -292,7 +292,7 @@ class Label(displayio.Group):
         self._text = new_text
         self._boundingbox = (left, top, left + right, bottom - top)
 
-        if self.background_color:
+        if self.background_color is not None:
             self._update_background_color(self._background_color)
 
     @property
