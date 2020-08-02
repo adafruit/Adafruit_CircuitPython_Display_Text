@@ -111,7 +111,7 @@ def text_bounding_box2(text, font, lineSpacing, background_tight=False):  # ****
                         box_height_adder = lineSpacingY(font, lineSpacing-1) - y_offset
                         #y_offset=label_position_yoffset
                         #box_height_adder=-label_position_yoffset
-                        print('label_position_yoffset: {}, lineSpacingY:{}, font[1]: {}'.format(label_position_yoffset, lineSpacingY(font, lineSpacing), font.get_bounding_box()[1]))
+                        #print('label_position_yoffset: {}, lineSpacingY:{}, font[1]: {}'.format(label_position_yoffset, lineSpacingY(font, lineSpacing), font.get_bounding_box()[1]))
                             # for a leading newline, this adds to the box_height
                     else:
                         y_offset = -y1_min # The bitmap y-offset is the max y-position of the first line
@@ -172,7 +172,7 @@ def text_bounding_box2(text, font, lineSpacing, background_tight=False):  # ****
 
     box_height=max(0, box_height+box_height_adder) # to add any additional height for leading newlines
 
-    print('background_tight: {}, box_width: {}, box_height: {}, x_offset: {}, y_offset: {}'.format(background_tight, box_width, box_height, -x1_min, y_offset))
+    #print('background_tight: {}, box_width: {}, box_height: {}, x_offset: {}, y_offset: {}'.format(background_tight, box_width, box_height, -x1_min, y_offset))
 
     return(box_width, box_height, -x1_min, y_offset) # -x1_min is the x_offset
 
@@ -234,14 +234,12 @@ def place_text(
     textPaletteIndex=1, 
     backgroundPaletteIndex=0, 
     scale=1,
-    printOnlyPixels=True,   # only update the bitmap where the glyph pixel color is > 0
-                            # this is especially useful for script fonts
+    printOnlyPixels=True,   # printOnlyPixels = True: only update the bitmap where the glyph pixel 
+                            # color is > 0 this is especially useful for script fonts where glyph
+                            # bounding boxes overlap
 ):
     # placeText - Writes text into a bitmap at the specified location.
     #
-    # (xPosition, yPosition) correspond to upper left corner of the height of the 'M' glyph
-    # To Do: Add anchor positions, and adjust the default baseline position to match
-    #   the current "label" function
     # Verify paletteIndex is working properly with * operator, especially if accommodating multicolored fonts
     #
     # Note: Scale is not implemented at this time
@@ -271,7 +269,7 @@ def place_text(
 
     left=right=xStart
     top=bottom=yStart
-    print('xStart, yStart: {}, {}'.format(xStart, yStart))
+    print('##place_text xStart, yStart: {}, {}'.format(xStart, yStart))
     
     for char in text:
 
@@ -323,16 +321,19 @@ def place_text(
                             paletteIndexes=(backgroundPaletteIndex, textPaletteIndex)
                             
                             # Allows for different paletteIndex for background and text.
-                            thisPixelColor=paletteIndexes[myGlyph.bitmap[y*width + x+glyph_offset_x]]
+                            #thisPixelColor=paletteIndexes[myGlyph.bitmap[x+glyph_offset_x,y]]
+                            thisPixelColor=paletteIndexes[myGlyph.bitmap[y*myGlyph.bitmap.width + x + glyph_offset_x]]
+                            #print('myGlyph.bitmap.width,height: {},{} char: {}, myGlyph.tile_index: {}, (x,y): ({},{}), glyph_offset_x: {}, thisPixelColor: {}'.format(myGlyph.bitmap.width, myGlyph.bitmap.height, char, myGlyph.tile_index, x, y, glyph_offset_x, thisPixelColor))
                             if not printOnlyPixels or thisPixelColor > 0: 
                                 # write all characters if printOnlyPixels = False, or if thisPixelColor is > 0
                                 bitmap[yPlacement*bitmapWidth + xPlacement] = thisPixelColor
+                                #print('* pixel')
                         elif (yPlacement > bitmapHeight):
                             break
                 
                 xPosition = xPosition + shift_x
 
-    print('left: {}, top: {}, right: {}, bottom: {}'.format(left, top, right, bottom))
+    print('##place_text left: {}, top: {}, right: {}, bottom: {}'.format(left, top, right, bottom))
 
     return (left, top, left+right, bottom-top) # bounding_box 
 
