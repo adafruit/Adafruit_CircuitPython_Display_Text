@@ -57,10 +57,7 @@ def lineSpacingY(font, lineSpacing):
     returnValue = int(lineSpacing * fontHeight)
     return returnValue
 
-def text_bounding_box2(text, font, lineSpacing, background_tight=False):  # **** change default background_tight=False
-    # this is the preferred approach since it utilizes the BDF file values
-    #(font_width, font_height, font_xoffset, font_yoffset)=font.get_bounding_box() # max glyph dimension
-
+def text_bounding_box(text, font, lineSpacing, background_tight=False):  # **** change default background_tight=False
 
     label_position_yoffset = int( # for calibration with label.py positioning
             (
@@ -71,8 +68,7 @@ def text_bounding_box2(text, font, lineSpacing, background_tight=False):  # ****
             / 2
         )
 
-    print('M height: {}, font.get_bounding_box()[1]: {}, label_position_yoffset: {}'.format(font.get_glyph(ord("M")).height, font.get_bounding_box()[1], label_position_yoffset))
-
+    
     # this empirical approach checks several glyphs for maximum ascender and descender height
     # Alternate option: utilize `font.get_bounding_box()` to get max glyph dimensions
     glyphs = "M j'"     # choose glyphs with highest ascender and lowest
@@ -81,16 +77,13 @@ def text_bounding_box2(text, font, lineSpacing, background_tight=False):  # ****
     for char in glyphs:
         this_glyph = font.get_glyph(ord(char))
         if this_glyph:
-            #print('char: {}, this_glyph.height: {}, this_glyph.dy: {}'.format(char, this_glyph.height, this_glyph.dy))
             ascender_max = max(ascender_max, this_glyph.height + this_glyph.dy)
             descender_max = max(descender_max, -this_glyph.dy)
-            #print('ascender_max: {}, descender_max: {}'.format(ascender_max, descender_max))
-    #print('FINAL -- ascender_max: {}, descender_max: {}'.format(ascender_max, descender_max))
     font_height=ascender_max+descender_max
     font_yoffset=ascender_max
 
-
     base_point=(0,0) # entry point for the next glyph
+
     # calculate dimensions for both "tight" and "loose" bounding boxes
     x1_min=y1_min=x2_max=y2_max=None # initialize the bounding box corners (1:lower left, 2: upper right)
 
@@ -104,26 +97,18 @@ def text_bounding_box2(text, font, lineSpacing, background_tight=False):  # ****
 
     for char in text:
         if char == '\n': # newline    
-            #if y1_min is None:
-            #    y1_min=font_yoffset-base_point[1]
             if firstline: # This the first line
                 firstline = False
                 if background_tight:
                     if y1_min is None:
                         y_offset =  label_position_yoffset
                         box_height_adder = ( lineSpacingY(font, lineSpacing)-lineSpacingY(font, 1) ) + y_offset
+                                            # for a leading newline, this adds to the box_height
 
-                        print('box_height_adder:{}'.format(box_height_adder))
-
-                        #y_offset=label_position_yoffset
-                        #box_height_adder=-label_position_yoffset
-                        #print('label_position_yoffset: {}, lineSpacingY:{}, font[1]: {}'.format(label_position_yoffset, lineSpacingY(font, lineSpacing), font.get_bounding_box()[1]))
-                            # for a leading newline, this adds to the box_height
                     else:
                         y_offset = -y1_min # The bitmap y-offset is the max y-position of the first line
                         
                 else: # background is "loose"
-                    #y_offset = font_height + font_yoffset
                     y_offset = font_yoffset
                     if y1_min is None:
                         box_height_adder = lineSpacingY(font, lineSpacing)
@@ -135,8 +120,6 @@ def text_bounding_box2(text, font, lineSpacing, background_tight=False):  # ****
             if myGlyph == None: # Error checking: no glyph found
                 print('Glyph not found: {}'.format(repr(char)))
             else:
-
-                #print('.width: {} .height: {} .dx: {} .dy: {} .shift_x: {} .shift_y: {}'.format(myGlyph.width, myGlyph.height, myGlyph.dx, myGlyph.dy, myGlyph.shift_x, myGlyph.shift_y))
 
                 x1=base_point[0]    # x1,y1 = upper left of glyph
                 x2=x1+myGlyph.shift_x          # x2,y2 = lower right of glyph
@@ -176,67 +159,14 @@ def text_bounding_box2(text, font, lineSpacing, background_tight=False):  # ****
             if background_tight:
                 y_offset =-y1_min # The bitmap y-offset is the max y-position of the first line
             else: # background is "loose"
-                #y_offset = font_height + font_yoffset
                 y_offset=font_yoffset
 
     box_height=max(0, box_height+box_height_adder) # to add any additional height for leading newlines
-
-    print('text: {}'.format(text))
-    print('background_tight: {}, box_width: {}, box_height: {}, x_offset: {}, y_offset: {}'.format(background_tight, box_width, box_height, -x1_min, y_offset))
 
     return(box_width, box_height, -x1_min, y_offset) # -x1_min is the x_offset
 
 
 
-def text_bounding_box(text, font, lineSpacing, background_tight=False):
-    # bounding_box - determines the bounding box size around the new text to be added.
-    #   To be used to calculate if the new text will be printed within the bounding_box
-    #   This function can used to determine character-wrapping or word-wrapping for a
-    #   text terminal box, prior to actually printing the text in the bitmap.
-    #
-    # Note: Scale is not implemented at this time
-
-    #print('bounding_box text: {}'.format(text))
-    boxHeight = boxWidth = 0
-    fontHeight = font.get_glyph(ord("M")).height
-    thisLineWidth = 0
-
-    for char in text:
-        if char == '\n': # newline    
-            boxWidth = max(boxWidth, thisLineWidth) # check to see if the last line is wider than any others.
-            thisLineWidth = 0 # new line, so restart thislineWidth at 0
-            boxHeight = boxHeight + _lineSpacingY(font, lineSpacing) # add a lineSpacing to the boxHeight
-
-        else: 
-            myGlyph = font.get_glyph(ord(char))
-            if myGlyph == None: # Error checking: no glyph found
-                print('Glyph not found: {}'.format(repr(char)))
-            else:
-                width = myGlyph.width
-                height = myGlyph.height
-                dx = myGlyph.dx
-                dy = myGlyph.dy
-                shift_x = myGlyph.shift_x
-                shift_y = myGlyph.shift_y
-
-                # Not working yet***
-                # This offset is used to match the label.py function from Adafruit_Display_Text library
-                # y_offset = int(
-                #     (
-                #         self._font.get_glyph(ord("M")).height
-                #         - new_text.count("\n") * self.height * self.line_spacing
-                #     )
-                #     / 2 )
-
-                # yOffset = int( (fontHeight-height*lineSpacing)/2 )
-                yOffset = fontHeight - height
-
-                thisLineWidth = thisLineWidth + shift_x
-                boxHeight = max(boxHeight, height - dy + yOffset)
-
-    boxWidth = max(boxWidth, thisLineWidth)
-
-    return (boxWidth, boxHeight)
 
 
 def place_text(
@@ -263,7 +193,6 @@ def place_text(
     xStart=xPosition # starting x position (left margin)
     yStart=yPosition
 
-    # **** check this.
     if backgroundPaletteIndex != 0: # the textbackground is different from the bitmap background
         # draw a bounding box where the text will go
 
@@ -279,7 +208,7 @@ def place_text(
 
     left=right=xStart
     top=bottom=yStart
-    print('##place_text xStart, yStart: {}, {}'.format(xStart, yStart))
+    #print('##place_text xStart, yStart: {}, {}'.format(xStart, yStart))
     
     for char in text:
 
@@ -328,22 +257,18 @@ def place_text(
                             and (yPlacement < bitmapHeight)
                         ):
 
+                            # Allows for remapping the bitmap indexes using paletteIndex for background and text.
                             paletteIndexes=(backgroundPaletteIndex, textPaletteIndex)
-                            
-                            # Allows for different paletteIndex for background and text.
-                            #thisPixelColor=paletteIndexes[myGlyph.bitmap[x+glyph_offset_x,y]]
+                        
                             thisPixelColor=paletteIndexes[myGlyph.bitmap[y*myGlyph.bitmap.width + x + glyph_offset_x]]
-                            #print('myGlyph.bitmap.width,height: {},{} char: {}, myGlyph.tile_index: {}, (x,y): ({},{}), glyph_offset_x: {}, thisPixelColor: {}'.format(myGlyph.bitmap.width, myGlyph.bitmap.height, char, myGlyph.tile_index, x, y, glyph_offset_x, thisPixelColor))
+                            
                             if not printOnlyPixels or thisPixelColor > 0: 
                                 # write all characters if printOnlyPixels = False, or if thisPixelColor is > 0
                                 bitmap[yPlacement*bitmapWidth + xPlacement] = thisPixelColor
-                                #print('* pixel')
                         elif (yPlacement > bitmapHeight):
                             break
                 
                 xPosition = xPosition + shift_x
-
-    print('##place_text left: {}, top: {}, right: {}, bottom: {}'.format(left, top, right, bottom))
 
     return (left, top, left+right, bottom-top) # bounding_box 
 
@@ -399,25 +324,24 @@ class Label(displayio.Group):
         # Calculate the text bounding box
 
         # Calculate tight box to provide bounding box dimensions to match label for anchor_position calculations
-        (tight_box_x, tight_box_y, dummy_x_offset, tight_y_offset) = text_bounding_box2(text, font, 
+        (tight_box_x, tight_box_y, dummy_x_offset, tight_y_offset) = text_bounding_box(text, font, 
                                                                 self._line_spacing, 
                                                                 background_tight=True,
                                                                 )
 
-        (box_x, box_y, x_offset, y_offset) = text_bounding_box2(text, font, 
-                                                                self._line_spacing, 
-                                                                background_tight=background_tight,
-                                                                )
+        if background_tight:
+            box_x=tight_box_x
+            box_y=tight_box_y
+            x_offset=dummy_x_offset
+            y_offset=tight_y_offset
+        else:
+            (box_x, box_y, x_offset, y_offset) = text_bounding_box(text, font, 
+                                                                    self._line_spacing, 
+                                                                    background_tight=background_tight,
+                                                                    )
         # Calculate the background size including padding
         box_x = box_x + padding_left + padding_right
         box_y = box_y + padding_top + padding_bottom
-
-        #print('box_x: {}, box_y: {}'.format(box_x, box_y))
-
-        # Determine the x,y offsets of the text inside the bitmap box, to be used with place_text
-        # **** Is this x_offset=padding_top and y_offset=padding_left
-
-
 
         # Create the two-color palette 
         self.palette = displayio.Palette(2)
@@ -431,21 +355,16 @@ class Label(displayio.Group):
         # Create the bitmap and TileGrid
         self.bitmap = displayio.Bitmap(box_x, box_y, len(self.palette)) 
 
-        # Place the text into the Bitmap
-        
+        # Place the text into the Bitmap 
         text_size=place_text(self.bitmap, text, font, self._line_spacing, padding_left+x_offset, padding_top+y_offset)
         
-
-
-        label_position_yoffset = int( # for calibration with label.py positioning
+        label_position_yoffset = int(       # To calibrate with label.py positioning
             (
                 font.get_glyph(ord("M")).height
                 - text.count("\n") * font.get_bounding_box()[1] * self._line_spacing
             )
             / 2
         )
-
-        #print('label_position_yoffset: {}, text: {}'.format(label_position_yoffset, text))
 
         self.tilegrid = displayio.TileGrid(self.bitmap, pixel_shader=self.palette, 
                                             width=1, height=1, 
@@ -454,8 +373,6 @@ class Label(displayio.Group):
                                             x=0,
                                             y=label_position_yoffset - y_offset,
                                             )
-        #print('box_x,y: ({},{}) y: {}, label_position_yoffset: {}'.format(box_x, box_y, y, label_position_yoffset))
-        print('bitmap_label bitmap width: {} height: {}, (x,y): ({},{})'.format(box_x, box_y, x, y+label_position_yoffset))
 
         # instance the Group with super...    super().__init__(
         # this Group will contain just one TileGrid with one contained bitmap
@@ -467,7 +384,6 @@ class Label(displayio.Group):
         # **** Should scale affect the placement of anchor_position?
 
         self.bounding_box=(self.tilegrid.x, self.tilegrid.y+(y_offset-tight_y_offset), tight_box_x, tight_box_y)
-        #self.bounding_box = (self.tilegrid.x, self.tilegrid.y, box_x, box_y)
                             # Update bounding_box values.  Note: To be consistent with label.py, 
                             # this is the bounding box for the text only, not including the background.
                             # ******** Need repair
@@ -496,12 +412,8 @@ class Label(displayio.Group):
 
     @anchored_position.setter
     def anchored_position(self, new_position):
-        #print('in bitmap_label self.tilegrid.x,y: {},{}'.format(self.tilegrid.x, self.tilegrid.y))
-        #print('in bitmap_label self.x,y: {},{}'.format(self.x, self.y))
-
 
         self._anchored_position=new_position
-        #print('_anchor_point: {}, _anchored_position: {}, scale: {}'.format(self._anchor_point, self._anchored_position, self.scale))
 
         # Set anchored_position
         if (self._anchor_point is not None) and (self._anchored_position is not None):
@@ -516,9 +428,7 @@ class Label(displayio.Group):
                         )
             self.x = new_x
             self.y = new_y
-            print('bitmap_label new x,y: {},{}'.format(new_x, new_y))
-            #print('out bitmap_label self.tilegrid.x,y: {},{}'.format(self.tilegrid.x, self.tilegrid.y))
-            print('out bitmap_label self.x,y: {},{}'.format(self.x, self.y))
+
 
 
 
