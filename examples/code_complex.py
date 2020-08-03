@@ -79,9 +79,9 @@ fontHeight = []
 
 # Load some proportional fonts
 fontFiles =   [
-            'fonts/Helvetica-Bold-16.bdf',
+#            'fonts/Helvetica-Bold-16.bdf',
 #            'fonts/BitstreamVeraSans-Roman-24.bdf', # Header2
-#            'fonts/BitstreamVeraSans-Roman-16.bdf', # mainText
+            'fonts/BitstreamVeraSans-Roman-16.bdf', # mainText
             ]
 
 from adafruit_bitmap_font import bitmap_font
@@ -90,7 +90,7 @@ for i, fontFile in enumerate(fontFiles):
     thisFont = bitmap_font.load_font(fontFile) 
 
 
-    #thisFont=terminalio.FONT
+    thisFont=terminalio.FONT  # comment this out to switch back to BDF loaded fonts
 
     fontList.append(thisFont)
     fontHeight.append( thisFont.get_glyph(ord("M")).height ) 
@@ -107,7 +107,8 @@ if preloadTheGlyphs:
 
     print('loading glyphs...')
     for font in fontList:
-        font.load_glyphs(glyphs)
+        if font is not terminalio.FONT:
+            font.load_glyphs(glyphs)
 
     print('Glyphs are loaded.')
 
@@ -126,7 +127,7 @@ import gc
 
 
 myString12=('Bit Juice ({[]}) Monsters!\"\'ABCDEFGHIJKLMNOPQRSTUVWXYZ\npuppy bug jump ({[]})')
-myString34='\nnone' 
+myString34=' none ' 
 myString_bitmap_label='bitmap_label'
 myString_label='label                               bitmap_label'
 #myString=('Full Screen Size: This is a stationary box, not a stationery box')

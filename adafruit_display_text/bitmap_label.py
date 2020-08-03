@@ -104,7 +104,7 @@ def text_bounding_box(
                     if (
                         y1_min is None
                     ):  # A newline was the first character of the first line
-                        y_offset = label_position_yoffset
+                        y_offset = 0 #label_position_yoffset
                         box_height_adder = (
                             line_spacing_ypixels(font, line_spacing - 1) + y_offset
                         )
@@ -399,7 +399,7 @@ class Label(displayio.Group):
         label_position_yoffset = int(  # To calibrate with label.py positioning
             (
                 font.get_glyph(ord("M")).height
-                - text.count("\n") * font.get_bounding_box()[1] * self._line_spacing
+                - font.get_bounding_box()[1] * self._line_spacing
             )
             / 2
         )
@@ -412,8 +412,9 @@ class Label(displayio.Group):
             tile_width=box_x,
             tile_height=box_y,
             default_tile=0,
-            x=0,
-            y=label_position_yoffset - y_offset,
+            x=-padding_left,
+            #y=label_position_yoffset - y_offset - padding_left,
+            y= - y_offset - padding_left,
         )
 
         # instance the Group with super...    super().__init__(
