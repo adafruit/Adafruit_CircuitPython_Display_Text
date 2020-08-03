@@ -65,10 +65,13 @@ def text_bounding_box2(text, font, lineSpacing, background_tight=False):  # ****
     label_position_yoffset = int( # for calibration with label.py positioning
             (
                 font.get_glyph(ord("M")).height
-                - text.count("\n") * font.get_bounding_box()[1] * lineSpacing
+                #- text.count("\n") * font.get_bounding_box()[1] * lineSpacing
+                - font.get_bounding_box()[1] * lineSpacing
             )
             / 2
         )
+
+    print('M height: {}, font.get_bounding_box()[1]: {}, label_position_yoffset: {}'.format(font.get_glyph(ord("M")).height, font.get_bounding_box()[1], label_position_yoffset))
 
     # this empirical approach checks several glyphs for maximum ascender and descender height
     # Alternate option: utilize `font.get_bounding_box()` to get max glyph dimensions
@@ -107,8 +110,11 @@ def text_bounding_box2(text, font, lineSpacing, background_tight=False):  # ****
                 firstline = False
                 if background_tight:
                     if y1_min is None:
-                        y_offset=label_position_yoffset
-                        box_height_adder = lineSpacingY(font, lineSpacing-1) - y_offset
+                        y_offset =  label_position_yoffset
+                        box_height_adder = ( lineSpacingY(font, lineSpacing)-lineSpacingY(font, 1) ) + y_offset
+
+                        print('box_height_adder:{}'.format(box_height_adder))
+
                         #y_offset=label_position_yoffset
                         #box_height_adder=-label_position_yoffset
                         #print('label_position_yoffset: {}, lineSpacingY:{}, font[1]: {}'.format(label_position_yoffset, lineSpacingY(font, lineSpacing), font.get_bounding_box()[1]))
@@ -129,6 +135,9 @@ def text_bounding_box2(text, font, lineSpacing, background_tight=False):  # ****
             if myGlyph == None: # Error checking: no glyph found
                 print('Glyph not found: {}'.format(repr(char)))
             else:
+
+                #print('.width: {} .height: {} .dx: {} .dy: {} .shift_x: {} .shift_y: {}'.format(myGlyph.width, myGlyph.height, myGlyph.dx, myGlyph.dy, myGlyph.shift_x, myGlyph.shift_y))
+
                 x1=base_point[0]    # x1,y1 = upper left of glyph
                 x2=x1+myGlyph.shift_x          # x2,y2 = lower right of glyph
                 if background_tight:
@@ -172,7 +181,8 @@ def text_bounding_box2(text, font, lineSpacing, background_tight=False):  # ****
 
     box_height=max(0, box_height+box_height_adder) # to add any additional height for leading newlines
 
-    #print('background_tight: {}, box_width: {}, box_height: {}, x_offset: {}, y_offset: {}'.format(background_tight, box_width, box_height, -x1_min, y_offset))
+    print('text: {}'.format(text))
+    print('background_tight: {}, box_width: {}, box_height: {}, x_offset: {}, y_offset: {}'.format(background_tight, box_width, box_height, -x1_min, y_offset))
 
     return(box_width, box_height, -x1_min, y_offset) # -x1_min is the x_offset
 
