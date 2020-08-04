@@ -78,109 +78,83 @@ def text_bounding_box(
     font_height = ascender_max + descender_max
     font_yoffset = ascender_max
 
-    base_point = (0, 0)  # entry point for the next glyph
 
-    x1_min = (
-        y1_min
-    ) = (
-        x2_max
-    ) = (
-        y2_max
-    ) = None  # initialize the bounding box corners (1:lower left, 2: upper right)
+    lines = 1
 
-    y_offset = None  # Provide the baseline y_offset for the bitmap
+    font_height = font.get_glyph(ord("M")).height
 
-    box_height = 0
-    box_width = 0
-    box_height_adder = 0
 
-    firstline = True  # handles special cases for first line
+    xposition = x_start = 0  # starting x position (left margin)
+    yposition = y_start = 0
+
+    left = right = x_start
+    top = bottom = y_start
+
+
+    y_offset_tight = int(( font.get_glyph(ord("M")).height - text.count("\n") *line_spacing_ypixels(font, line_spacing)
+    )
+    / 2) 
+    # this needs to be reviewed (also in label.py), since it doesn't respond 
+    # properly to the number of newlines.
+
+    newline=False
 
     for char in text:
+
         if char == "\n":  # newline
-            if firstline:  # This the first line
-                firstline = False
-                if background_tight:
-                    if (
-                        y1_min is None
-                    ):  # A newline was the first character of the first line
-                        y_offset = 0 #label_position_yoffset
-                        box_height_adder = (
-                            line_spacing_ypixels(font, line_spacing - 1) + y_offset
-                        )
-                        # for a leading newline, this adds to the box_height
-
-                    else:
-                        y_offset = (
-                            -y1_min
-                        )  # The bitmap y-offset is the max y-position of the first line
-
-                else:  # background is "loose"
-                    y_offset = font_yoffset
-                    if y1_min is None:
-                        box_height_adder = line_spacing_ypixels(font, line_spacing)
-
-            base_point = (
-                0,
-                base_point[1] + line_spacing_ypixels(font, line_spacing),
-            )  # baseline point for the next glyph
+            newline=True
 
         else:
+
             my_glyph = font.get_glyph(ord(char))
+
             if my_glyph == None:  # Error checking: no glyph found
                 print("Glyph not found: {}".format(repr(char)))
             else:
-                x1 = base_point[0]  # x1,y1 = upper left of glyph
-                x2 = x1 + my_glyph.shift_x  # x2,y2 = lower right of glyph
-                if background_tight:
-                    y1 = base_point[1] - (
-                        my_glyph.height + my_glyph.dy
-                    )  # Upper left corner Note: Positive Y is down
-                    y2 = y1 + my_glyph.height
-                else:  # background is "loose"
-                    y1 = base_point[1] - font_yoffset
-                    y2 = y1 + font_height
-                base_point = (
-                    base_point[0] + my_glyph.shift_x,
-                    base_point[1] + my_glyph.shift_y,
-                )  # update the next baseline point location
+                if newline:
+                    newline=False
+                    xposition = x_start  # reset to left column
+                    yposition = yposition + line_spacing_ypixels(
+                                font, line_spacing
+                                )  # Add a newline
+                    lines += 1
+                xposition += my_glyph.shift_x
+                right = max(right, xposition)
 
-                # find the min bounding box size incorporating this glyph's bounding box
-                if x1_min is not None:
-                    x1_min = min(x1, x1_min)
-                else:
-                    x1_min = min(0, x1)  # ****
-                if y1_min is not None:
-                    y1_min = min(y1, y1_min)
-                else:
-                    y1_min = y1
-                if x2_max is not None:
-                    x2_max = max(x2, x2_max)
-                else:
-                    x2_max = x2
-                if y2_max is not None:
-                    y2_max = max(y2, y2_max)
-                else:
-                    y2_max = y2
+                if yposition == y_start:  # first line, find the Ascender height
+                    top = min(top, - my_glyph.height - my_glyph.dy + y_offset_tight)
+                bottom = max(bottom, yposition - my_glyph.dy + y_offset_tight)
 
-        if x1_min is not None and x2_max is not None:
-            box_width = max(0, x2_max - x1_min)
-        if y1_min is not None and y2_max is not None:
-            box_height = y2_max - y1_min
+                # width = my_glyph.width
+                # height = my_glyph.height
+                # dx = my_glyph.dx
+                # dy = my_glyph.dy
+                # shift_x = my_glyph.shift_x
+                # shift_y = my_glyph.shift_x
 
-        if firstline:  # This the first line
-            if background_tight:
-                y_offset = (
-                    -y1_min
-                )  # The bitmap y-offset is the max y-position of the first line
-            else:  # background is "loose"
-                y_offset = font_yoffset
 
-    box_height = max(
-        0, box_height + box_height_adder
-    )  # to add any additional height for leading newlines
+    loose_height= (lines - 1) * line_spacing_ypixels(font, line_spacing) + (ascender_max + descender_max)
 
-    return (box_width, box_height, -x1_min, y_offset)  # -x1_min is the x_offset
+
+
+    label_calibration_offset=int(( font.get_glyph(ord("M")).height - text.count("\n") *line_spacing_ypixels(font, line_spacing)
+    )
+    / 2)
+
+    y_offset_tight = -top +label_calibration_offset #  
+
+
+
+    final_box_width=right-left
+    if background_tight:
+        final_box_height=bottom-top
+        final_y_offset=y_offset_tight
+        
+    else:
+        final_box_height=loose_height
+        final_y_offset=ascender_max
+
+    return (final_box_width, final_box_height, 0, final_y_offset)  # -x1_min is the x_offset
 
 
 def place_text(
@@ -211,26 +185,6 @@ def place_text(
 
     x_start = xposition  # starting x position (left margin)
     y_start = yposition
-
-    if (
-        background_palette_index != 0
-    ):  # the textbackground is different from the bitmap background
-        # draw a bounding box where the text will go
-
-        (ignore, font_line_height) = bounding_box(
-            "M g", font, line_spacing, scale
-        )  # check height with ascender and descender.
-        (box_x, box_y) = bounding_box(text, font, line_spacing, scale)
-        box_y = max(font_line_height, box_y)
-
-        for y in range(box_y):
-            for x in range(box_x):
-                if (xposition + x < bitmap_width) and (
-                    yposition + y < bitmap_height
-                ):  # check boundaries
-                    bitmap[
-                        (yposition + y) * bitmap_width + (xposition + x)
-                    ] = background_palette_index
 
     left = right = x_start
     top = bottom = y_start
@@ -302,7 +256,7 @@ def place_text(
 
                 xposition = xposition + shift_x
 
-    return (left, top, left + right, bottom - top)  # bounding_box
+    return (left, top, right-left, bottom - top)  # bounding_box
 
 
 class Label(displayio.Group):
@@ -357,15 +311,15 @@ class Label(displayio.Group):
         # Calculate the text bounding box
 
         # Calculate tight box to provide bounding box dimensions to match label for anchor_position calculations
-        (tight_box_x, tight_box_y, dummy_x_offset, tight_y_offset) = text_bounding_box(
+        (tight_box_x, tight_box_y, x_offset, tight_y_offset) = text_bounding_box(
             text, font, self._line_spacing, background_tight=True,
         )
 
         if background_tight:
             box_x = tight_box_x
             box_y = tight_box_y
-            x_offset = dummy_x_offset
             y_offset = tight_y_offset
+
         else:
             (box_x, box_y, x_offset, y_offset) = text_bounding_box(
                 text, font, self._line_spacing, background_tight=background_tight,
@@ -399,7 +353,7 @@ class Label(displayio.Group):
         label_position_yoffset = int(  # To calibrate with label.py positioning
             (
                 font.get_glyph(ord("M")).height
-                - font.get_bounding_box()[1] * self._line_spacing
+                - text.count("\n") * font.get_bounding_box()[1] * self._line_spacing
             )
             / 2
         )
@@ -413,8 +367,7 @@ class Label(displayio.Group):
             tile_height=box_y,
             default_tile=0,
             x=-padding_left,
-            #y=label_position_yoffset - y_offset - padding_left,
-            y= - y_offset - padding_left,
+            y= label_position_yoffset - y_offset - padding_top,
         )
 
         # instance the Group with super...    super().__init__(
@@ -430,10 +383,21 @@ class Label(displayio.Group):
 
         self.bounding_box = (
             self.tilegrid.x,
-            self.tilegrid.y + (y_offset - tight_y_offset),
+            #self.tilegrid.y + (y_offset - tight_y_offset),
+            self.tilegrid.y, #+ (y_offset - tight_y_offset),
             tight_box_x,
             tight_box_y,
         )
+
+        # self.bounding_box = (
+        #     self.tilegrid.x,
+        #     self.tilegrid.y + (y_offset),
+        #     tight_box_x,
+        #     tight_box_y,
+        # )
+
+
+
         # Update bounding_box values.  Note: To be consistent with label.py,
         # this is the bounding box for the text only, not including the background.
         # ******** Need repair
