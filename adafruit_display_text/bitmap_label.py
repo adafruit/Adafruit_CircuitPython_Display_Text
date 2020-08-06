@@ -78,11 +78,9 @@ def text_bounding_box(
     font_height = ascender_max + descender_max
     font_yoffset = ascender_max
 
-
     lines = 1
 
     font_height = font.get_glyph(ord("M")).height
-
 
     xposition = x_start = 0  # starting x position (left margin)
     yposition = y_start = 0
@@ -90,19 +88,22 @@ def text_bounding_box(
     left = right = x_start
     top = bottom = y_start
 
-
-    y_offset_tight = int(( font.get_glyph(ord("M")).height - text.count("\n") *line_spacing_ypixels(font, line_spacing)
+    y_offset_tight = int(
+        (
+            font.get_glyph(ord("M")).height
+            - text.count("\n") * line_spacing_ypixels(font, line_spacing)
+        )
+        / 2
     )
-    / 2) 
-    # this needs to be reviewed (also in label.py), since it doesn't respond 
+    # this needs to be reviewed (also in label.py), since it doesn't respond
     # properly to the number of newlines.
 
-    newline=False
+    newline = False
 
     for char in text:
 
         if char == "\n":  # newline
-            newline=True
+            newline = True
 
         else:
 
@@ -112,49 +113,43 @@ def text_bounding_box(
                 print("Glyph not found: {}".format(repr(char)))
             else:
                 if newline:
-                    newline=False
+                    newline = False
                     xposition = x_start  # reset to left column
                     yposition = yposition + line_spacing_ypixels(
-                                font, line_spacing
-                                )  # Add a newline
+                        font, line_spacing
+                    )  # Add a newline
                     lines += 1
                 xposition += my_glyph.shift_x
                 right = max(right, xposition)
 
                 if yposition == y_start:  # first line, find the Ascender height
-                    top = min(top, - my_glyph.height - my_glyph.dy + y_offset_tight)
+                    top = min(top, -my_glyph.height - my_glyph.dy + y_offset_tight)
                 bottom = max(bottom, yposition - my_glyph.dy + y_offset_tight)
 
-                # width = my_glyph.width
-                # height = my_glyph.height
-                # dx = my_glyph.dx
-                # dy = my_glyph.dy
-                # shift_x = my_glyph.shift_x
-                # shift_y = my_glyph.shift_x
-
-
-    loose_height= (lines - 1) * line_spacing_ypixels(font, line_spacing) + (ascender_max + descender_max)
-
-
-
-    label_calibration_offset=int(( font.get_glyph(ord("M")).height - text.count("\n") *line_spacing_ypixels(font, line_spacing)
+    loose_height = (lines - 1) * line_spacing_ypixels(font, line_spacing) + (
+        ascender_max + descender_max
     )
-    / 2)
 
-    y_offset_tight = -top +label_calibration_offset #  
+    label_calibration_offset = int(
+        (
+            font.get_glyph(ord("M")).height
+            - text.count("\n") * line_spacing_ypixels(font, line_spacing)
+        )
+        / 2
+    )
 
+    y_offset_tight = -top + label_calibration_offset
 
-
-    final_box_width=right-left
+    final_box_width = right - left
     if background_tight:
-        final_box_height=bottom-top
-        final_y_offset=y_offset_tight
-        
-    else:
-        final_box_height=loose_height
-        final_y_offset=ascender_max
+        final_box_height = bottom - top
+        final_y_offset = y_offset_tight
 
-    return (final_box_width, final_box_height, 0, final_y_offset)  # -x1_min is the x_offset
+    else:
+        final_box_height = loose_height
+        final_y_offset = ascender_max
+
+    return (final_box_width, final_box_height, 0, final_y_offset)
 
 
 def place_text(
@@ -256,13 +251,13 @@ def place_text(
 
                 xposition = xposition + shift_x
 
-    return (left, top, right-left, bottom - top)  # bounding_box
+    return (left, top, right - left, bottom - top)  # bounding_box
 
 
 class Label(displayio.Group):
     # Class variable
     # To save memory, set Label._memory_saver=True and avoid storing the text string in the class.
-    # If set to False, the class saves the text string for future reference. *** use getter
+    # If set to False, the class saves the text string for future reference.
     _memory_saver = True
 
     def __init__(
@@ -302,7 +297,7 @@ class Label(displayio.Group):
         else:
             self._text = text  # text to be displayed
 
-        # limit padding to >= 0 *** raise an error if negative padding is requested
+        # limit padding to >= 0
         padding_top = max(0, padding_top)
         padding_bottom = max(0, padding_bottom)
         padding_left = max(0, padding_left)
@@ -367,7 +362,7 @@ class Label(displayio.Group):
             tile_height=box_y,
             default_tile=0,
             x=-padding_left,
-            y= label_position_yoffset - y_offset - padding_top,
+            y=label_position_yoffset - y_offset - padding_top,
         )
 
         # instance the Group with super...    super().__init__(
@@ -377,31 +372,15 @@ class Label(displayio.Group):
         )  # this will include any arguments, including scale
         self.append(self.tilegrid)  # add the bitmap's tilegrid to the group
 
-        #######  *******
-        # Set the tileGrid position in the parent based upon anchor_point and anchor_position
-        # **** Should scale affect the placement of anchor_position?
+        # Update bounding_box values.  Note: To be consistent with label.py,
+        # this is the bounding box for the text only, not including the background.
 
         self.bounding_box = (
             self.tilegrid.x,
-            #self.tilegrid.y + (y_offset - tight_y_offset),
-            self.tilegrid.y, #+ (y_offset - tight_y_offset),
+            self.tilegrid.y,
             tight_box_x,
             tight_box_y,
         )
-
-        # self.bounding_box = (
-        #     self.tilegrid.x,
-        #     self.tilegrid.y + (y_offset),
-        #     tight_box_x,
-        #     tight_box_y,
-        # )
-
-
-
-        # Update bounding_box values.  Note: To be consistent with label.py,
-        # this is the bounding box for the text only, not including the background.
-        # ******** Need repair
-        # Create the TileGrid to hold the single Bitmap (self.bitmap)
 
         self._anchored_position = anchored_position
         self.anchor_point = anchor_point
