@@ -49,212 +49,8 @@ Implementation Notes
 
 import displayio
 
-
-def line_spacing_ypixels(font, line_spacing):
-    # Note: Scale is not implemented at this time, any scaling is pushed up to the Group level
-    return_value = int(line_spacing * font.get_bounding_box()[1])
-    return return_value
-
-
-def text_bounding_box(
-    text, font, line_spacing, background_tight=False
-):  # **** change default background_tight=False
-
-    label_position_yoffset = int(  # for calibration with label.py positioning
-        (font.get_glyph(ord("M")).height - font.get_bounding_box()[1] * line_spacing)
-        / 2
-    )
-
-    # This empirical approach checks several glyphs for maximum ascender and descender height
-    # (consistent with label.py)
-    glyphs = "M j'"  # choose glyphs with highest ascender and lowest
-    # descender, will depend upon font used
-    ascender_max = descender_max = 0
-    for char in glyphs:
-        this_glyph = font.get_glyph(ord(char))
-        if this_glyph:
-            ascender_max = max(ascender_max, this_glyph.height + this_glyph.dy)
-            descender_max = max(descender_max, -this_glyph.dy)
-    font_height = ascender_max + descender_max
-    font_yoffset = ascender_max
-
-    lines = 1
-
-    font_height = font.get_glyph(ord("M")).height
-
-    xposition = x_start = 0  # starting x position (left margin)
-    yposition = y_start = 0
-
-    left = right = x_start
-    top = bottom = y_start
-
-    y_offset_tight = int(
-        (
-            font.get_glyph(ord("M")).height
-            - text.count("\n") * line_spacing_ypixels(font, line_spacing)
-        )
-        / 2
-    )
-    # this needs to be reviewed (also in label.py), since it doesn't respond
-    # properly to the number of newlines.
-
-    newline = False
-
-    for char in text:
-
-        if char == "\n":  # newline
-            newline = True
-
-        else:
-
-            my_glyph = font.get_glyph(ord(char))
-
-            if my_glyph == None:  # Error checking: no glyph found
-                print("Glyph not found: {}".format(repr(char)))
-            else:
-                if newline:
-                    newline = False
-                    xposition = x_start  # reset to left column
-                    yposition = yposition + line_spacing_ypixels(
-                        font, line_spacing
-                    )  # Add a newline
-                    lines += 1
-                xposition += my_glyph.shift_x
-                right = max(right, xposition)
-
-                if yposition == y_start:  # first line, find the Ascender height
-                    top = min(top, -my_glyph.height - my_glyph.dy + y_offset_tight)
-                bottom = max(bottom, yposition - my_glyph.dy + y_offset_tight)
-
-    loose_height = (lines - 1) * line_spacing_ypixels(font, line_spacing) + (
-        ascender_max + descender_max
-    )
-
-    label_calibration_offset = int(
-        (
-            font.get_glyph(ord("M")).height
-            - text.count("\n") * line_spacing_ypixels(font, line_spacing)
-        )
-        / 2
-    )
-
-    y_offset_tight = -top + label_calibration_offset
-
-    final_box_width = right - left
-    if background_tight:
-        final_box_height = bottom - top
-        final_y_offset = y_offset_tight
-
-    else:
-        final_box_height = loose_height
-        final_y_offset = ascender_max
-
-    return (final_box_width, final_box_height, 0, final_y_offset)
-
-
-def place_text(
-    bitmap,
-    text,
-    font,
-    line_spacing,
-    xposition,
-    yposition,
-    text_palette_index=1,
-    background_palette_index=0,
-    scale=1,
-    print_only_pixels=True,  # print_only_pixels = True: only update the bitmap where the glyph
-    # pixel color is > 0.  This is especially useful for script fonts where glyph
-    # bounding boxes overlap
-    # Set `print_only_pixels=False` to write all pixels
-):
-    # placeText - Writes text into a bitmap at the specified location.
-    #
-    # Verify paletteIndex is working properly with * operator, especially if accommodating multicolored fonts
-    #
-    # Note: Scale is not implemented at this time, is pushed up to Group level
-
-    font_height = font.get_glyph(ord("M")).height
-
-    bitmap_width = bitmap.width
-    bitmap_height = bitmap.height
-
-    x_start = xposition  # starting x position (left margin)
-    y_start = yposition
-
-    left = right = x_start
-    top = bottom = y_start
-
-    for char in text:
-
-        if char == "\n":  # newline
-            xposition = x_start  # reset to left column
-            yposition = yposition + line_spacing_ypixels(
-                font, line_spacing
-            )  # Add a newline
-
-        else:
-
-            my_glyph = font.get_glyph(ord(char))
-
-            if my_glyph == None:  # Error checking: no glyph found
-                print("Glyph not found: {}".format(repr(char)))
-            else:
-
-                right = max(right, xposition + my_glyph.shift_x)
-                if yposition == y_start:  # first line, find the Ascender height
-                    top = min(top, -my_glyph.height - my_glyph.dy)
-                bottom = max(bottom, yposition - my_glyph.dy)
-
-                width = my_glyph.width
-                height = my_glyph.height
-                dx = my_glyph.dx
-                dy = my_glyph.dy
-                shift_x = my_glyph.shift_x
-                shift_y = my_glyph.shift_x
-                glyph_offset_x = (
-                    my_glyph.tile_index * width
-                )  # for type BuiltinFont, this creates the x-offset in the glyph bitmap.
-                # for BDF loaded fonts, this should equal 0
-
-                y_offset = font_height - height
-                for y in range(height):
-                    for x in range(width):
-                        x_placement = x + xposition + dx
-                        y_placement = y + yposition - height - dy
-
-                        if (
-                            (x_placement >= 0)
-                            and (y_placement >= 0)
-                            and (x_placement < bitmap_width)
-                            and (y_placement < bitmap_height)
-                        ):
-
-                            # Allows for remapping the bitmap indexes using paletteIndex for background and text.
-                            palette_indexes = (
-                                background_palette_index,
-                                text_palette_index,
-                            )
-
-                            this_pixel_color = palette_indexes[
-                                my_glyph.bitmap[
-                                    y * my_glyph.bitmap.width + x + glyph_offset_x
-                                ]
-                            ]
-
-                            if not print_only_pixels or this_pixel_color > 0:
-                                # write all characters if printOnlyPixels = False, or if thisPixelColor is > 0
-                                bitmap[
-                                    y_placement * bitmap_width + x_placement
-                                ] = this_pixel_color
-                        elif y_placement > bitmap_height:
-                            break
-
-                xposition = xposition + shift_x
-
-    return (left, top, right - left, bottom - top)  # bounding_box
-
-
 class Label(displayio.Group):
+
     # Class variable
     # To save memory, set Label._memory_saver=True and avoid storing the text string in the class.
     # If set to False, the class saves the text string for future reference.
@@ -306,7 +102,7 @@ class Label(displayio.Group):
         # Calculate the text bounding box
 
         # Calculate tight box to provide bounding box dimensions to match label for anchor_position calculations
-        (tight_box_x, tight_box_y, x_offset, tight_y_offset) = text_bounding_box(
+        (tight_box_x, tight_box_y, x_offset, tight_y_offset) = self.text_bounding_box(
             text, font, self._line_spacing, background_tight=True,
         )
 
@@ -316,7 +112,7 @@ class Label(displayio.Group):
             y_offset = tight_y_offset
 
         else:
-            (box_x, box_y, x_offset, y_offset) = text_bounding_box(
+            (box_x, box_y, x_offset, y_offset) = self.text_bounding_box(
                 text, font, self._line_spacing, background_tight=background_tight,
             )
         # Calculate the background size including padding
@@ -336,7 +132,7 @@ class Label(displayio.Group):
         self.bitmap = displayio.Bitmap(box_x, box_y, len(self.palette))
 
         # Place the text into the Bitmap
-        text_size = place_text(
+        text_size = self.place_text(
             self.bitmap,
             text,
             font,
@@ -365,7 +161,7 @@ class Label(displayio.Group):
             y=label_position_yoffset - y_offset - padding_top,
         )
 
-        # instance the Group with super...    super().__init__(
+        # instance the Group 
         # this Group will contain just one TileGrid with one contained bitmap
         super().__init__(
             max_size=1, x=x, y=y, **kwargs
@@ -387,6 +183,210 @@ class Label(displayio.Group):
         self.anchored_position = (
             self._anchored_position
         )  # sets anchored_position with setter after bitmap is created
+
+    @staticmethod
+    def line_spacing_ypixels(font, line_spacing):
+        # Note: Scale is not implemented at this time, any scaling is pushed up to the Group level
+        return_value = int(line_spacing * font.get_bounding_box()[1])
+        return return_value
+
+    def text_bounding_box(self,
+        text, font, line_spacing, background_tight=False
+    ):  # **** change default background_tight=False
+
+        label_position_yoffset = int(  # for calibration with label.py positioning
+            (font.get_glyph(ord("M")).height - font.get_bounding_box()[1] * line_spacing)
+            / 2
+        )
+
+        # This empirical approach checks several glyphs for maximum ascender and descender height
+        # (consistent with label.py)
+        glyphs = "M j'"  # choose glyphs with highest ascender and lowest
+        # descender, will depend upon font used
+        ascender_max = descender_max = 0
+        for char in glyphs:
+            this_glyph = font.get_glyph(ord(char))
+            if this_glyph:
+                ascender_max = max(ascender_max, this_glyph.height + this_glyph.dy)
+                descender_max = max(descender_max, -this_glyph.dy)
+        font_height = ascender_max + descender_max
+        font_yoffset = ascender_max
+
+        lines = 1
+
+        font_height = font.get_glyph(ord("M")).height
+
+        xposition = x_start = 0  # starting x position (left margin)
+        yposition = y_start = 0
+
+        left = right = x_start
+        top = bottom = y_start
+
+        y_offset_tight = int(
+            (
+                font.get_glyph(ord("M")).height
+                - text.count("\n") * self.line_spacing_ypixels(font, line_spacing)
+            )
+            / 2
+        )
+        # this needs to be reviewed (also in label.py), since it doesn't respond
+        # properly to the number of newlines.
+
+        newline = False
+
+        for char in text:
+
+            if char == "\n":  # newline
+                newline = True
+
+            else:
+
+                my_glyph = font.get_glyph(ord(char))
+
+                if my_glyph == None:  # Error checking: no glyph found
+                    print("Glyph not found: {}".format(repr(char)))
+                else:
+                    if newline:
+                        newline = False
+                        xposition = x_start  # reset to left column
+                        yposition = yposition + self.line_spacing_ypixels(
+                            font, line_spacing
+                        )  # Add a newline
+                        lines += 1
+                    xposition += my_glyph.shift_x
+                    right = max(right, xposition)
+
+                    if yposition == y_start:  # first line, find the Ascender height
+                        top = min(top, -my_glyph.height - my_glyph.dy + y_offset_tight)
+                    bottom = max(bottom, yposition - my_glyph.dy + y_offset_tight)
+
+        loose_height = (lines - 1) * self.line_spacing_ypixels(font, line_spacing) + (
+            ascender_max + descender_max
+        )
+
+        label_calibration_offset = int(
+            (
+                font.get_glyph(ord("M")).height
+                - text.count("\n") * self.line_spacing_ypixels(font, line_spacing)
+            )
+            / 2
+        )
+
+        y_offset_tight = -top + label_calibration_offset
+
+        final_box_width = right - left
+        if background_tight:
+            final_box_height = bottom - top
+            final_y_offset = y_offset_tight
+
+        else:
+            final_box_height = loose_height
+            final_y_offset = ascender_max
+
+        return (final_box_width, final_box_height, 0, final_y_offset)
+
+    def place_text(self,
+        bitmap,
+        text,
+        font,
+        line_spacing,
+        xposition,
+        yposition,
+        text_palette_index=1,
+        background_palette_index=0,
+        scale=1,
+        print_only_pixels=True,  # print_only_pixels = True: only update the bitmap where the glyph
+        # pixel color is > 0.  This is especially useful for script fonts where glyph
+        # bounding boxes overlap
+        # Set `print_only_pixels=False` to write all pixels
+    ):
+        # placeText - Writes text into a bitmap at the specified location.
+        #
+        # Verify paletteIndex is working properly with * operator, especially if accommodating multicolored fonts
+        #
+        # Note: Scale is not implemented at this time, is pushed up to Group level
+
+        font_height = font.get_glyph(ord("M")).height
+
+        bitmap_width = bitmap.width
+        bitmap_height = bitmap.height
+
+        x_start = xposition  # starting x position (left margin)
+        y_start = yposition
+
+        left = right = x_start
+        top = bottom = y_start
+
+        for char in text:
+
+            if char == "\n":  # newline
+                xposition = x_start  # reset to left column
+                yposition = yposition + self.line_spacing_ypixels(
+                    font, line_spacing
+                )  # Add a newline
+
+            else:
+
+                my_glyph = font.get_glyph(ord(char))
+
+                if my_glyph == None:  # Error checking: no glyph found
+                    print("Glyph not found: {}".format(repr(char)))
+                else:
+
+                    right = max(right, xposition + my_glyph.shift_x)
+                    if yposition == y_start:  # first line, find the Ascender height
+                        top = min(top, -my_glyph.height - my_glyph.dy)
+                    bottom = max(bottom, yposition - my_glyph.dy)
+
+                    width = my_glyph.width
+                    height = my_glyph.height
+                    dx = my_glyph.dx
+                    dy = my_glyph.dy
+                    shift_x = my_glyph.shift_x
+                    shift_y = my_glyph.shift_x
+                    glyph_offset_x = (
+                        my_glyph.tile_index * width
+                    )  # for type BuiltinFont, this creates the x-offset in the glyph bitmap.
+                    # for BDF loaded fonts, this should equal 0
+
+                    y_offset = font_height - height
+                    for y in range(height):
+                        for x in range(width):
+                            x_placement = x + xposition + dx
+                            y_placement = y + yposition - height - dy
+
+                            if (
+                                (x_placement >= 0)
+                                and (y_placement >= 0)
+                                and (x_placement < bitmap_width)
+                                and (y_placement < bitmap_height)
+                            ):
+
+                                # Allows for remapping the bitmap indexes using paletteIndex for background and text.
+                                palette_indexes = (
+                                    background_palette_index,
+                                    text_palette_index,
+                                )
+
+                                this_pixel_color = palette_indexes[
+                                    my_glyph.bitmap[
+                                        y * my_glyph.bitmap.width + x + glyph_offset_x
+                                    ]
+                                ]
+
+                                if not print_only_pixels or this_pixel_color > 0:
+                                    # write all characters if printOnlyPixels = False, or if thisPixelColor is > 0
+                                    bitmap[
+                                        y_placement * bitmap_width + x_placement
+                                    ] = this_pixel_color
+                            elif y_placement > bitmap_height:
+                                break
+
+                    xposition = xposition + shift_x
+
+        return (left, top, right - left, bottom - top)  # bounding_box
+
+
 
     @property
     def anchor_point(self):
