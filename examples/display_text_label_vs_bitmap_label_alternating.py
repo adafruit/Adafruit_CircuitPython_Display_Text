@@ -99,7 +99,6 @@ fontFiles = [
 ]
 
 
-
 for i, fontFile in enumerate(fontFiles):
 
     if use_builtinfont:
@@ -112,7 +111,9 @@ for i, fontFile in enumerate(fontFiles):
     fontList.append(thisFont)
 
 
-preload_glyphs = True  # set this to True if you want to preload the font glyphs into memory
+preload_glyphs = (
+    True  # set this to True if you want to preload the font glyphs into memory
+)
 # preloading the glyphs will help speed up the rendering of text but will use more RAM
 
 if preload_glyphs:
