@@ -8,32 +8,33 @@
 # import textmap
 # from textmap import textBox
 
+import gc
+import time
 import board
 import displayio
 import terminalio
-import gc
-import time
+
 
 ##########
 # Use these Boolean variables to select the text display library and which font style to use
 ##########
-use_bitmap_label = True  # Set True if to use 'bitmap_label.py'
+use_bitmaplabel = True  # Set True if to use 'bitmap_label.py'
 # Set False to use 'label.py' library
 ##########
-use_builtin_font = True  # Set True to use the terminalio.FONT BuiltinFont,
+use_builtinfont = True  # Set True to use the terminalio.FONT BuiltinFont,
 # Set False to use a BDF loaded font, see "fontFiles" below
 ##########
 
 
 my_scale = 1
 
-if use_bitmap_label:  # use bitmap_label.py library (Bitmap)
+if use_bitmaplabel:  # use bitmap_label.py library (Bitmap)
     from adafruit_display_text import bitmap_label as label
 
     version = "bitmap_label.py"
 
 else:  # use label.py library (TileGrid)
-    from adafruit_display_text import label as label
+    from adafruit_display_text import label
 
     version = "label.py"
 
@@ -106,7 +107,7 @@ font_list = []
 
 for i, font_file in enumerate(font_files):
 
-    if use_builtin_font:
+    if use_builtinfont:
         this_font = (
             terminalio.FONT
         )  # comment this out to switch back to BDF loaded fonts
@@ -138,7 +139,6 @@ if preload_the_glyphs:
 print("Fonts completed loading.")
 
 # create group
-import gc
 
 gc.collect()
 print("After creating Group,  Memory free: {}".format(gc.mem_free()))

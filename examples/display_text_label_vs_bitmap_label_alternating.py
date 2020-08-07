@@ -8,13 +8,12 @@
 # import textmap
 # from textmap import textBox
 
+import gc
+import time
 import board
 import displayio
 import terminalio
-import fontio
-import sys
-import time
-import busio
+from adafruit_bitmap_font import bitmap_font
 
 from adafruit_display_text import bitmap_label
 
@@ -26,7 +25,7 @@ from adafruit_display_text import label
 ##########
 # Use this Boolean variables to select which font style to use
 ##########
-use_builtin_font = True  # Set True to use the terminalio.FONT BuiltinFont,
+use_builtinfont = True  # Set True to use the terminalio.FONT BuiltinFont,
 # Set False to use a BDF loaded font, see "fontFiles" below
 ##########
 
@@ -99,11 +98,11 @@ fontFiles = [
     #            'fonts/BitstreamVeraSans-Roman-16.bdf', # mainText
 ]
 
-from adafruit_bitmap_font import bitmap_font
+
 
 for i, fontFile in enumerate(fontFiles):
 
-    if use_builtin_font:
+    if use_builtinfont:
         thisFont = (
             terminalio.FONT
         )  # comment this out to switch back to BDF loaded fonts
@@ -113,12 +112,10 @@ for i, fontFile in enumerate(fontFiles):
     fontList.append(thisFont)
 
 
-preloadTheGlyphs = (
-    True  # set this to True if you want to preload the font glyphs into memory
-)
+preload_glyphs = True  # set this to True if you want to preload the font glyphs into memory
 # preloading the glyphs will help speed up the rendering of text but will use more RAM
 
-if preloadTheGlyphs:
+if preload_glyphs:
 
     # identify the glyphs to load into memory -> increases rendering speed
     glyphs = b"0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-,.:?! "
@@ -134,13 +131,11 @@ if preloadTheGlyphs:
 print("Fonts completed loading.")
 
 # create group
-import gc
 
-
-myString1 = "This is a label.py and\nbitmap_label.py comparison."
-myString23 = "none"
-myString_bitmap_label = "bitmap_label"
-myString_label = "label                               bitmap_label"
+my_string1 = "This is a label.py and\nbitmap_label.py comparison."
+my_string23 = "none"
+my_string_bitmap_label = "bitmap_label"
+my_string_label = "label                               bitmap_label"
 
 
 #####
@@ -151,9 +146,9 @@ bitmap_label_start = gc.mem_free()
 
 bmap_label1 = bitmap_label.Label(
     font=fontList[0],
-    text=myString1,
+    text=my_string1,
     color=0xFFFFFF,
-    max_glyphs=len(myString1),
+    max_glyphs=len(my_string1),
     background_color=0xFF0000,
     padding_bottom=0,
     padding_left=0,
@@ -170,9 +165,9 @@ bmap_label1 = bitmap_label.Label(
 label2_padding = 10
 bmap_label2 = bitmap_label.Label(
     font=fontList[0],
-    text=myString23,
+    text=my_string23,
     color=0x000000,
-    max_glyphs=len(myString23),
+    max_glyphs=len(my_string23),
     background_color=0xFFFF00,
     padding_bottom=label2_padding,
     padding_left=0,
@@ -189,9 +184,9 @@ bmap_label2 = bitmap_label.Label(
 
 bmap_label3 = bitmap_label.Label(
     font=fontList[0],
-    text=myString23,
+    text=my_string23,
     color=0x000000,
-    max_glyphs=len(myString23),
+    max_glyphs=len(my_string23),
     background_color=0xFFFF00,
     padding_bottom=0,
     padding_left=0,
@@ -206,9 +201,9 @@ bmap_label3 = bitmap_label.Label(
 
 bmap_label4 = bitmap_label.Label(
     font=fontList[0],
-    text=myString_label,
+    text=my_string_label,
     color=0x000000,
-    max_glyphs=len(myString_label),
+    max_glyphs=len(my_string_label),
     background_color=0xFFFF00,
     padding_bottom=0,
     padding_left=0,
@@ -221,12 +216,12 @@ bmap_label4 = bitmap_label.Label(
     scale=my_scale,
 )
 
-myString5 = "bitmap_label -->"
+my_string5 = "bitmap_label -->"
 bmap_label5 = bitmap_label.Label(
     font=fontList[0],
-    text=myString5,
+    text=my_string5,
     color=0xFFFFFF,
-    max_glyphs=len(myString5),
+    max_glyphs=len(my_string5),
     background_color=0x000000,
     padding_bottom=0,
     padding_left=0,
@@ -261,9 +256,9 @@ label_start = gc.mem_free()
 
 label1 = label.Label(
     font=fontList[0],
-    text=myString1,
+    text=my_string1,
     color=0xFFFFFF,
-    max_glyphs=len(myString1),
+    max_glyphs=len(my_string1),
     background_color=0xFF0000,
     padding_bottom=0,
     padding_left=0,
@@ -280,9 +275,9 @@ label1 = label.Label(
 
 label2 = label.Label(
     font=fontList[0],
-    text=myString23,
+    text=my_string23,
     color=0x000000,
-    max_glyphs=len(myString23),
+    max_glyphs=len(my_string23),
     background_color=0xFFFF00,
     padding_bottom=label2_padding,
     padding_left=0,
@@ -299,9 +294,9 @@ label2 = label.Label(
 
 label3 = label.Label(
     font=fontList[0],
-    text=myString23,
+    text=my_string23,
     color=0x000000,
-    max_glyphs=len(myString23),
+    max_glyphs=len(my_string23),
     background_color=0xFFFF00,
     padding_bottom=0,
     padding_left=0,
@@ -316,9 +311,9 @@ label3 = label.Label(
 
 label4 = label.Label(
     font=fontList[0],
-    text=myString_label,
+    text=my_string_label,
     color=0x000000,
-    max_glyphs=len(myString_label),
+    max_glyphs=len(my_string_label),
     background_color=0xFFFF00,
     padding_bottom=0,
     padding_left=0,
@@ -332,12 +327,12 @@ label4 = label.Label(
 )
 
 
-myString5 = "<-- label"
+my_string5 = "<-- label"
 label5 = label.Label(
     font=fontList[0],
-    text=myString5,
+    text=my_string5,
     color=0xFFFFFF,
-    max_glyphs=len(myString5),
+    max_glyphs=len(my_string5),
     background_color=0x000000,
     padding_bottom=0,
     padding_left=0,
