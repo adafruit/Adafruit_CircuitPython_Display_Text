@@ -49,6 +49,7 @@ Implementation Notes
 
 import displayio
 
+
 class Label(displayio.Group):
 
     # Class variable
@@ -161,7 +162,7 @@ class Label(displayio.Group):
             y=label_position_yoffset - y_offset - padding_top,
         )
 
-        # instance the Group 
+        # instance the Group
         # this Group will contain just one TileGrid with one contained bitmap
         super().__init__(
             max_size=1, x=x, y=y, **kwargs
@@ -190,12 +191,15 @@ class Label(displayio.Group):
         return_value = int(line_spacing * font.get_bounding_box()[1])
         return return_value
 
-    def text_bounding_box(self,
-        text, font, line_spacing, background_tight=False
+    def text_bounding_box(
+        self, text, font, line_spacing, background_tight=False
     ):  # **** change default background_tight=False
 
         label_position_yoffset = int(  # for calibration with label.py positioning
-            (font.get_glyph(ord("M")).height - font.get_bounding_box()[1] * line_spacing)
+            (
+                font.get_glyph(ord("M")).height
+                - font.get_bounding_box()[1] * line_spacing
+            )
             / 2
         )
 
@@ -285,7 +289,8 @@ class Label(displayio.Group):
 
         return (final_box_width, final_box_height, 0, final_y_offset)
 
-    def place_text(self,
+    def place_text(
+        self,
         bitmap,
         text,
         font,
@@ -385,8 +390,6 @@ class Label(displayio.Group):
                     xposition = xposition + shift_x
 
         return (left, top, right - left, bottom - top)  # bounding_box
-
-
 
     @property
     def anchor_point(self):
