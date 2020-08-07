@@ -33,7 +33,8 @@ Implementation Notes
 
 **Hardware:**
 
-.. todo:: Add links to any specific hardware product page(s), or category page(s). Use unordered list & hyperlink rST
+.. todo:: Add links to any specific hardware product page(s), or category page(s). Use
+unordered list & hyperlink rST
    inline format: "* `Link Text <url>`_"
 
 **Software and Dependencies:**
@@ -41,7 +42,8 @@ Implementation Notes
 * Adafruit CircuitPython firmware for the supported boards:
   https://github.com/adafruit/circuitpython/releases
 
-.. todo:: Uncomment or remove the Bus Device and/or the Register library dependencies based on the library's use of either.
+.. todo:: Uncomment or remove the Bus Device and/or the Register library dependencies based
+on the library's use of either.
 
 # * Adafruit's Bus Device library: https://github.com/adafruit/Adafruit_CircuitPython_BusDevice
 # * Adafruit's Register library: https://github.com/adafruit/Adafruit_CircuitPython_Register
@@ -49,8 +51,41 @@ Implementation Notes
 
 import displayio
 
+__version__ = "0.0.0-auto.0"
+__repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_Display_Text.git"
+
 
 class Label(displayio.Group):
+    """A label displaying a string of text. The origin point set by ``x`` and ``y``
+       properties will be the left edge of the bounding box, and in the center of a M
+       glyph (if its one line), or the (number of lines * linespacing + M)/2. That is,
+       it will try to have it be center-left as close as possible.
+
+       :param Font font: A font class that has ``get_bounding_box`` and ``get_glyph``.
+         Must include a capital M for measuring character size.
+       :param str text: Text to display
+       :param int max_glyphs: Unnecessary parameter (provided only for direct compability
+       with label.py)
+       :param int color: Color of all text in RGB hex
+       :param int background_color: Color of the background, use `None` for transparent
+       :param double line_spacing: Line spacing of text to display
+       :param boolean background_tight: Set `True` only if you want background box to tightly
+       surround text
+       :param int padding_top: Additional pixels added to background bounding box at top
+       :param int padding_bottom: Additional pixels added to background bounding box at bottom
+       :param int padding_left: Additional pixels added to background bounding box at left
+       :param int padding_right: Additional pixels added to background bounding box at right
+       :param (double,double) anchor_point: Point that anchored_position moves relative to.
+        Tuple with decimal percentage of width and height.
+        (E.g. (0,0) is top left, (1.0, 0.5): is middle right.)
+       :param (int,int) anchored_position: Position relative to the anchor_point. Tuple
+       containing x,y pixel coordinates.
+       :param int scale: Integer value of the pixel scaling
+       """
+
+    # pylint: disable=unused-argument, too-many-instance-attributes, too-many-locals, too-many-arguments
+    # Note: max_glyphs parameter is unnecessary, this is used for direct
+    # compatibility with label.py
 
     # Class variable
     # To save memory, set Label._memory_saver=True and avoid storing the text string in the class.
@@ -63,8 +98,8 @@ class Label(displayio.Group):
         x=0,
         y=0,
         text="",
-        max_glyphs=None,  # This input parameter is ignored, only present for compatibility with label.py
-        # width, height,
+        max_glyphs=None,  # This input parameter is ignored, only present for compatibility
+        # with label.py
         color=0xFFFFFF,
         background_color=None,
         line_spacing=1.25,
@@ -102,8 +137,9 @@ class Label(displayio.Group):
 
         # Calculate the text bounding box
 
-        # Calculate tight box to provide bounding box dimensions to match label for anchor_position calculations
-        (tight_box_x, tight_box_y, x_offset, tight_y_offset) = self.text_bounding_box(
+        # Calculate tight box to provide bounding box dimensions to match label for
+        # anchor_position calculations
+        (tight_box_x, tight_box_y, x_offset, tight_y_offset) = self._text_bounding_box(
             text, font, self._line_spacing, background_tight=True,
         )
 
@@ -113,7 +149,7 @@ class Label(displayio.Group):
             y_offset = tight_y_offset
 
         else:
-            (box_x, box_y, x_offset, y_offset) = self.text_bounding_box(
+            (box_x, box_y, x_offset, y_offset) = self._text_bounding_box(
                 text, font, self._line_spacing, background_tight=background_tight,
             )
         # Calculate the background size including padding
@@ -133,7 +169,7 @@ class Label(displayio.Group):
         self.bitmap = displayio.Bitmap(box_x, box_y, len(self.palette))
 
         # Place the text into the Bitmap
-        text_size = self.place_text(
+        self._place_text(
             self.bitmap,
             text,
             font,
@@ -186,22 +222,14 @@ class Label(displayio.Group):
         )  # sets anchored_position with setter after bitmap is created
 
     @staticmethod
-    def line_spacing_ypixels(font, line_spacing):
+    def _line_spacing_ypixels(font, line_spacing):
         # Note: Scale is not implemented at this time, any scaling is pushed up to the Group level
         return_value = int(line_spacing * font.get_bounding_box()[1])
         return return_value
 
-    def text_bounding_box(
+    def _text_bounding_box(
         self, text, font, line_spacing, background_tight=False
     ):  # **** change default background_tight=False
-
-        label_position_yoffset = int(  # for calibration with label.py positioning
-            (
-                font.get_glyph(ord("M")).height
-                - font.get_bounding_box()[1] * line_spacing
-            )
-            / 2
-        )
 
         # This empirical approach checks several glyphs for maximum ascender and descender height
         # (consistent with label.py)
@@ -213,12 +241,8 @@ class Label(displayio.Group):
             if this_glyph:
                 ascender_max = max(ascender_max, this_glyph.height + this_glyph.dy)
                 descender_max = max(descender_max, -this_glyph.dy)
-        font_height = ascender_max + descender_max
-        font_yoffset = ascender_max
 
         lines = 1
-
-        font_height = font.get_glyph(ord("M")).height
 
         xposition = x_start = 0  # starting x position (left margin)
         yposition = y_start = 0
@@ -229,7 +253,7 @@ class Label(displayio.Group):
         y_offset_tight = int(
             (
                 font.get_glyph(ord("M")).height
-                - text.count("\n") * self.line_spacing_ypixels(font, line_spacing)
+                - text.count("\n") * self._line_spacing_ypixels(font, line_spacing)
             )
             / 2
         )
@@ -247,13 +271,13 @@ class Label(displayio.Group):
 
                 my_glyph = font.get_glyph(ord(char))
 
-                if my_glyph == None:  # Error checking: no glyph found
+                if my_glyph is None:  # Error checking: no glyph found
                     print("Glyph not found: {}".format(repr(char)))
                 else:
                     if newline:
                         newline = False
                         xposition = x_start  # reset to left column
-                        yposition = yposition + self.line_spacing_ypixels(
+                        yposition = yposition + self._line_spacing_ypixels(
                             font, line_spacing
                         )  # Add a newline
                         lines += 1
@@ -264,14 +288,14 @@ class Label(displayio.Group):
                         top = min(top, -my_glyph.height - my_glyph.dy + y_offset_tight)
                     bottom = max(bottom, yposition - my_glyph.dy + y_offset_tight)
 
-        loose_height = (lines - 1) * self.line_spacing_ypixels(font, line_spacing) + (
+        loose_height = (lines - 1) * self._line_spacing_ypixels(font, line_spacing) + (
             ascender_max + descender_max
         )
 
         label_calibration_offset = int(
             (
                 font.get_glyph(ord("M")).height
-                - text.count("\n") * self.line_spacing_ypixels(font, line_spacing)
+                - text.count("\n") * self._line_spacing_ypixels(font, line_spacing)
             )
             / 2
         )
@@ -289,7 +313,8 @@ class Label(displayio.Group):
 
         return (final_box_width, final_box_height, 0, final_y_offset)
 
-    def place_text(
+    # pylint: disable=too-many-nested-blocks
+    def _place_text(
         self,
         bitmap,
         text,
@@ -299,7 +324,6 @@ class Label(displayio.Group):
         yposition,
         text_palette_index=1,
         background_palette_index=0,
-        scale=1,
         print_only_pixels=True,  # print_only_pixels = True: only update the bitmap where the glyph
         # pixel color is > 0.  This is especially useful for script fonts where glyph
         # bounding boxes overlap
@@ -307,11 +331,10 @@ class Label(displayio.Group):
     ):
         # placeText - Writes text into a bitmap at the specified location.
         #
-        # Verify paletteIndex is working properly with * operator, especially if accommodating multicolored fonts
+        # Verify paletteIndex is working properly with * operator, especially
+        # if accommodating multicolored fonts
         #
         # Note: Scale is not implemented at this time, is pushed up to Group level
-
-        font_height = font.get_glyph(ord("M")).height
 
         bitmap_width = bitmap.width
         bitmap_height = bitmap.height
@@ -326,7 +349,7 @@ class Label(displayio.Group):
 
             if char == "\n":  # newline
                 xposition = x_start  # reset to left column
-                yposition = yposition + self.line_spacing_ypixels(
+                yposition = yposition + self._line_spacing_ypixels(
                     font, line_spacing
                 )  # Add a newline
 
@@ -334,7 +357,7 @@ class Label(displayio.Group):
 
                 my_glyph = font.get_glyph(ord(char))
 
-                if my_glyph == None:  # Error checking: no glyph found
+                if my_glyph is None:  # Error checking: no glyph found
                     print("Glyph not found: {}".format(repr(char)))
                 else:
 
@@ -343,31 +366,22 @@ class Label(displayio.Group):
                         top = min(top, -my_glyph.height - my_glyph.dy)
                     bottom = max(bottom, yposition - my_glyph.dy)
 
-                    width = my_glyph.width
-                    height = my_glyph.height
-                    dx = my_glyph.dx
-                    dy = my_glyph.dy
-                    shift_x = my_glyph.shift_x
-                    shift_y = my_glyph.shift_x
                     glyph_offset_x = (
-                        my_glyph.tile_index * width
+                        my_glyph.tile_index * my_glyph.width
                     )  # for type BuiltinFont, this creates the x-offset in the glyph bitmap.
                     # for BDF loaded fonts, this should equal 0
 
-                    y_offset = font_height - height
-                    for y in range(height):
-                        for x in range(width):
-                            x_placement = x + xposition + dx
-                            y_placement = y + yposition - height - dy
+                    for y in range(my_glyph.height):
+                        for x in range(my_glyph.width):
+                            x_placement = x + xposition + my_glyph.dx
+                            y_placement = y + yposition - my_glyph.height - my_glyph.dy
 
-                            if (
-                                (x_placement >= 0)
-                                and (y_placement >= 0)
-                                and (x_placement < bitmap_width)
-                                and (y_placement < bitmap_height)
+                            if (bitmap_width > x_placement >= 0) and (
+                                bitmap_height > y_placement >= 0
                             ):
 
-                                # Allows for remapping the bitmap indexes using paletteIndex for background and text.
+                                # Allows for remapping the bitmap indexes using paletteIndex
+                                # for background and text.
                                 palette_indexes = (
                                     background_palette_index,
                                     text_palette_index,
@@ -380,14 +394,15 @@ class Label(displayio.Group):
                                 ]
 
                                 if not print_only_pixels or this_pixel_color > 0:
-                                    # write all characters if printOnlyPixels = False, or if thisPixelColor is > 0
+                                    # write all characters if printOnlyPixels = False,
+                                    # or if thisPixelColor is > 0
                                     bitmap[
                                         y_placement * bitmap_width + x_placement
                                     ] = this_pixel_color
                             elif y_placement > bitmap_height:
                                 break
 
-                    xposition = xposition + shift_x
+                    xposition = xposition + my_glyph.shift_x
 
         return (left, top, right - left, bottom - top)  # bounding_box
 
@@ -407,11 +422,12 @@ class Label(displayio.Group):
 
     @property
     def anchored_position(self):
+        """Position relative to the anchor_point. Tuple containing x,y
+           pixel coordinates."""
         return self._anchored_position
 
     @anchored_position.setter
     def anchored_position(self, new_position):
-
         self._anchored_position = new_position
 
         # Set anchored_position
