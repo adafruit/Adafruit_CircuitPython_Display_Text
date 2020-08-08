@@ -1,12 +1,6 @@
-# Sample code using the textMap library and the "textBox" wrapper class
-# Creates four textBox instances
-# Inserts each textBox into a tileGrid group
-# Writes text into the box one character at a time
-# Moves the position of the textBox around the display
-# Clears each textBox after the full string is written (even if the text is outside of the box)
+# Sample for comparing label and bitmap_label positioning with Builtin or loaded BDF fonts
 
-# import textmap
-# from textmap import textBox
+# pylint: disable=no-member
 
 import gc
 import time
@@ -17,9 +11,9 @@ from adafruit_bitmap_font import bitmap_font
 
 from adafruit_display_text import bitmap_label
 
-# from adafruit_display_text import bitmap_label as Label
-
 from adafruit_display_text import label
+
+# pylint: disable=no-member
 
 #  Setup the SPI display
 ##########
