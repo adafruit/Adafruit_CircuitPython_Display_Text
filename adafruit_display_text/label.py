@@ -396,7 +396,7 @@ class Label(displayio.Group):
     @anchored_position.setter
     def anchored_position(self, new_position):
         if (self._anchor_point is None) or (new_position is None):
-            pass  # Note: anchor_point must be set before setting anchored_position
+            return  # Note: anchor_point must be set before setting anchored_position
         else:
             new_x = int(
                 new_position[0]
