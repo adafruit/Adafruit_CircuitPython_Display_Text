@@ -397,15 +397,14 @@ class Label(displayio.Group):
     def anchored_position(self, new_position):
         if (self._anchor_point is None) or (new_position is None):
             return  # Note: anchor_point must be set before setting anchored_position
-        else:
-            new_x = int(
-                new_position[0]
-                - self._anchor_point[0] * (self._boundingbox[2] * self._scale)
-            )
-            new_y = int(
-                new_position[1]
-                - (self._anchor_point[1] * self._boundingbox[3] * self._scale)
-                + round((self._boundingbox[3] * self._scale) / 2.0)
-            )
-            self.x = new_x
-            self.y = new_y
+        new_x = int(
+            new_position[0]
+            - self._anchor_point[0] * (self._boundingbox[2] * self._scale)
+        )
+        new_y = int(
+            new_position[1]
+            - (self._anchor_point[1] * self._boundingbox[3] * self._scale)
+            + round((self._boundingbox[3] * self._scale) / 2.0)
+        )
+        self.x = new_x
+        self.y = new_y
