@@ -95,10 +95,7 @@ class Label(displayio.Group):
         self.width = max_glyphs
         self._font = font
         self._text = None
-        if anchor_point is None:
-            self._anchor_point = (0, 0)
-        else:
-            self._anchor_point = anchor_point
+        self._anchor_point = anchor_point
         self.x = x
         self.y = y
 
@@ -126,7 +123,7 @@ class Label(displayio.Group):
 
         if text is not None:
             self._update_text(str(text))
-        if anchored_position is not None:
+        if (anchored_position is not None) and (anchor_point is not None):
             self.anchored_position = anchored_position
 
     def _create_background_box(self, lines, y_offset):
@@ -374,14 +371,19 @@ class Label(displayio.Group):
 
     @anchor_point.setter
     def anchor_point(self, new_anchor_point):
-        current_anchored_position = self.anchored_position
-        self._anchor_point = new_anchor_point
-        self.anchored_position = current_anchored_position
+        if self._anchor_point is not None:
+            current_anchored_position = self.anchored_position
+            self._anchor_point = new_anchor_point
+            self.anchored_position = current_anchored_position
+        else:
+            self._anchor_point = new_anchor_point
 
     @property
     def anchored_position(self):
         """Position relative to the anchor_point. Tuple containing x,y
            pixel coordinates."""
+        if self._anchor_point is None:
+            return None
         return (
             int(self.x + (self._anchor_point[0] * self._boundingbox[2] * self._scale)),
             int(
@@ -393,6 +395,8 @@ class Label(displayio.Group):
 
     @anchored_position.setter
     def anchored_position(self, new_position):
+        if (self._anchor_point is None) or (new_position is None):
+            return  # Note: anchor_point must be set before setting anchored_position
         new_x = int(
             new_position[0]
             - self._anchor_point[0] * (self._boundingbox[2] * self._scale)
