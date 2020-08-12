@@ -110,7 +110,6 @@ print("Fonts completed loading.")
 # create group
 
 long_string = "The purple snake\nbrings python fun\nto everyone."
-short_string = "Hello World"
 
 #####
 # Create the "bitmap_label.py" versions of the text labels.
@@ -120,9 +119,8 @@ bitmap_label_start = gc.mem_free()
 
 bmap_label1 = bitmap_label.Label(
     font=fontToUse,
-    text=short_string,
+    text="bitmap_label",
     color=0xFFFFFF,
-    max_glyphs=len(short_string),
     background_color=0xFF0000,
     padding_bottom=0,
     padding_left=0,
@@ -155,6 +153,8 @@ bmap_label2 = bitmap_label.Label(
 gc.collect()
 bitmap_label_end = gc.mem_free()
 
+print("bitmap_label used: {} memory".format(bitmap_label_start - bitmap_label_end))
+
 bmap_group = displayio.Group(max_size=4)  # Create a group for displaying
 bmap_group.append(bmap_label1)
 bmap_group.append(bmap_label2)
@@ -168,9 +168,8 @@ label_start = gc.mem_free()
 
 label1 = label.Label(
     font=fontToUse,
-    text=short_string,
+    text="label",
     color=0xFFFFFF,
-    max_glyphs=len(short_string),
     background_color=0xFF0000,
     padding_bottom=0,
     padding_left=0,
@@ -203,6 +202,7 @@ label2 = label.Label(
 gc.collect()
 label_end = gc.mem_free()
 
+print("label used: {} memory".format(label_start - label_end))
 label_group = displayio.Group(max_size=4)  # Create a group for displaying
 label_group.append(label1)
 label_group.append(label2)
