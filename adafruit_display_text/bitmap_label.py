@@ -420,6 +420,7 @@ class Label(displayio.Group):
         bounding-box height. (E.g. 1.0 is the bounding-box height)"""
         return self._line_spacing
 
+    # pylint: disable=no-self-use
     @line_spacing.setter
     def line_spacing(self, new_line_spacing):
         raise RuntimeError(
@@ -461,6 +462,7 @@ class Label(displayio.Group):
         """Text to displayed."""
         return self._text
 
+    # pylint: disable=no-self-use
     @text.setter
     def text(self, new_text):
         raise RuntimeError(
@@ -472,6 +474,7 @@ class Label(displayio.Group):
         """Font to use for text display."""
         return self.font
 
+    # pylint: disable=no-self-use
     @font.setter
     def font(self, new_font):
         raise RuntimeError(
