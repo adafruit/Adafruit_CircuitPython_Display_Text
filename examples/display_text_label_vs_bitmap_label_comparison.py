@@ -3,7 +3,6 @@
 # pylint: disable=no-member
 
 import gc
-import time
 import board
 import displayio
 import terminalio
