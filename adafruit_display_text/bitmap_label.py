@@ -33,20 +33,11 @@ Implementation Notes
 
 **Hardware:**
 
-.. todo:: Add links to any specific hardware product page(s), or category page(s). Use
-unordered list & hyperlink rST
-   inline format: "* `Link Text <url>`_"
-
 **Software and Dependencies:**
 
 * Adafruit CircuitPython firmware for the supported boards:
   https://github.com/adafruit/circuitpython/releases
 
-.. todo:: Uncomment or remove the Bus Device and/or the Register library dependencies based
-on the library's use of either.
-
-# * Adafruit's Bus Device library: https://github.com/adafruit/Adafruit_CircuitPython_BusDevice
-# * Adafruit's Register library: https://github.com/adafruit/Adafruit_CircuitPython_Register
 """
 
 import displayio
@@ -56,7 +47,18 @@ __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_Display_Text.git"
 
 
 class Label(displayio.Group):
-    """A label displaying a string of text. The origin point set by ``x`` and ``y``
+    """A label displaying a string of text that is stored in a bitmap.
+       Note: This ``bitmap_label.py`` library utilizes a bitmap to display the text.
+       This method is memory-conserving relative to ``label.py``.
+       For the bitmap_label library, the font, text, and line_spacing must be set at
+       instancing and are immutable.  The ``max_glyphs`` parameter is ignored and is present
+       only for direct compatability with label.py.
+       For use cases where text changes are required after the initial instancing, please
+       use the `label.py` library.
+       For further reduction in memory usage, set save_text to False (text string will not
+       be stored).
+
+       The origin point set by ``x`` and ``y``
        properties will be the left edge of the bounding box, and in the center of a M
        glyph (if its one line), or the (number of lines * linespacing + M)/2. That is,
        it will try to have it be center-left as close as possible.
@@ -81,16 +83,13 @@ class Label(displayio.Group):
        :param (int,int) anchored_position: Position relative to the anchor_point. Tuple
        containing x,y pixel coordinates.
        :param int scale: Integer value of the pixel scaling
+       :param bool save_text: Set True to save the text string as a constant in the
+        label structure.  Set False to reduce memory use.
        """
 
     # pylint: disable=unused-argument, too-many-instance-attributes, too-many-locals, too-many-arguments
     # Note: max_glyphs parameter is unnecessary, this is used for direct
     # compatibility with label.py
-
-    # Class variable
-    # To save memory, set Label._memory_saver=True and avoid storing the text string in the class.
-    # If set to False, the class saves the text string for future reference.
-    _memory_saver = True
 
     def __init__(
         self,
@@ -108,13 +107,18 @@ class Label(displayio.Group):
         padding_bottom=0,
         padding_left=0,
         padding_right=0,
-        anchor_point=(0, 0),
+        anchor_point=None,
         anchored_position=None,
+        save_text=True,  # can reduce memory use if save_text = False
         **kwargs
     ):
 
         if text == "":
-            raise RuntimeError("Please provide text string")
+            raise RuntimeError(
+                "Please provide text string, or use label.py for mutable text"
+            )
+
+        self._font = font
 
         # Scale will be passed to Group using kwargs.
         if "scale" in kwargs.keys():
@@ -123,11 +127,12 @@ class Label(displayio.Group):
             self._scale = 1
 
         self._line_spacing = line_spacing
+        self._save_text = save_text
 
-        if self._memory_saver:  # do not save the text in the instance
-            self._text = None
+        if self._save_text:  # text string will be saved
+            self._text = text
         else:
-            self._text = text  # text to be displayed
+            self._text = None  # save a None value since text string is not saved
 
         # limit padding to >= 0
         padding_top = max(0, padding_top)
@@ -158,12 +163,9 @@ class Label(displayio.Group):
 
         # Create the two-color palette
         self.palette = displayio.Palette(2)
-        if background_color is not None:
-            self.palette[0] = background_color
-        else:
-            self.palette[0] = 0
-            self.palette.make_transparent(0)
-        self.palette[1] = color
+
+        self.background_color = background_color
+        self.color = color
 
         # Create the bitmap and TileGrid
         self.bitmap = displayio.Bitmap(box_x, box_y, len(self.palette))
@@ -208,7 +210,7 @@ class Label(displayio.Group):
         # Update bounding_box values.  Note: To be consistent with label.py,
         # this is the bounding box for the text only, not including the background.
 
-        self.bounding_box = (
+        self._bounding_box = (
             self.tilegrid.x,
             self.tilegrid.y,
             tight_box_x,
@@ -407,6 +409,76 @@ class Label(displayio.Group):
         return (left, top, right - left, bottom - top)  # bounding_box
 
     @property
+    def bounding_box(self):
+        """An (x, y, w, h) tuple that completely covers all glyphs. The
+        first two numbers are offset from the x, y origin of this group"""
+        return self._bounding_box
+
+    @property
+    def line_spacing(self):
+        """The amount of space between lines of text, in multiples of the font's
+        bounding-box height. (E.g. 1.0 is the bounding-box height)"""
+        return self._line_spacing
+
+    @line_spacing.setter
+    def line_spacing(self, new_line_spacing):
+        raise RuntimeError(
+            "line_spacing is immutable for bitmap_label.py; use label.py for mutable line_spacing"
+        )
+
+    @property
+    def color(self):
+        """Color of the text as an RGB hex number."""
+        return self._color
+
+    @color.setter
+    def color(self, new_color):
+        self._color = new_color
+        if new_color is not None:
+            self.palette[1] = new_color
+            self.palette.make_opaque(1)
+        else:
+            self.palette[1] = 0
+            self.palette.make_transparent(1)
+
+    @property
+    def background_color(self):
+        """Color of the background as an RGB hex number."""
+        return self._background_color
+
+    @background_color.setter
+    def background_color(self, new_color):
+        self._background_color = new_color
+        if new_color is not None:
+            self.palette[0] = new_color
+            self.palette.make_opaque(0)
+        else:
+            self.palette[0] = 0
+            self.palette.make_transparent(0)
+
+    @property
+    def text(self):
+        """Text to displayed."""
+        return self._text
+
+    @text.setter
+    def text(self, new_text):
+        raise RuntimeError(
+            "text is immutable for bitmap_label.py; use label.py library for mutable text"
+        )
+
+    @property
+    def font(self):
+        """Font to use for text display."""
+        return self.font
+
+    @font.setter
+    def font(self, new_font):
+        raise RuntimeError(
+            "font is immutable for bitmap_label.py; use label.py library for mutable font"
+        )
+
+    @property
     def anchor_point(self):
         """Point that anchored_position moves relative to.
            Tuple with decimal percentage of width and height.
@@ -434,12 +506,12 @@ class Label(displayio.Group):
         if (self._anchor_point is not None) and (self._anchored_position is not None):
             new_x = int(
                 new_position[0]
-                - self._anchor_point[0] * (self.bounding_box[2] * self._scale)
+                - self._anchor_point[0] * (self._bounding_box[2] * self._scale)
             )
             new_y = int(
                 new_position[1]
-                - (self._anchor_point[1] * self.bounding_box[3] * self.scale)
-                + round((self.bounding_box[3] * self.scale) / 2.0)
+                - (self._anchor_point[1] * self._bounding_box[3] * self.scale)
+                + round((self._bounding_box[3] * self.scale) / 2.0)
             )
             self.x = new_x
             self.y = new_y
