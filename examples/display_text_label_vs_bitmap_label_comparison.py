@@ -89,7 +89,6 @@ else:
 print("Display is started")
 
 
-
 preload_glyphs = (
     True  # set this to True if you want to preload the font glyphs into memory
 )
@@ -179,7 +178,7 @@ label1 = label.Label(
     line_spacing=1.25,
     scale=my_scale,
     anchor_point=(1.0, 0),
-    anchored_position=(display.width-10, 60),
+    anchored_position=(display.width - 10, 60),
 )
 
 label2 = label.Label(
@@ -196,7 +195,7 @@ label2 = label.Label(
     line_spacing=1.25,
     scale=my_scale,
     anchor_point=(1.0, 0),
-    anchored_position=(display.width-10, 120),
+    anchored_position=(display.width - 10, 120),
 )
 
 gc.collect()
