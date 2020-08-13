@@ -96,7 +96,9 @@ preload_glyphs = (
 if preload_glyphs and not use_builtinfont:
 
     # identify the glyphs to load into memory -> increases rendering speed
-    glyphs = b"0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-,.:?! "
+    glyphs = (
+        b"0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ/-_,.:?!'\n "
+    )
 
     print("loading glyphs...")
     fontToUse.load_glyphs(glyphs)
@@ -108,6 +110,7 @@ print("Fonts completed loading.")
 # create group
 
 long_string = "The purple snake\nbrings python fun\nto everyone."
+label2_padding = 10
 
 #####
 # Create the "bitmap_label.py" versions of the text labels.
@@ -130,7 +133,7 @@ bmap_label1 = bitmap_label.Label(
     anchor_point=(0.0, 0),
     anchored_position=(10, 60),
 )
-label2_padding = 10
+
 bmap_label2 = bitmap_label.Label(
     font=fontToUse,
     text=long_string,
