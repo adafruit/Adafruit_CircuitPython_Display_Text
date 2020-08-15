@@ -390,9 +390,11 @@ class Label(displayio.Group):
                 + round(self._anchor_point[0] * self._boundingbox[2] * self._scale)
             ),
             int(
-                self.y
-                + (self._anchor_point[1] * self._boundingbox[3] * self._scale)
-                - round((self._boundingbox[3] * self._scale) / 2.0)
+                round(
+                    self.y
+                    + (self._anchor_point[1] * self._boundingbox[3] * self._scale)
+                    - ((self._boundingbox[3] * self._scale) / 2.0)
+                )
             ),
         )
 
@@ -405,9 +407,11 @@ class Label(displayio.Group):
             - round(self._anchor_point[0] * (self._boundingbox[2] * self._scale))
         )
         new_y = int(
-            new_position[1]
-            - (self._anchor_point[1] * self._boundingbox[3] * self._scale)
-            + round((self._boundingbox[3] * self._scale) / 2.0)
+            round(
+                new_position[1]
+                - (self._anchor_point[1] * self._boundingbox[3] * self._scale)
+                + ((self._boundingbox[3] * self._scale) / 2.0)
+            )
         )
         self.x = new_x
         self.y = new_y
