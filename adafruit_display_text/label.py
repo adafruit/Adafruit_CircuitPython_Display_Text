@@ -385,7 +385,10 @@ class Label(displayio.Group):
         if self._anchor_point is None:
             return None
         return (
-            int(self.x + round(self._anchor_point[0] * self._boundingbox[2] * self._scale)),
+            int(
+                self.x
+                + round(self._anchor_point[0] * self._boundingbox[2] * self._scale)
+            ),
             int(
                 self.y
                 + (self._anchor_point[1] * self._boundingbox[3] * self._scale)
