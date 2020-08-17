@@ -237,6 +237,7 @@ class Label(displayio.Group):
         else:
             i = 0
         tilegrid_count = i
+        self._font.load_glyphs(new_text + "M")
         y_offset = int(
             (
                 self._font.get_glyph(ord("M")).height
