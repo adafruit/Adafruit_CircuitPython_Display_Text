@@ -181,11 +181,7 @@ class Label(displayio.Group):
         )
 
         label_position_yoffset = int(  # To calibrate with label.py positioning
-            (
-                font.get_glyph(ord("M")).height
-                - text.count("\n") * font.get_bounding_box()[1] * self._line_spacing
-            )
-            / 2
+            (font.get_glyph(ord("M")).height) / 2
         )
 
         self.tilegrid = displayio.TileGrid(
@@ -237,6 +233,9 @@ class Label(displayio.Group):
         # (consistent with label.py)
         glyphs = "M j'"  # choose glyphs with highest ascender and lowest
         # descender, will depend upon font used
+
+        font.load_glyphs(text + glyphs)
+
         ascender_max = descender_max = 0
         for char in glyphs:
             this_glyph = font.get_glyph(ord(char))
@@ -252,13 +251,7 @@ class Label(displayio.Group):
         left = right = x_start
         top = bottom = y_start
 
-        y_offset_tight = int(
-            (
-                font.get_glyph(ord("M")).height
-                - text.count("\n") * self._line_spacing_ypixels(font, line_spacing)
-            )
-            / 2
-        )
+        y_offset_tight = int((font.get_glyph(ord("M")).height) / 2)
         # this needs to be reviewed (also in label.py), since it doesn't respond
         # properly to the number of newlines.
 
@@ -283,8 +276,10 @@ class Label(displayio.Group):
                             font, line_spacing
                         )  # Add a newline
                         lines += 1
+                    xright = xposition + my_glyph.width + my_glyph.dx
                     xposition += my_glyph.shift_x
-                    right = max(right, xposition)
+
+                    right = max(right, xposition, xright)
 
                     if yposition == y_start:  # first line, find the Ascender height
                         top = min(top, -my_glyph.height - my_glyph.dy + y_offset_tight)
@@ -297,7 +292,7 @@ class Label(displayio.Group):
         label_calibration_offset = int(
             (
                 font.get_glyph(ord("M")).height
-                - text.count("\n") * self._line_spacing_ypixels(font, line_spacing)
+                # - text.count("\n") * self._line_spacing_ypixels(font, line_spacing)
             )
             / 2
         )
@@ -363,7 +358,11 @@ class Label(displayio.Group):
                     print("Glyph not found: {}".format(repr(char)))
                 else:
 
-                    right = max(right, xposition + my_glyph.shift_x)
+                    right = max(
+                        right,
+                        xposition + my_glyph.shift_x,
+                        xposition + my_glyph.width + my_glyph.dx,
+                    )
                     if yposition == y_start:  # first line, find the Ascender height
                         top = min(top, -my_glyph.height - my_glyph.dy)
                     bottom = max(bottom, yposition - my_glyph.dy)
@@ -420,7 +419,6 @@ class Label(displayio.Group):
         bounding-box height. (E.g. 1.0 is the bounding-box height)"""
         return self._line_spacing
 
-    # pylint: disable=no-self-use
     @line_spacing.setter
     def line_spacing(self, new_line_spacing):
         raise RuntimeError(
@@ -462,7 +460,6 @@ class Label(displayio.Group):
         """Text to displayed."""
         return self._text
 
-    # pylint: disable=no-self-use
     @text.setter
     def text(self, new_text):
         raise RuntimeError(
@@ -474,7 +471,6 @@ class Label(displayio.Group):
         """Font to use for text display."""
         return self.font
 
-    # pylint: disable=no-self-use
     @font.setter
     def font(self, new_font):
         raise RuntimeError(
@@ -509,12 +505,14 @@ class Label(displayio.Group):
         if (self._anchor_point is not None) and (self._anchored_position is not None):
             new_x = int(
                 new_position[0]
-                - self._anchor_point[0] * (self._bounding_box[2] * self._scale)
+                - round(self._anchor_point[0] * (self._bounding_box[2] * self._scale))
             )
             new_y = int(
-                new_position[1]
-                - (self._anchor_point[1] * self._bounding_box[3] * self.scale)
-                + round((self._bounding_box[3] * self.scale) / 2.0)
+                round(
+                    new_position[1]
+                    - (self._anchor_point[1] * self._bounding_box[3] * self.scale)
+                    + ((self._bounding_box[3] * self.scale) / 2.0)
+                )
             )
             self.x = new_x
             self.y = new_y

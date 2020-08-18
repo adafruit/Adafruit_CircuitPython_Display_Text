@@ -22,21 +22,14 @@
 """
 `adafruit_display_text.label`
 ====================================================
-
 Displays text labels using CircuitPython's displayio.
-
 * Author(s): Scott Shawcroft
-
 Implementation Notes
 --------------------
-
 **Hardware:**
-
 **Software and Dependencies:**
-
 * Adafruit CircuitPython firmware for the supported boards:
   https://github.com/adafruit/circuitpython/releases
-
 """
 
 import displayio
@@ -50,7 +43,6 @@ class Label(displayio.Group):
        properties will be the left edge of the bounding box, and in the center of a M
        glyph (if its one line), or the (number of lines * linespacing + M)/2. That is,
        it will try to have it be center-left as close as possible.
-
        :param Font font: A font class that has ``get_bounding_box`` and ``get_glyph``.
          Must include a capital M for measuring character size.
        :param str text: Text to display
@@ -185,13 +177,7 @@ class Label(displayio.Group):
             self._background_palette[0] = new_color
         self._background_color = new_color
 
-        y_offset = int(
-            (
-                self._font.get_glyph(ord("M")).height
-                - self.text.count("\n") * self.height * self.line_spacing
-            )
-            / 2
-        )
+        y_offset = int((self._font.get_glyph(ord("M")).height) / 2)
         lines = self.text.count("\n") + 1
 
         if not self._added_background_tilegrid:  # no bitmap is in the self Group
@@ -237,14 +223,7 @@ class Label(displayio.Group):
         else:
             i = 0
         tilegrid_count = i
-        self._font.load_glyphs(new_text + "M")
-        y_offset = int(
-            (
-                self._font.get_glyph(ord("M")).height
-                - new_text.count("\n") * self.height * self.line_spacing
-            )
-            / 2
-        )
+        y_offset = int((self._font.get_glyph(ord("M")).height) / 2)
         left = right = top = bottom = 0
         lines = 1
         for character in new_text:
@@ -256,7 +235,7 @@ class Label(displayio.Group):
             glyph = self._font.get_glyph(ord(character))
             if not glyph:
                 continue
-            right = max(right, x + glyph.shift_x)
+            right = max(right, x + glyph.shift_x, x + glyph.width + glyph.dx)
             if y == 0:  # first line, find the Ascender height
                 top = min(top, -glyph.height - glyph.dy + y_offset)
             bottom = max(bottom, y - glyph.dy + y_offset)
@@ -386,11 +365,16 @@ class Label(displayio.Group):
         if self._anchor_point is None:
             return None
         return (
-            int(self.x + (self._anchor_point[0] * self._boundingbox[2] * self._scale)),
             int(
-                self.y
-                + (self._anchor_point[1] * self._boundingbox[3] * self._scale)
-                - round((self._boundingbox[3] * self._scale) / 2.0)
+                self.x
+                + round(self._anchor_point[0] * self._boundingbox[2] * self._scale)
+            ),
+            int(
+                round(
+                    self.y
+                    + (self._anchor_point[1] * self._boundingbox[3] * self._scale)
+                    - ((self._boundingbox[3] * self._scale) / 2.0)
+                )
             ),
         )
 
@@ -400,12 +384,14 @@ class Label(displayio.Group):
             return  # Note: anchor_point must be set before setting anchored_position
         new_x = int(
             new_position[0]
-            - self._anchor_point[0] * (self._boundingbox[2] * self._scale)
+            - round(self._anchor_point[0] * (self._boundingbox[2] * self._scale))
         )
         new_y = int(
-            new_position[1]
-            - (self._anchor_point[1] * self._boundingbox[3] * self._scale)
-            + round((self._boundingbox[3] * self._scale) / 2.0)
+            round(
+                new_position[1]
+                - (self._anchor_point[1] * self._boundingbox[3] * self._scale)
+                + ((self._boundingbox[3] * self._scale) / 2.0)
+            )
         )
         self.x = new_x
         self.y = new_y
