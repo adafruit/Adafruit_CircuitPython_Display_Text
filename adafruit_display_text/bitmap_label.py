@@ -144,7 +144,12 @@ class Label(displayio.Group):
 
         # Calculate tight box to provide bounding box dimensions to match label for
         # anchor_position calculations
-        (tight_box_x, tight_box_y, x_offset, tight_y_offset) = self._text_bounding_box(
+        (
+            tight_box_x,
+            tight_box_y,
+            tight_x_offset,
+            tight_y_offset,
+        ) = self._text_bounding_box(
             text, font, self._line_spacing, background_tight=True,
         )
 
@@ -152,6 +157,7 @@ class Label(displayio.Group):
             box_x = tight_box_x
             box_y = tight_box_y
             y_offset = tight_y_offset
+            x_offset = tight_x_offset
 
         else:
             (box_x, box_y, x_offset, y_offset) = self._text_bounding_box(
@@ -176,7 +182,7 @@ class Label(displayio.Group):
             text,
             font,
             self._line_spacing,
-            padding_left + x_offset,
+            padding_left - x_offset,
             padding_top + y_offset,
         )
 
@@ -192,7 +198,7 @@ class Label(displayio.Group):
             tile_width=box_x,
             tile_height=box_y,
             default_tile=0,
-            x=-padding_left,
+            x=-padding_left + x_offset,
             y=label_position_yoffset - y_offset - padding_top,
         )
 
@@ -248,7 +254,8 @@ class Label(displayio.Group):
         xposition = x_start = 0  # starting x position (left margin)
         yposition = y_start = 0
 
-        left = right = x_start
+        left = None
+        right = x_start
         top = bottom = y_start
 
         y_offset_tight = int((font.get_glyph(ord("M")).height) / 2)
@@ -276,6 +283,11 @@ class Label(displayio.Group):
                             font, line_spacing
                         )  # Add a newline
                         lines += 1
+                    if xposition == x_start:
+                        if left is None:
+                            left = my_glyph.dx
+                        else:
+                            left = min(left, my_glyph.dx)
                     xright = xposition + my_glyph.width + my_glyph.dx
                     xposition += my_glyph.shift_x
 
@@ -289,13 +301,10 @@ class Label(displayio.Group):
             ascender_max + descender_max
         )
 
-        label_calibration_offset = int(
-            (
-                font.get_glyph(ord("M")).height
-                # - text.count("\n") * self._line_spacing_ypixels(font, line_spacing)
-            )
-            / 2
-        )
+        label_calibration_offset = int((font.get_glyph(ord("M")).height) / 2)
+
+        if left is None:
+            left = 0
 
         y_offset_tight = -top + label_calibration_offset
 
@@ -308,7 +317,7 @@ class Label(displayio.Group):
             final_box_height = loose_height
             final_y_offset = ascender_max
 
-        return (final_box_width, final_box_height, 0, final_y_offset)
+        return (final_box_width, final_box_height, left, final_y_offset)
 
     # pylint: disable=too-many-nested-blocks
     def _place_text(
@@ -339,7 +348,8 @@ class Label(displayio.Group):
         x_start = xposition  # starting x position (left margin)
         y_start = yposition
 
-        left = right = x_start
+        left = None
+        right = x_start
         top = bottom = y_start
 
         for char in text:
@@ -357,6 +367,11 @@ class Label(displayio.Group):
                 if my_glyph is None:  # Error checking: no glyph found
                     print("Glyph not found: {}".format(repr(char)))
                 else:
+                    if xposition == x_start:
+                        if left is None:
+                            left = my_glyph.dx
+                        else:
+                            left = min(left, my_glyph.dx)
 
                     right = max(
                         right,

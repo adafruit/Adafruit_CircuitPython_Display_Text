@@ -224,7 +224,9 @@ class Label(displayio.Group):
             i = 0
         tilegrid_count = i
         y_offset = int((self._font.get_glyph(ord("M")).height) / 2)
-        left = right = top = bottom = 0
+        right = top = bottom = 0
+        left = None
+
         lines = 1
         for character in new_text:
             if character == "\n":
@@ -236,6 +238,11 @@ class Label(displayio.Group):
             if not glyph:
                 continue
             right = max(right, x + glyph.shift_x, x + glyph.width + glyph.dx)
+            if x == 0:
+                if left is None:
+                    left = glyph.dx
+                else:
+                    left = min(left, glyph.dx)
             if y == 0:  # first line, find the Ascender height
                 top = min(top, -glyph.height - glyph.dy + y_offset)
             bottom = max(bottom, y - glyph.dy + y_offset)
@@ -271,10 +278,13 @@ class Label(displayio.Group):
             i += 1
         # Remove the rest
 
+        if left is None:
+            left = 0
+
         while len(self) > tilegrid_count:  # i:
             self.pop()
         self._text = new_text
-        self._boundingbox = (left, top, left + right, bottom - top)
+        self._boundingbox = (left, top, right - left, bottom - top)
 
         if self.background_color is not None:
             self._update_background_color(self._background_color)
