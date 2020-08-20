@@ -22,14 +22,21 @@
 """
 `adafruit_display_text.label`
 ====================================================
+
 Displays text labels using CircuitPython's displayio.
+
 * Author(s): Scott Shawcroft
+
 Implementation Notes
 --------------------
+
 **Hardware:**
+
 **Software and Dependencies:**
+
 * Adafruit CircuitPython firmware for the supported boards:
   https://github.com/adafruit/circuitpython/releases
+
 """
 
 import displayio
@@ -45,7 +52,7 @@ class Label(displayio.Group):
        it will try to have it be center-left as close as possible.
 
        :param Font font: A font class that has ``get_bounding_box`` and ``get_glyph``.
-        Must include a capital M for measuring character size.
+         Must include a capital M for measuring character size.
        :param str text: Text to display
        :param int max_glyphs: The largest quantity of glyphs we will display
        :param int color: Color of all text in RGB hex
