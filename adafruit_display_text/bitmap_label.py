@@ -88,6 +88,7 @@ class Label(displayio.Group):
        """
 
     # pylint: disable=unused-argument, too-many-instance-attributes, too-many-locals, too-many-arguments
+    # pylint: disable=too-many-branches, no-self-use
     # Note: max_glyphs parameter is unnecessary, this is used for direct
     # compatibility with label.py
 
@@ -231,16 +232,18 @@ class Label(displayio.Group):
         return_value = int(line_spacing * font.get_bounding_box()[1])
         return return_value
 
-    def _text_bounding_box(
-        self, text, font, line_spacing, background_tight=False
-    ):  # **** change default background_tight=False
+    def _text_bounding_box(self, text, font, line_spacing, background_tight=False):
 
         # This empirical approach checks several glyphs for maximum ascender and descender height
         # (consistent with label.py)
         glyphs = "M j'"  # choose glyphs with highest ascender and lowest
         # descender, will depend upon font used
 
-        font.load_glyphs(text + glyphs)
+        try:
+            self._font.load_glyphs(text + glyphs)
+        except AttributeError:
+            # ignore if font does not have load_glyphs
+            pass
 
         ascender_max = descender_max = 0
         for char in glyphs:
@@ -251,8 +254,9 @@ class Label(displayio.Group):
 
         lines = 1
 
-        xposition = x_start = 0  # starting x position (left margin)
-        yposition = y_start = 0
+        xposition = (
+            x_start
+        ) = yposition = y_start = 0  # starting x and y position (left margin)
 
         left = None
         right = x_start
@@ -297,24 +301,18 @@ class Label(displayio.Group):
                         top = min(top, -my_glyph.height - my_glyph.dy + y_offset_tight)
                     bottom = max(bottom, yposition - my_glyph.dy + y_offset_tight)
 
-        loose_height = (lines - 1) * self._line_spacing_ypixels(font, line_spacing) + (
-            ascender_max + descender_max
-        )
-
-        label_calibration_offset = int((font.get_glyph(ord("M")).height) / 2)
-
         if left is None:
             left = 0
-
-        y_offset_tight = -top + label_calibration_offset
 
         final_box_width = right - left
         if background_tight:
             final_box_height = bottom - top
-            final_y_offset = y_offset_tight
+            final_y_offset = -top + y_offset_tight
 
         else:
-            final_box_height = loose_height
+            final_box_height = (lines - 1) * self._line_spacing_ypixels(
+                font, line_spacing
+            ) + (ascender_max + descender_max)
             final_y_offset = ascender_max
 
         return (final_box_width, final_box_height, left, final_y_offset)
@@ -518,16 +516,13 @@ class Label(displayio.Group):
 
         # Set anchored_position
         if (self._anchor_point is not None) and (self._anchored_position is not None):
-            new_x = int(
+            self.x = int(
                 new_position[0]
+                - (self._bounding_box[0] * self._scale)
                 - round(self._anchor_point[0] * (self._bounding_box[2] * self._scale))
             )
-            new_y = int(
-                round(
-                    new_position[1]
-                    - (self._anchor_point[1] * self._bounding_box[3] * self.scale)
-                    + ((self._bounding_box[3] * self.scale) / 2.0)
-                )
+            self.y = int(
+                new_position[1]
+                - (self._bounding_box[1] * self._scale)
+                - round(self._anchor_point[1] * self._bounding_box[3] * self._scale)
             )
-            self.x = new_x
-            self.y = new_y
