@@ -43,6 +43,7 @@ class Label(displayio.Group):
        properties will be the left edge of the bounding box, and in the center of a M
        glyph (if its one line), or the (number of lines * linespacing + M)/2. That is,
        it will try to have it be center-left as close as possible.
+       
        :param Font font: A font class that has ``get_bounding_box`` and ``get_glyph``.
         Must include a capital M for measuring character size.
        :param str text: Text to display
