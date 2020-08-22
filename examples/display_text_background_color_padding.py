@@ -55,7 +55,7 @@ display.show(None)
 
 # font=terminalio.FONT # this is the Builtin fixed dimension font
 
-font = bitmap_font.load_font("fonts/BitstreamVeraSans-Roman-24.bdf")
+font = bitmap_font.load_font("fonts/Helvetica-Bold-16.bdf")
 
 
 text = []
