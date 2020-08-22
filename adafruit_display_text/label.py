@@ -355,8 +355,8 @@ class Label(displayio.Group):
             current_anchored_position = self.anchored_position
             self._update_text(str(new_text))
             self.anchored_position = current_anchored_position
-        except RuntimeError as e:
-            raise RuntimeError("Text length exceeds max_glyphs") from e
+        except RuntimeError as run_error:
+            raise RuntimeError("Text length exceeds max_glyphs") from run_error
 
     @property
     def font(self):
