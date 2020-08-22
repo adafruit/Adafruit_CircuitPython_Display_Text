@@ -399,7 +399,7 @@ class Label(displayio.Group):
             int(
                 self.x
                 + (self._boundingbox[0] * self._scale)
-                + +round(self._anchor_point[0] * self._boundingbox[2] * self._scale)
+                + round(self._anchor_point[0] * self._boundingbox[2] * self._scale)
             ),
             int(
                 self.y
