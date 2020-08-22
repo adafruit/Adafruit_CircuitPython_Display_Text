@@ -8,8 +8,8 @@ import displayio
 
 # from adafruit_st7789 import ST7789
 from adafruit_ili9341 import ILI9341
-from adafruit_display_text import label
 from adafruit_bitmap_font import bitmap_font
+from adafruit_display_text import label
 
 #  Setup the SPI display
 
