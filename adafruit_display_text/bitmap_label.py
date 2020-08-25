@@ -98,8 +98,8 @@ class Label(displayio.Group):
         x=0,
         y=0,
         text="",
-        max_glyphs=None,  # This input parameter is ignored, only present for compatibility
-        # with label.py
+        max_glyphs=None,    # This input parameter is ignored, only present for compatibility
+                            # with label.py
         color=0xFFFFFF,
         background_color=None,
         line_spacing=1.25,
@@ -114,117 +114,199 @@ class Label(displayio.Group):
         **kwargs
     ):
 
-        if text == "":
-            raise RuntimeError(
-                "Please provide text string, or use label.py for mutable text"
-            )
+        # instance the Group
+        # this Group will contain just one TileGrid with one contained bitmap
+        super().__init__(
+            max_size=1, x=x, y=y, **kwargs
+        )  # this will include any arguments, including scale
 
         self._font = font
 
-        # Scale will be passed to Group using kwargs.
-        if "scale" in kwargs.keys():
-            self._scale = kwargs["scale"]
-        else:
-            self._scale = 1
+        # Create the two-color palette
+        self.palette = displayio.Palette(2)
+        self.color = color
+        self.background_color = background_color
 
-        self._line_spacing = line_spacing
-        self._save_text = save_text
+        self._anchor_point = anchor_point
+        self._anchored_position = anchored_position
+
+        self._scale = 1 # initialize to the default scale of 1
+
+        # call the text updater with all the arguments.
+        self._reset_text(font=font, 
+                    x=x, 
+                    y=y, 
+                    text=text, 
+                    # color=color,
+                    # background_color=background_color,
+                    line_spacing=line_spacing,
+                    background_tight=background_tight,
+                    padding_top=padding_top,
+                    padding_bottom=padding_bottom,
+                    padding_left=padding_left,
+                    padding_right=padding_right,
+                    anchor_point=anchor_point,
+                    anchored_position=anchored_position,
+                    save_text=save_text,
+                    **kwargs,
+                    )
+
+
+    def _reset_text(
+        self,
+        font=None,
+        x=None,
+        y=None,
+        text=None,
+        line_spacing=None,
+        background_tight=None,
+        padding_top=None,
+        padding_bottom=None,
+        padding_left=None,
+        padding_right=None,
+        anchor_point=None,
+        anchored_position=None,
+        save_text=None, 
+        **kwargs
+        ):
+
+        # store the instance variables
+
+        print('_reset_text Text string to print: {}'.format(text))
+
+        # Store all the instance variables
+        if font is not None:
+            self._font = font
+        if x is not None:
+            self.x = x
+        if y is not None:
+            self.y = y
+        # if color is not None:
+        #     self.color = color
+        # if background_color is not None:
+        #     self.background_color = background_color
+        if line_spacing is not None:
+            self._line_spacing = line_spacing
+        if background_tight is not None:
+            self._background_tight = background_tight
+        if padding_top is not None:
+            self._padding_top = max(0, padding_top)
+        if padding_bottom is not None:
+            self._padding_bottom = max(0, padding_bottom)
+        if padding_left is not None:
+            self._padding_left = max(0, padding_left)
+        if padding_right is not None:
+            self._padding_right = max(0, padding_right)
+        if anchor_point is not None:
+            self.anchor_point = anchor_point
+        if anchored_position is not None:
+            self._anchored_position = anchored_position
+        if save_text is not None:
+            self._save_text = save_text
+
+        # if text is not provided as a parameter (text is None), use the previous value.
+        if (text is None) and self._save_text:
+            text = self._text
 
         if self._save_text:  # text string will be saved
             self._text = text
         else:
             self._text = None  # save a None value since text string is not saved
 
-        # limit padding to >= 0
-        padding_top = max(0, padding_top)
-        padding_bottom = max(0, padding_bottom)
-        padding_left = max(0, padding_left)
-        padding_right = max(0, padding_right)
+        # Scale will be passed to Group using kwargs.
+        if "scale" in kwargs.keys():
+            self._scale = kwargs["scale"]
 
-        # Calculate the text bounding box
 
-        # Calculate tight box to provide bounding box dimensions to match label for
-        # anchor_position calculations
-        (
-            tight_box_x,
-            tight_box_y,
-            tight_x_offset,
-            tight_y_offset,
-        ) = self._text_bounding_box(
-            text, font, self._line_spacing, background_tight=True,
-        )
+        # Check for empty string
+        if (text == "") or (text is None): # If empty string, just create a zero-sized bounding box and that's it.
 
-        if background_tight:
-            box_x = tight_box_x
-            box_y = tight_box_y
-            y_offset = tight_y_offset
-            x_offset = tight_x_offset
+            self._bounding_box = (
+                                0,
+                                0,
+                                0, # zero width with text == ""
+                                0, # zero height with text == ""
+                                )
+            # Clear out any items in the self Group, in case this is an update to the bitmap_label
+            for item in self:
+                self.pop(0)
 
-        else:
-            (box_x, box_y, x_offset, y_offset) = self._text_bounding_box(
-                text, font, self._line_spacing, background_tight=background_tight,
+        else: # The text string is not empty, so create the Bitmap and TileGrid and append to the self Group
+
+
+            # Calculate the text bounding box
+
+            # Calculate tight box to provide bounding box dimensions to match label for
+            # anchor_position calculations
+            (
+                tight_box_x,
+                tight_box_y,
+                tight_x_offset,
+                tight_y_offset,
+            ) = self._text_bounding_box(
+                text, self._font, self._line_spacing, background_tight=True,
+            ) # calculate the box size for a tight background
+
+            if self._background_tight: 
+                box_x = tight_box_x
+                box_y = tight_box_y
+                y_offset = tight_y_offset
+                x_offset = tight_x_offset
+
+            else: # calculate the box size for a loose background
+                (box_x, box_y, x_offset, y_offset) = self._text_bounding_box(
+                    text, self._font, self._line_spacing, background_tight=self._background_tight,
+                )
+            # Calculate the background size including padding
+            box_x = box_x + self._padding_left + self._padding_right
+            box_y = box_y + self._padding_top + self._padding_bottom
+
+            # Create the bitmap and TileGrid
+            self.bitmap = displayio.Bitmap(box_x, box_y, len(self.palette))
+
+            # Place the text into the Bitmap
+            self._place_text(
+                self.bitmap,
+                text,
+                self._font,
+                self._line_spacing,
+                self._padding_left - x_offset,
+                self._padding_top + y_offset,
             )
-        # Calculate the background size including padding
-        box_x = box_x + padding_left + padding_right
-        box_y = box_y + padding_top + padding_bottom
 
-        # Create the two-color palette
-        self.palette = displayio.Palette(2)
+            label_position_yoffset = int(  # To calibrate with label.py positioning
+                (self._font.get_glyph(ord("M")).height) / 2
+            )
 
-        self.background_color = background_color
-        self.color = color
+            self.tilegrid = displayio.TileGrid(
+                self.bitmap,
+                pixel_shader=self.palette,
+                width=1,
+                height=1,
+                tile_width=box_x,
+                tile_height=box_y,
+                default_tile=0,
+                x=-self._padding_left + x_offset,
+                y=label_position_yoffset - y_offset - self._padding_top,
+            )
 
-        # Create the bitmap and TileGrid
-        self.bitmap = displayio.Bitmap(box_x, box_y, len(self.palette))
+            # Clear out any items in the self Group, in case this is an update to the bitmap_label
+            for item in self:
+                self.pop(0)
+            self.append(self.tilegrid)  # add the bitmap's tilegrid to the group
 
-        # Place the text into the Bitmap
-        self._place_text(
-            self.bitmap,
-            text,
-            font,
-            self._line_spacing,
-            padding_left - x_offset,
-            padding_top + y_offset,
-        )
+            # Update bounding_box values.  Note: To be consistent with label.py,
+            # this is the bounding box for the text only, not including the background.
+            self._bounding_box = (
+                self.tilegrid.x,
+                self.tilegrid.y,
+                tight_box_x,
+                tight_box_y,
+            )
 
-        label_position_yoffset = int(  # To calibrate with label.py positioning
-            (font.get_glyph(ord("M")).height) / 2
-        )
-
-        self.tilegrid = displayio.TileGrid(
-            self.bitmap,
-            pixel_shader=self.palette,
-            width=1,
-            height=1,
-            tile_width=box_x,
-            tile_height=box_y,
-            default_tile=0,
-            x=-padding_left + x_offset,
-            y=label_position_yoffset - y_offset - padding_top,
-        )
-
-        # instance the Group
-        # this Group will contain just one TileGrid with one contained bitmap
-        super().__init__(
-            max_size=1, x=x, y=y, **kwargs
-        )  # this will include any arguments, including scale
-        self.append(self.tilegrid)  # add the bitmap's tilegrid to the group
-
-        # Update bounding_box values.  Note: To be consistent with label.py,
-        # this is the bounding box for the text only, not including the background.
-
-        self._bounding_box = (
-            self.tilegrid.x,
-            self.tilegrid.y,
-            tight_box_x,
-            tight_box_y,
-        )
-
-        self._anchored_position = anchored_position
-        self.anchor_point = anchor_point
         self.anchored_position = (
             self._anchored_position
-        )  # sets anchored_position with setter after bitmap is created
+        )  # set the anchored_position with setter after bitmap is created, sets the x,y positions of the label
 
     @staticmethod
     def _line_spacing_ypixels(font, line_spacing):
@@ -240,7 +322,7 @@ class Label(displayio.Group):
         # descender, will depend upon font used
 
         try:
-            self._font.load_glyphs(text + glyphs)
+            font.load_glyphs(text + glyphs)
         except AttributeError:
             # ignore if font does not have load_glyphs
             pass
@@ -434,9 +516,8 @@ class Label(displayio.Group):
 
     @line_spacing.setter
     def line_spacing(self, new_line_spacing):
-        raise RuntimeError(
-            "line_spacing is immutable for bitmap_label.py; use label.py for mutable line_spacing"
-        )
+        self._reset_text(line_spacing=new_line_spacing)
+
 
     @property
     def color(self):
@@ -473,11 +554,10 @@ class Label(displayio.Group):
         """Text to displayed."""
         return self._text
 
-    @text.setter
+    @text.setter # Cannot set color or background color with text setter, use separate setter
     def text(self, new_text):
-        raise RuntimeError(
-            "text is immutable for bitmap_label.py; use label.py library for mutable text"
-        )
+        self._reset_text(text=new_text)
+        print('updated text: {}'.format(new_text))
 
     @property
     def font(self):
@@ -486,9 +566,7 @@ class Label(displayio.Group):
 
     @font.setter
     def font(self, new_font):
-        raise RuntimeError(
-            "font is immutable for bitmap_label.py; use label.py library for mutable font"
-        )
+        self._reset_text(font=new_font)
 
     @property
     def anchor_point(self):
