@@ -450,20 +450,58 @@ class Label(displayio.Group):
                     )  # for type BuiltinFont, this creates the x-offset in the glyph bitmap.
                        # for BDF loaded fonts, this should equal 0
 
-                    bitmap.blit(
-                        xposition + my_glyph.dx,
-                        yposition - my_glyph.height - my_glyph.dy,
-                        my_glyph.bitmap,
-                        x1=glyph_offset_x,
-                        y1=0,
-                        x2=glyph_offset_x + my_glyph.width - 1,
-                        y2=0 + my_glyph.height - 1,
-                        skip_index=0, # do not copy over any 0 background pixels
-                    )
+                    try:
+                        bitmap.blit(
+                            xposition + my_glyph.dx,
+                            yposition - my_glyph.height - my_glyph.dy,
+                            my_glyph.bitmap,
+                            x1=glyph_offset_x,
+                            y1=0,
+                            x2=glyph_offset_x + my_glyph.width - 1,
+                            y2=0 + my_glyph.height - 1,
+                            skip_index=0, # do not copy over any 0 background pixels
+                        )
+
+                    except:
+                        for y in range(my_glyph.height):
+                            for x in range(my_glyph.width):
+                                x_placement = x + xposition + my_glyph.dx
+                                y_placement = y + yposition - my_glyph.height - my_glyph.dy
+
+                                if (bitmap_width > x_placement >= 0) and (
+                                    bitmap_height > y_placement >= 0
+                                ):
+
+                                    # Allows for remapping the bitmap indexes using paletteIndex
+                                    # for background and text.
+                                    palette_indexes = (
+                                        background_palette_index,
+                                        text_palette_index,
+                                    )
+
+                                    this_pixel_color = palette_indexes[
+                                        my_glyph.bitmap[
+                                            y * my_glyph.bitmap.width + x + glyph_offset_x
+                                        ]
+                                    ]
+
+                                    if not print_only_pixels or this_pixel_color > 0:
+                                        # write all characters if printOnlyPixels = False,
+                                        # or if thisPixelColor is > 0
+                                        bitmap[
+                                            y_placement * bitmap_width + x_placement
+                                        ] = this_pixel_color
+                                elif y_placement > bitmap_height:
+                                    break
 
                     xposition = xposition + my_glyph.shift_x
 
         return (left, top, right - left, bottom - top)  # bounding_box
+
+
+
+
+
 
     @property
     def bounding_box(self):
