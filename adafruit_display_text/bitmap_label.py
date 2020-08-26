@@ -400,6 +400,10 @@ class Label(displayio.Group):
         yposition,
         text_palette_index=1,
         background_palette_index=0,
+        print_only_pixels=True,  # print_only_pixels = True: only update the bitmap where the glyph
+        # pixel color is > 0.  This is especially useful for script fonts where glyph
+        # bounding boxes overlap
+        # Set `print_only_pixels=False` to write all pixels
     ):
         # placeText - Writes text into a bitmap at the specified location.
         #
@@ -514,10 +518,16 @@ class Label(displayio.Group):
     #     return self._scale
     
     # @scale.setter
+    # #@displayio.Group.scale.setter
     # def scale(self, new_scale):
     #     self._scale=new_scale
     #     #super(displayio.Group, self).scale.fset(self, new_scale)
-    #     anchored_position=self._anchored_position # update the anchored_position
+    #     self.anchored_position=self._anchored_position # update the anchored_position
+    #     #displayio.Group.scale.__set__(self, new_scale)
+    #     #displayio.Group.scale=new_scale
+    #     #setattr(super(), "scale", new_scale)
+    #     #setattr(self, "scale", new_scale)
+    #     super(displayio.Group, self).scale.__set__(self, new_scale)
 
     def set_scale(self, new_scale):
         """Set the scaling of the label"""
