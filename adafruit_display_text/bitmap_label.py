@@ -88,7 +88,7 @@ class Label(displayio.Group):
        """
 
     # pylint: disable=unused-argument, too-many-instance-attributes, too-many-locals, too-many-arguments
-    # pylint: disable=too-many-branches, no-self-use
+    # pylint: disable=too-many-branches, no-self-use, too-many-statements
     # Note: max_glyphs parameter is unnecessary, this is used for direct
     # compatibility with label.py
 
@@ -495,7 +495,7 @@ class Label(displayio.Group):
                             skip_index=0,  # do not copy over any 0 background pixels
                         )
 
-                    except:
+                    except AttributeError:
                         for y in range(my_glyph.height):
                             for x in range(my_glyph.width):
                                 x_placement = x + xposition + my_glyph.dx
