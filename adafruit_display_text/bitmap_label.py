@@ -119,8 +119,9 @@ class Label(displayio.Group):
             scale = kwargs["scale"]
             kwargs.pop(
                 "scale"
-            )  # Do not change scale of self Group, use this value to set scale of
-            # local_group
+            )  # Do not change scale of self Group, use this value to set scale of local_group
+        else:
+            scale = 1  # Set default scale=1
 
         # instance the Group
         # self Group will contain a single local_group which contains one TileGrid which contains
