@@ -114,11 +114,20 @@ class Label(displayio.Group):
         **kwargs
     ):
 
+
+        # Scale will be passed to Group using kwargs.
+        if "scale" in kwargs.keys():
+            scale = kwargs["scale"]
+            kwargs.pop("scale") # Do not change scale of self Group, use this value to set scale of local_group
+
         # instance the Group
-        # this Group will contain just one TileGrid with one contained bitmap
+        # self Group will contain a single local_group which contains one TileGrid which contains the text bitmap
         super().__init__(
             max_size=1, x=x, y=y, **kwargs
         )  # this will include any arguments, including scale
+
+        self.local_group=displayio.Group(max_size=1, **kwargs) # local_group holds the tileGrid and sets the scaling
+        self.append(self.local_group) # the local_group will always stay in the self Group
 
         self._font = font
 
@@ -129,8 +138,6 @@ class Label(displayio.Group):
 
         self._anchor_point = anchor_point
         self._anchored_position = anchored_position
-
-        self._scale = 1 # initialize to the default scale of 1
 
         # call the text updater with all the arguments.
         self._reset_text(font=font, 
@@ -146,6 +153,7 @@ class Label(displayio.Group):
                     anchor_point=anchor_point,
                     anchored_position=anchored_position,
                     save_text=save_text,
+                    scale=scale,
                     **kwargs,
                     )
 
@@ -164,7 +172,8 @@ class Label(displayio.Group):
         padding_right=None,
         anchor_point=None,
         anchored_position=None,
-        save_text=None, 
+        save_text=None,
+        scale=None,
         **kwargs
         ):
 
@@ -193,6 +202,8 @@ class Label(displayio.Group):
             self._anchored_position = anchored_position
         if save_text is not None:
             self._save_text = save_text
+        if scale is not None: # Scale will be defined in local_group (Note: self should have scale=1)
+            self.scale=scale  # call the setter
 
         # if text is not provided as a parameter (text is None), use the previous value.
         if (text is None) and self._save_text:
@@ -202,10 +213,6 @@ class Label(displayio.Group):
             self._text = text
         else:
             self._text = None  # save a None value since text string is not saved
-
-        # Scale will be passed to Group using kwargs.
-        if "scale" in kwargs.keys():
-            self._scale = kwargs["scale"]
 
 
         # Check for empty string
@@ -280,10 +287,10 @@ class Label(displayio.Group):
                 y=label_position_yoffset - y_offset - self._padding_top,
             )
 
-            # Clear out any items in the self Group, in case this is an update to the bitmap_label
-            for item in self:
-                self.pop(0)
-            self.append(self.tilegrid)  # add the bitmap's tilegrid to the group
+            # Clear out any items in the local_group Group, in case this is an update to the bitmap_label
+            for item in self.local_group:
+                self.local_group.pop(0)
+            self.local_group.append(self.tilegrid)  # add the bitmap's tilegrid to the group
 
             # Update bounding_box values.  Note: To be consistent with label.py,
             # this is the bounding box for the text only, not including the background.
@@ -461,8 +468,8 @@ class Label(displayio.Group):
                             my_glyph.bitmap,
                             x1=glyph_offset_x,
                             y1=0,
-                            x2=glyph_offset_x + my_glyph.width - 1,
-                            y2=0 + my_glyph.height - 1,
+                            x2=glyph_offset_x + my_glyph.width,
+                            y2=0 + my_glyph.height,
                             skip_index=0, # do not copy over any 0 background pixels
                         )
 
@@ -502,38 +509,22 @@ class Label(displayio.Group):
 
         return (left, top, right - left, bottom - top)  # bounding_box
 
-
-
-
-
-
     @property
     def bounding_box(self):
         """An (x, y, w, h) tuple that completely covers all glyphs. The
         first two numbers are offset from the x, y origin of this group"""
         return self._bounding_box
 
-    # @property
-    # def scale(self):
-    #     return self._scale
-    
-    # @scale.setter
-    # #@displayio.Group.scale.setter
-    # def scale(self, new_scale):
-    #     self._scale=new_scale
-    #     #super(displayio.Group, self).scale.fset(self, new_scale)
-    #     self.anchored_position=self._anchored_position # update the anchored_position
-    #     #displayio.Group.scale.__set__(self, new_scale)
-    #     #displayio.Group.scale=new_scale
-    #     #setattr(super(), "scale", new_scale)
-    #     #setattr(self, "scale", new_scale)
-    #     super(displayio.Group, self).scale.__set__(self, new_scale)
-
-    def set_scale(self, new_scale):
+    @property
+    def scale(self):
         """Set the scaling of the label"""
-        self._scale=int(round(new_scale))
-        self.scale=self._scale
-        self.anchored_position=self._anchored_position
+        return self._scale
+    
+    @scale.setter
+    def scale(self, new_scale):
+        self.local_group.scale=new_scale
+        self._scale=new_scale
+        self.anchored_position=self._anchored_position # update the anchored_position
 
     @property
     def line_spacing(self):
@@ -543,7 +534,10 @@ class Label(displayio.Group):
 
     @line_spacing.setter
     def line_spacing(self, new_line_spacing):
-        self._reset_text(line_spacing=new_line_spacing)
+        if self._save_text:
+            self._reset_text(line_spacing=new_line_spacing)
+        else:
+            raise RuntimeError("line_spacing is immutable when save_text is False")
 
 
     @property
@@ -592,7 +586,10 @@ class Label(displayio.Group):
 
     @font.setter
     def font(self, new_font):
-        self._reset_text(font=new_font)
+        if self._save_text:
+            self._reset_text(font=new_font)
+        else:
+            raise RuntimeError("font is immutable when save_text is False")
 
     @property
     def anchor_point(self):
@@ -617,16 +614,15 @@ class Label(displayio.Group):
     @anchored_position.setter
     def anchored_position(self, new_position):
         self._anchored_position = new_position
-
         # Set anchored_position
         if (self._anchor_point is not None) and (self._anchored_position is not None):
             self.x = int(
                 new_position[0]
-                - (self._bounding_box[0] * self._scale)
-                - round(self._anchor_point[0] * (self._bounding_box[2] * self._scale))
+                - (self._bounding_box[0] * self.scale)
+                - round(self._anchor_point[0] * (self._bounding_box[2] * self.scale))
             )
             self.y = int(
                 new_position[1]
-                - (self._bounding_box[1] * self._scale)
-                - round(self._anchor_point[1] * self._bounding_box[3] * self._scale)
+                - (self._bounding_box[1] * self.scale)
+                - round(self._anchor_point[1] * self._bounding_box[3] * self.scale)
             )
