@@ -80,14 +80,23 @@ class Label(displayio.Group):
         anchor_point=None,
         anchored_position=None,
         scale=1,
+        **kwargs
     ):
         if not max_glyphs and not text:
             raise RuntimeError("Please provide a max size, or initial text")
         if not max_glyphs:
             max_glyphs = len(text)
         # add one to max_size for the background bitmap tileGrid
-        super().__init__(max_size=1)
-        self.local_group = displayio.Group(max_size=max_glyphs + 1, scale=scale)
+
+        # instance the Group
+        # self Group will contain a single local_group which contains a Group (self.local_group)
+        # which contains a TileGrid
+        super().__init__(
+            max_size=1, scale=1, **kwargs
+        )  # The self scale should always be 1
+        self.local_group = displayio.Group(
+            max_size=max_glyphs + 1, scale=scale
+        )  # local_group will set the scale
         self.append(self.local_group)
 
         self.width = max_glyphs

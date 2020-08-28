@@ -112,14 +112,18 @@ class Label(displayio.Group):
         anchored_position=None,
         save_text=True,  # can reduce memory use if save_text = False
         scale=1,
+        **kwargs,
     ):
 
         # instance the Group
-        # self Group will contain a single local_group which contains one TileGrid which contains
-        # the text bitmap
+        # self Group will contain a single local_group which contains a Group (self.local_group)
+        # which contains a TileGrid (self.tilegrid) which contains the text bitmap (self.bitmap)
         super().__init__(
-            max_size=1, x=x, y=y,
-        )  # this will include any arguments, including scale
+            max_size=1, x=x, y=y, scale=1, **kwargs,
+        )
+        # the self group scale should always remain at 1, the self.local_group will
+        # be used to set the scale
+        # **kwargs will pass any additional arguments provided to the Label
 
         self.local_group = displayio.Group(
             max_size=1, scale=scale
@@ -418,17 +422,13 @@ class Label(displayio.Group):
         yposition,
         text_palette_index=1,
         background_palette_index=0,
-        print_only_pixels=True,  # print_only_pixels = True: only update the bitmap where the glyph
-        # pixel color is > 0.  This is especially useful for script fonts where glyph
-        # bounding boxes overlap
-        # Set `print_only_pixels=False` to write all pixels
+        skip_index=0,  # set to None to write all pixels, other wise skip this palette index
+        # when copying glyph bitmaps (this is important for slanted text
+        # where rectangulary glyph boxes overlap)
     ):
         # placeText - Writes text into a bitmap at the specified location.
         #
         # Note: scale is pushed up to Group level
-
-        bitmap_width = bitmap.width
-        bitmap_height = bitmap.height
 
         x_start = xposition  # starting x position (left margin)
         y_start = yposition
@@ -472,57 +472,93 @@ class Label(displayio.Group):
                     )  # for type BuiltinFont, this creates the x-offset in the glyph bitmap.
                     # for BDF loaded fonts, this should equal 0
 
-                    try:
-                        bitmap.blit(
-                            xposition + my_glyph.dx,
-                            yposition - my_glyph.height - my_glyph.dy,
-                            my_glyph.bitmap,
-                            x1=glyph_offset_x,
-                            y1=0,
-                            x2=glyph_offset_x + my_glyph.width,
-                            y2=0 + my_glyph.height,
-                            skip_index=0,  # do not copy over any 0 background pixels
-                        )
-
-                    except AttributeError:
-                        for y in range(my_glyph.height):
-                            for x in range(my_glyph.width):
-                                x_placement = x + xposition + my_glyph.dx
-                                y_placement = (
-                                    y + yposition - my_glyph.height - my_glyph.dy
-                                )
-
-                                if (bitmap_width > x_placement >= 0) and (
-                                    bitmap_height > y_placement >= 0
-                                ):
-
-                                    # Allows for remapping the bitmap indexes using paletteIndex
-                                    # for background and text.
-                                    palette_indexes = (
-                                        background_palette_index,
-                                        text_palette_index,
-                                    )
-
-                                    this_pixel_color = palette_indexes[
-                                        my_glyph.bitmap[
-                                            y * my_glyph.bitmap.width
-                                            + x
-                                            + glyph_offset_x
-                                        ]
-                                    ]
-
-                                    if not print_only_pixels or this_pixel_color > 0:
-                                        # write all characters if printOnlyPixels = False,
-                                        # or if thisPixelColor is > 0
-                                        bitmap[
-                                            y_placement * bitmap_width + x_placement
-                                        ] = this_pixel_color
-                                elif y_placement > bitmap_height:
-                                    break
+                    self._blit(
+                        bitmap,
+                        xposition + my_glyph.dx,
+                        yposition - my_glyph.height - my_glyph.dy,
+                        my_glyph.bitmap,
+                        x_1=glyph_offset_x,
+                        y_1=0,
+                        x_2=glyph_offset_x + my_glyph.width,
+                        y_2=0 + my_glyph.height,
+                        skip_index=skip_index,  # do not copy over any 0 background pixels
+                    )
 
                     xposition = xposition + my_glyph.shift_x
 
         return (left, top, right - left, bottom - top)  # bounding_box
+
+    def _blit(
+        self,
+        bitmap,  # target bitmap
+        x,  # target x upper left corner
+        y,  # target y upper left corner
+        source_bitmap,  # source bitmap
+        x_1=0,  # source x start
+        y_1=0,  # source y start
+        x_2=None,  # source x end
+        y_2=None,  # source y end
+        skip_index=None,  # palette index that will not be copied
+        # (for example: the background color of a glyph)
+    ):
+
+        if hasattr(bitmap, "blit"):  # if bitmap has a built-in blit function, call it
+            # this function should perform its own input checks
+            bitmap.blit(
+                x,
+                y,
+                source_bitmap,
+                x1=x_1,
+                y1=y_1,
+                x2=x_2,
+                y2=y_2,
+                skip_index=skip_index,
+            )
+
+        else:  # perform pixel by pixel copy of the bitmap
+
+            # Perform input checks
+
+            if x_2 is None:
+                x_2 = source_bitmap.width
+            if y_2 is None:
+                y_2 = source_bitmap.height
+
+            # Rearrange so that x_1 < x_2 and y1 < y2
+            if x_1 > x_2:
+                x_1, x_2 = x_2, x_1
+            if y_1 > y_2:
+                y_1, y_2 = y_2, y_1
+
+            # Ensure that x2 and y2 are within source bitmap size
+            x_2 = min(x_2, source_bitmap.width)
+            y_2 = min(y_2, source_bitmap.height)
+
+            for y_count in range(y_2 - y_1):
+                for x_count in range(x_2 - x_1):
+                    x_placement = x + x_count
+                    y_placement = y + y_count
+
+                    if (bitmap.width > x_placement >= 0) and (
+                        bitmap.height > y_placement >= 0
+                    ):  # ensure placement is within target bitmap
+
+                        # get the palette index from the source bitmap
+                        this_pixel_color = source_bitmap[
+                            y_1
+                            + (
+                                y_count * source_bitmap.width
+                            )  # Direct index into a bitmap array is speedier than [x,y] tuple
+                            + x_1
+                            + x_count
+                        ]
+
+                        if (skip_index is None) or (this_pixel_color != skip_index):
+                            bitmap[  # Direct index into a bitmap array is speedier than [x,y] tuple
+                                y_placement * bitmap.width + x_placement
+                            ] = this_pixel_color
+                    elif y_placement > bitmap.height:
+                        break
 
     @property
     def bounding_box(self):
@@ -532,7 +568,7 @@ class Label(displayio.Group):
 
     @property
     def scale(self):
-        """Set the scaling of the label"""
+        """Set the scaling of the label, in integer values"""
         return self._scale
 
     @scale.setter
