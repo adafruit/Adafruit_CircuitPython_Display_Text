@@ -111,29 +111,19 @@ class Label(displayio.Group):
         anchor_point=None,
         anchored_position=None,
         save_text=True,  # can reduce memory use if save_text = False
-        **kwargs
+        scale=1,
     ):
-
-        # Scale will be passed to Group using kwargs.
-        if "scale" in kwargs.keys():
-            scale = kwargs["scale"]
-            kwargs.pop(
-                "scale"
-            )  # Do not change scale of self Group, use this value to set scale of local_group
-        else:
-            scale = 1  # Set default scale=1
 
         # instance the Group
         # self Group will contain a single local_group which contains one TileGrid which contains
         # the text bitmap
         super().__init__(
-            max_size=1, x=x, y=y, **kwargs
+            max_size=1, x=x, y=y, 
         )  # this will include any arguments, including scale
 
         self.local_group = displayio.Group(
-            max_size=1, **kwargs
-        )  # local_group holds the tileGrid and
-        # sets the scaling
+            max_size=1, scale=scale
+        )  # local_group holds the tileGrid and sets the scaling
         self.append(
             self.local_group
         )  # the local_group will always stay in the self Group
@@ -165,7 +155,6 @@ class Label(displayio.Group):
             anchored_position=anchored_position,
             save_text=save_text,
             scale=scale,
-            **kwargs,
         )
 
     def _reset_text(
@@ -184,7 +173,6 @@ class Label(displayio.Group):
         anchored_position=None,
         save_text=None,
         scale=None,
-        **kwargs
     ):
 
         # Store all the instance variables
