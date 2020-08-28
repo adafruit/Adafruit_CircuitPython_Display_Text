@@ -118,7 +118,7 @@ class Label(displayio.Group):
         # self Group will contain a single local_group which contains one TileGrid which contains
         # the text bitmap
         super().__init__(
-            max_size=1, x=x, y=y, 
+            max_size=1, x=x, y=y,
         )  # this will include any arguments, including scale
 
         self.local_group = displayio.Group(
