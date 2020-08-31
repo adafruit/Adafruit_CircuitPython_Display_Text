@@ -79,18 +79,25 @@ class Label(displayio.Group):
         padding_right=0,
         anchor_point=None,
         anchored_position=None,
+        scale=1,
         **kwargs
     ):
-        if "scale" in kwargs.keys():
-            self._scale = kwargs["scale"]
-        else:
-            self._scale = 1
         if not max_glyphs and not text:
             raise RuntimeError("Please provide a max size, or initial text")
         if not max_glyphs:
             max_glyphs = len(text)
         # add one to max_size for the background bitmap tileGrid
-        super().__init__(max_size=max_glyphs + 1, **kwargs)
+
+        # instance the Group
+        # self Group will contain a single local_group which contains a Group (self.local_group)
+        # which contains a TileGrid
+        super().__init__(
+            max_size=1, scale=1, **kwargs
+        )  # The self scale should always be 1
+        self.local_group = displayio.Group(
+            max_size=max_glyphs + 1, scale=scale
+        )  # local_group will set the scale
+        self.append(self.local_group)
 
         self.width = max_glyphs
         self._font = font
@@ -121,6 +128,8 @@ class Label(displayio.Group):
         self._padding_bottom = padding_bottom
         self._padding_left = padding_left
         self._padding_right = padding_right
+
+        self._scale = scale
 
         if text is not None:
             self._update_text(str(text))
@@ -179,7 +188,7 @@ class Label(displayio.Group):
         if new_color is None:
             self._background_palette.make_transparent(0)
             if self._added_background_tilegrid:
-                self.pop(0)
+                self.local_group.pop(0)
                 self._added_background_tilegrid = False
         else:
             self._background_palette.make_opaque(0)
@@ -200,10 +209,16 @@ class Label(displayio.Group):
                     self._boundingbox[3] + self._padding_top + self._padding_bottom > 0
                 )
             ):
-                if len(self) > 0:
-                    self.insert(0, self._create_background_box(lines, y_offset))
+                if (
+                    len(self.local_group) > 0
+                ):  # This can be simplified in CP v6.0, when group.append(0) bug is corrected
+                    self.local_group.insert(
+                        0, self._create_background_box(lines, y_offset)
+                    )
                 else:
-                    self.append(self._create_background_box(lines, y_offset))
+                    self.local_group.append(
+                        self._create_background_box(lines, y_offset)
+                    )
                 self._added_background_tilegrid = True
 
         else:  # a bitmap is present in the self Group
@@ -217,9 +232,9 @@ class Label(displayio.Group):
                     self._boundingbox[3] + self._padding_top + self._padding_bottom > 0
                 )
             ):
-                self[0] = self._create_background_box(lines, y_offset)
+                self.local_group[0] = self._create_background_box(lines, y_offset)
             else:  # delete the existing bitmap
-                self.pop(0)
+                self.local_group.pop(0)
                 self._added_background_tilegrid = False
 
     def _update_text(
@@ -284,10 +299,10 @@ class Label(displayio.Group):
                         x=position_x,
                         y=position_y,
                     )
-                if tilegrid_count < len(self):
-                    self[tilegrid_count] = face
+                if tilegrid_count < len(self.local_group):
+                    self.local_group[tilegrid_count] = face
                 else:
-                    self.append(face)
+                    self.local_group.append(face)
                 tilegrid_count += 1
             x += glyph.shift_x
             i += 1
@@ -296,8 +311,8 @@ class Label(displayio.Group):
         if left is None:
             left = 0
 
-        while len(self) > tilegrid_count:  # i:
-            self.pop()
+        while len(self.local_group) > tilegrid_count:  # i:
+            self.local_group.pop()
         self._text = new_text
         self._boundingbox = (left, top, right - left, bottom - top)
 
@@ -319,6 +334,7 @@ class Label(displayio.Group):
     @line_spacing.setter
     def line_spacing(self, spacing):
         self._line_spacing = spacing
+        self.text = self._text  # redraw the box
 
     @property
     def color(self):
@@ -357,6 +373,18 @@ class Label(displayio.Group):
             self.anchored_position = current_anchored_position
         except RuntimeError as run_error:
             raise RuntimeError("Text length exceeds max_glyphs") from run_error
+
+    @property
+    def scale(self):
+        """Set the scaling of the label, in integer values"""
+        return self._scale
+
+    @scale.setter
+    def scale(self, new_scale):
+        current_anchored_position = self.anchored_position
+        self._scale = new_scale
+        self.local_group.scale = new_scale
+        self.anchored_position = current_anchored_position
 
     @property
     def font(self):
