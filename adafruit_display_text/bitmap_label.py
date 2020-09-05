@@ -50,13 +50,12 @@ class Label(displayio.Group):
     """A label displaying a string of text that is stored in a bitmap.
        Note: This ``bitmap_label.py`` library utilizes a bitmap to display the text.
        This method is memory-conserving relative to ``label.py``.
-       For the bitmap_label library, the font, text, and line_spacing must be set at
-       instancing and are immutable.  The ``max_glyphs`` parameter is ignored and is present
+       The ``max_glyphs`` parameter is ignored and is present
        only for direct compatability with label.py.
-       For use cases where text changes are required after the initial instancing, please
-       use the `label.py` library.
-       For further reduction in memory usage, set save_text to False (text string will not
-       be stored).
+
+       For further reduction in memory usage, set ``save_text=False`` (text string will not
+       be stored and ``line_spacing`` and ``font`` are immutable with ``save_text``
+       set to ``False``).
 
        The origin point set by ``x`` and ``y``
        properties will be the left edge of the bounding box, and in the center of a M
