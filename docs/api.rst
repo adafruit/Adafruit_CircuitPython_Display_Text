@@ -6,3 +6,6 @@
 
 .. automodule:: adafruit_display_text.label
    :members:
+
+.. automodule:: adafruit_display_text.bitmap_label
+   :members:

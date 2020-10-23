@@ -1,8 +1,9 @@
 import os
 import board
 import displayio
-from adafruit_display_text.label import Label
 from adafruit_bitmap_font import bitmap_font
+from adafruit_display_text.label import Label
+
 
 # the current working directory (where this file is)
 cwd = ("/" + __file__).rsplit("/", 1)[0]
