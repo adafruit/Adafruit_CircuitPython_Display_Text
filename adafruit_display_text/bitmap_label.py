@@ -228,9 +228,10 @@ class Label(displayio.Group):
                 0,  # zero width with text == ""
                 0,  # zero height with text == ""
             )
-            # Clear out any items in the self Group, in case this is an update to the bitmap_label
-            for _ in self:
-                self.pop(0)
+            # Clear out any items in the self.local_group Group, in case this is an
+            # update to the bitmap_label
+            for _ in self.local_group:
+                self.local_group.pop(0)
 
         else:  # The text string is not empty, so create the Bitmap and TileGrid and
             # append to the self Group
