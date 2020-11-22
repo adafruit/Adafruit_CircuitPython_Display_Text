@@ -1,6 +1,8 @@
 """
 Display Text module helper functions
 """
+
+
 # The MIT License (MIT)
 #
 # Copyright (c) 2020 Tim C for Adafruit Industries LLC
@@ -35,11 +37,25 @@ def wrap_text_to_lines(string, max_chars):
         of max_chars provided
 
     """
+
+    def chunks(lst, n):
+        """Yield successive n-sized chunks from lst."""
+        for i in range(0, len(lst), n):
+            yield lst[i : i + n]
+
     string = string.replace("\n", "").replace("\r", "")  # Strip confusing newlines
     words = string.split(" ")
     the_lines = []
     the_line = ""
     for w in words:
+        if len(w) > max_chars:
+            parts = []
+            for part in chunks(w, max_chars - 1):
+                parts.append("{}-".format(part))
+            the_lines.extend(parts[:-1])
+            the_line = parts[-1][:-1]
+            continue
+
         if len(the_line + " " + w) <= max_chars:
             the_line += " " + w
         else:
@@ -48,5 +64,6 @@ def wrap_text_to_lines(string, max_chars):
     if the_line:  # Last line remaining
         the_lines.append(the_line)
     # Remove first space from first line:
-    the_lines[0] = the_lines[0][1:]
+    if the_lines[0][0] == " ":
+        the_lines[0] = the_lines[0][1:]
     return the_lines
