@@ -53,6 +53,7 @@ def wrap_text_to_lines(string, max_chars):
             for part in chunks(w, max_chars - 1):
                 parts.append("{}-".format(part))
             the_lines.extend(parts[:-1])
+            # Remove the last hyphen on the last chunk
             the_line = parts[-1][:-1]
             continue
 
@@ -63,6 +64,9 @@ def wrap_text_to_lines(string, max_chars):
             the_line = "" + w
     if the_line:  # Last line remaining
         the_lines.append(the_line)
+    # Remove any blank lines
+    while not the_lines[0]:
+        del the_lines[0]
     # Remove first space from first line:
     if the_lines[0][0] == " ":
         the_lines[0] = the_lines[0][1:]
