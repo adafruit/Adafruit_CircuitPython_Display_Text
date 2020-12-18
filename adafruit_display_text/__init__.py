@@ -53,12 +53,13 @@ def wrap_text_to_lines(string, max_chars):
             for part in chunks(w, max_chars - 1):
                 parts.append("{}-".format(part))
             the_lines.extend(parts[:-1])
-            # Remove the last hyphen on the last chunk
             the_line = parts[-1][:-1]
             continue
 
         if len(the_line + " " + w) <= max_chars:
             the_line += " " + w
+        elif not the_line and len(w) == max_chars:
+            the_lines.append(w)
         else:
             the_lines.append(the_line)
             the_line = "" + w
