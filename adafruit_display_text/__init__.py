@@ -49,6 +49,8 @@ def wrap_text_to_lines(string, max_chars):
     the_line = ""
     for w in words:
         if len(w) > max_chars:
+            if the_line:  # add what we had stored
+                the_lines.append(the_line)
             parts = []
             for part in chunks(w, max_chars - 1):
                 parts.append("{}-".format(part))
