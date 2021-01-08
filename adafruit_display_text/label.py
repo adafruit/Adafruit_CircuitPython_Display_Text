@@ -178,7 +178,11 @@ class Label(displayio.Group):
 
         # check a few glyphs for maximum ascender and descender height
         glyphs = "M j'"  # choose glyphs with highest ascender and lowest
-        self._font.load_glyphs(glyphs)
+        try:
+            self._font.load_glyphs(glyphs)
+        except AttributeError:
+            # Builtin font doesn't have or need load_glyphs
+            pass
         # descender, will depend upon font used
         ascender_max = descender_max = 0
         for char in glyphs:
