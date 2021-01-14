@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2021 ladyada for Adafruit Industries
+# SPDX-License-Identifier: MIT
+
 """
 This example show the use of the backlight as well as using labels to simulate
 a terminal using a font on the PyPortal

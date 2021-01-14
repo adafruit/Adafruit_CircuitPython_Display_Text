@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2021 ladyada for Adafruit Industries
+# SPDX-License-Identifier: MIT
+
 # Sample for comparing label and bitmap_label positioning with Builtin or loaded BDF fonts
 
 # pylint: disable=no-member
