@@ -1,24 +1,7 @@
-# The MIT License (MIT)
+# SPDX-FileCopyrightText: 2019 Scott Shawcroft for Adafruit Industries
 #
-# Copyright (c) 2019 Scott Shawcroft for Adafruit Industries LLC
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in
-# all copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-# THE SOFTWARE.
+# SPDX-License-Identifier: MIT
+
 """
 `adafruit_display_text.label`
 ====================================================
@@ -47,16 +30,16 @@ __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_Display_Text.git"
 
 class Label(displayio.Group):
     """A label displaying a string of text. The origin point set by ``x`` and ``y``
-       properties will be the left edge of the bounding box, and in the center of a M
-       glyph (if its one line), or the (number of lines * linespacing + M)/2. That is,
-       it will try to have it be center-left as close as possible.
+    properties will be the left edge of the bounding box, and in the center of a M
+    glyph (if its one line), or the (number of lines * linespacing + M)/2. That is,
+    it will try to have it be center-left as close as possible.
 
-       :param Font font: A font class that has ``get_bounding_box`` and ``get_glyph``.
-         Must include a capital M for measuring character size.
-       :param str text: Text to display
-       :param int max_glyphs: The largest quantity of glyphs we will display
-       :param int color: Color of all text in RGB hex
-       :param double line_spacing: Line spacing of text to display"""
+    :param Font font: A font class that has ``get_bounding_box`` and ``get_glyph``.
+      Must include a capital M for measuring character size.
+    :param str text: Text to display
+    :param int max_glyphs: The largest quantity of glyphs we will display
+    :param int color: Color of all text in RGB hex
+    :param double line_spacing: Line spacing of text to display"""
 
     # pylint: disable=too-many-instance-attributes, too-many-locals
     # This has a lot of getters/setters, maybe it needs cleanup.
@@ -410,8 +393,8 @@ class Label(displayio.Group):
     @property
     def anchor_point(self):
         """Point that anchored_position moves relative to.
-           Tuple with decimal percentage of width and height.
-           (E.g. (0,0) is top left, (1.0, 0.5): is middle right.)"""
+        Tuple with decimal percentage of width and height.
+        (E.g. (0,0) is top left, (1.0, 0.5): is middle right.)"""
         return self._anchor_point
 
     @anchor_point.setter
@@ -426,7 +409,7 @@ class Label(displayio.Group):
     @property
     def anchored_position(self):
         """Position relative to the anchor_point. Tuple containing x,y
-           pixel coordinates."""
+        pixel coordinates."""
         if self._anchor_point is None:
             return None
         return (

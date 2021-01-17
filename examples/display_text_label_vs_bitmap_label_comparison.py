@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2021 ladyada for Adafruit Industries
+# SPDX-License-Identifier: MIT
+
 # Sample for comparing label and bitmap_label positioning with Builtin or loaded BDF fonts
 
 # pylint: disable=no-member
@@ -29,14 +32,20 @@ if not use_builtinfont:
     fontList = []
 
     # Load some proportional fonts
-    fontFile = "fonts/Helvetica-Bold-16.bdf"
+    fontFile = "fonts/LeagueSpartan-Bold-16.bdf"
     fontToUse = bitmap_font.load_font(fontFile)
 
 # Set scaling factor for display text
 my_scale = 1
 
 #  Setup the SPI display
-if "DISPLAY" not in dir(board):
+if "DISPLAY" in dir(board):
+    # use built in display (PyPortal, PyGamer, PyBadge, CLUE, etc.)
+    # see guide for setting up external displays (TFT / OLED breakouts, RGB matrices, etc.)
+    # https://learn.adafruit.com/circuitpython-display-support-using-displayio/display-and-display-bus
+    display = board.DISPLAY
+
+else:
     # Setup the LCD display with driver
     # You may need to change this to match the display driver for the chipset
     # used on your display
@@ -81,12 +90,8 @@ if "DISPLAY" not in dir(board):
 
     # reset the display to show nothing.
     display.show(None)
-else:
-    # built-in display
-    display = board.DISPLAY
 
 print("Display is started")
-
 
 preload_glyphs = (
     True  # set this to True if you want to preload the font glyphs into memory
