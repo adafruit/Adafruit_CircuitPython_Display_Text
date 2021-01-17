@@ -198,15 +198,12 @@ class Label(displayio.Group):
         if padding_right is not None:
             self._padding_right = max(0, padding_right)
         if anchor_point is not None:
-            self.anchor_point = anchor_point
+            self._anchor_point = anchor_point
         if anchored_position is not None:
             self._anchored_position = anchored_position
         if save_text is not None:
             self._save_text = save_text
-        if (
-            scale is not None
-        ):  # Scale will be defined in local_group (Note: self should have scale=1)
-            self.scale = scale  # call the setter
+
 
         # if text is not provided as a parameter (text is None), use the previous value.
         if (text is None) and self._save_text:
@@ -229,8 +226,8 @@ class Label(displayio.Group):
                 0,  # zero height with text == ""
             )
             # Clear out any items in the self Group, in case this is an update to the bitmap_label
-            for _ in self:
-                self.pop(0)
+            for _ in self.local_group:
+                self.local_group.pop(0)
 
         else:  # The text string is not empty, so create the Bitmap and TileGrid and
             # append to the self Group
@@ -308,10 +305,18 @@ class Label(displayio.Group):
                 tight_box_y,
             )
 
+
+        if (
+            scale is not None
+        ):  # Scale will be defined in local_group (Note: self should have scale=1)
+            self.scale = scale  # call the setter
+
         self.anchored_position = (
             self._anchored_position
         )  # set the anchored_position with setter after bitmap is created, sets the
         # x,y positions of the label
+
+
 
     @staticmethod
     def _line_spacing_ypixels(font, line_spacing):
