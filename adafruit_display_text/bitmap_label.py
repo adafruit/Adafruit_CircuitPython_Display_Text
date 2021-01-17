@@ -48,43 +48,43 @@ __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_Display_Text.git"
 
 class Label(displayio.Group):
     """A label displaying a string of text that is stored in a bitmap.
-       Note: This ``bitmap_label.py`` library utilizes a bitmap to display the text.
-       This method is memory-conserving relative to ``label.py``.
-       The ``max_glyphs`` parameter is ignored and is present
-       only for direct compatability with label.py.
+    Note: This ``bitmap_label.py`` library utilizes a bitmap to display the text.
+    This method is memory-conserving relative to ``label.py``.
+    The ``max_glyphs`` parameter is ignored and is present
+    only for direct compatability with label.py.
 
-       For further reduction in memory usage, set ``save_text=False`` (text string will not
-       be stored and ``line_spacing`` and ``font`` are immutable with ``save_text``
-       set to ``False``).
+    For further reduction in memory usage, set ``save_text=False`` (text string will not
+    be stored and ``line_spacing`` and ``font`` are immutable with ``save_text``
+    set to ``False``).
 
-       The origin point set by ``x`` and ``y``
-       properties will be the left edge of the bounding box, and in the center of a M
-       glyph (if its one line), or the (number of lines * linespacing + M)/2. That is,
-       it will try to have it be center-left as close as possible.
+    The origin point set by ``x`` and ``y``
+    properties will be the left edge of the bounding box, and in the center of a M
+    glyph (if its one line), or the (number of lines * linespacing + M)/2. That is,
+    it will try to have it be center-left as close as possible.
 
-       :param Font font: A font class that has ``get_bounding_box`` and ``get_glyph``.
-         Must include a capital M for measuring character size.
-       :param str text: Text to display
-       :param int max_glyphs: Unnecessary parameter (provided only for direct compability
-       with label.py)
-       :param int color: Color of all text in RGB hex
-       :param int background_color: Color of the background, use `None` for transparent
-       :param double line_spacing: Line spacing of text to display
-       :param boolean background_tight: Set `True` only if you want background box to tightly
-       surround text
-       :param int padding_top: Additional pixels added to background bounding box at top
-       :param int padding_bottom: Additional pixels added to background bounding box at bottom
-       :param int padding_left: Additional pixels added to background bounding box at left
-       :param int padding_right: Additional pixels added to background bounding box at right
-       :param (double,double) anchor_point: Point that anchored_position moves relative to.
-        Tuple with decimal percentage of width and height.
-        (E.g. (0,0) is top left, (1.0, 0.5): is middle right.)
-       :param (int,int) anchored_position: Position relative to the anchor_point. Tuple
-       containing x,y pixel coordinates.
-       :param int scale: Integer value of the pixel scaling
-       :param bool save_text: Set True to save the text string as a constant in the
-        label structure.  Set False to reduce memory use.
-       """
+    :param Font font: A font class that has ``get_bounding_box`` and ``get_glyph``.
+      Must include a capital M for measuring character size.
+    :param str text: Text to display
+    :param int max_glyphs: Unnecessary parameter (provided only for direct compability
+    with label.py)
+    :param int color: Color of all text in RGB hex
+    :param int background_color: Color of the background, use `None` for transparent
+    :param double line_spacing: Line spacing of text to display
+    :param boolean background_tight: Set `True` only if you want background box to tightly
+    surround text
+    :param int padding_top: Additional pixels added to background bounding box at top
+    :param int padding_bottom: Additional pixels added to background bounding box at bottom
+    :param int padding_left: Additional pixels added to background bounding box at left
+    :param int padding_right: Additional pixels added to background bounding box at right
+    :param (double,double) anchor_point: Point that anchored_position moves relative to.
+     Tuple with decimal percentage of width and height.
+     (E.g. (0,0) is top left, (1.0, 0.5): is middle right.)
+    :param (int,int) anchored_position: Position relative to the anchor_point. Tuple
+    containing x,y pixel coordinates.
+    :param int scale: Integer value of the pixel scaling
+    :param bool save_text: Set True to save the text string as a constant in the
+     label structure.  Set False to reduce memory use.
+    """
 
     # pylint: disable=unused-argument, too-many-instance-attributes, too-many-locals, too-many-arguments
     # pylint: disable=too-many-branches, no-self-use, too-many-statements
@@ -118,7 +118,11 @@ class Label(displayio.Group):
         # self Group will contain a single local_group which contains a Group (self.local_group)
         # which contains a TileGrid (self.tilegrid) which contains the text bitmap (self.bitmap)
         super().__init__(
-            max_size=1, x=x, y=y, scale=1, **kwargs,
+            max_size=1,
+            x=x,
+            y=y,
+            scale=1,
+            **kwargs,
         )
         # the self group scale should always remain at 1, the self.local_group will
         # be used to set the scale
@@ -204,7 +208,6 @@ class Label(displayio.Group):
         if save_text is not None:
             self._save_text = save_text
 
-
         # if text is not provided as a parameter (text is None), use the previous value.
         if (text is None) and self._save_text:
             text = self._text
@@ -244,7 +247,9 @@ class Label(displayio.Group):
                 loose_box_y,
                 loose_y_offset,
             ) = self._text_bounding_box(
-                text, self._font, self._line_spacing,
+                text,
+                self._font,
+                self._line_spacing,
             )  # calculate the box size for a tight and loose backgrounds
 
             if self._background_tight:
@@ -305,7 +310,6 @@ class Label(displayio.Group):
                 tight_box_y,
             )
 
-
         if (
             scale is not None
         ):  # Scale will be defined in local_group (Note: self should have scale=1)
@@ -315,8 +319,6 @@ class Label(displayio.Group):
             self._anchored_position
         )  # set the anchored_position with setter after bitmap is created, sets the
         # x,y positions of the label
-
-
 
     @staticmethod
     def _line_spacing_ypixels(font, line_spacing):
@@ -649,8 +651,8 @@ class Label(displayio.Group):
     @property
     def anchor_point(self):
         """Point that anchored_position moves relative to.
-           Tuple with decimal percentage of width and height.
-           (E.g. (0,0) is top left, (1.0, 0.5): is middle right.)"""
+        Tuple with decimal percentage of width and height.
+        (E.g. (0,0) is top left, (1.0, 0.5): is middle right.)"""
         return self._anchor_point
 
     @anchor_point.setter
@@ -663,7 +665,7 @@ class Label(displayio.Group):
     @property
     def anchored_position(self):
         """Position relative to the anchor_point. Tuple containing x,y
-           pixel coordinates."""
+        pixel coordinates."""
         return self._anchored_position
 
     @anchored_position.setter
