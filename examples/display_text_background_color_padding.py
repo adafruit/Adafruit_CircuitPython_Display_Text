@@ -5,58 +5,70 @@ import time
 import board
 import displayio
 
-
-# from adafruit_st7789 import ST7789
-from adafruit_ili9341 import ILI9341
 from adafruit_bitmap_font import bitmap_font
 from adafruit_display_text import label
 
+
 #  Setup the SPI display
+if "DISPLAY" in dir(board):
+    # use built in display (PyPortal, PyGamer, PyBadge, CLUE, etc.)
+    # see guide for setting up external displays (TFT / OLED breakouts, RGB matrices, etc.)
+    # https://learn.adafruit.com/circuitpython-display-support-using-displayio/display-and-display-bus
+    display = board.DISPLAY
 
-print("Starting the display...")  # goes to serial only
-displayio.release_displays()
+else:
+    print("Starting external display")  # goes to serial only
+    # Setup the LCD display with driver
+    # You may need to change this to match the display driver for the chipset
+    # used on your display
+    from adafruit_ili9341 import ILI9341
 
+    # from adafruit_st7789 import ST7789
 
-spi = board.SPI()
-tft_cs = board.D9  # arbitrary, pin not used
-tft_dc = board.D10
-tft_backlight = board.D12
-tft_reset = board.D11
+    displayio.release_displays()
 
-while not spi.try_lock():
-    spi.configure(baudrate=32000000)
-spi.unlock()
+    # setup the SPI bus
+    spi = board.SPI()
+    tft_cs = board.D9  # arbitrary, pin not used
+    tft_dc = board.D10
+    tft_backlight = board.D12
+    tft_reset = board.D11
 
-display_bus = displayio.FourWire(
-    spi,
-    command=tft_dc,
-    chip_select=tft_cs,
-    reset=tft_reset,
-    baudrate=32000000,
-    polarity=1,
-    phase=1,
-)
+    while not spi.try_lock():
+        spi.configure(baudrate=32000000)
+    spi.unlock()
 
-print("spi.frequency: {}".format(spi.frequency))
+    display_bus = displayio.FourWire(
+        spi,
+        command=tft_dc,
+        chip_select=tft_cs,
+        reset=tft_reset,
+        baudrate=32000000,
+        polarity=1,
+        phase=1,
+    )
 
-DISPLAY_WIDTH = 320
-DISPLAY_HEIGHT = 240
+    # Number of pixels in the display
+    DISPLAY_WIDTH = 320
+    DISPLAY_HEIGHT = 240
 
-# display = ST7789(display_bus, width=240, height=240, rotation=0, rowstart=80, colstart=0)
-display = ILI9341(
-    display_bus,
-    width=DISPLAY_WIDTH,
-    height=DISPLAY_HEIGHT,
-    rotation=180,
-    auto_refresh=True,
-)
+    # display = ST7789(display_bus, width=240, height=240, rotation=0, rowstart=80, colstart=0)
+
+    # create the display
+    display = ILI9341(
+        display_bus,
+        width=DISPLAY_WIDTH,
+        height=DISPLAY_HEIGHT,
+        rotation=180,  # The rotation can be adjusted to match your configuration.
+        auto_refresh=True,
+        native_frames_per_second=90,
+    )
 
 display.show(None)
 
 # font=terminalio.FONT # this is the Builtin fixed dimension font
 
-font = bitmap_font.load_font("fonts/Helvetica-Bold-16.bdf")
-
+font = bitmap_font.load_font("fonts/LeagueSpartan-Bold-16.bdf")
 
 text = []
 text.append("none")  # no ascenders or descenders
