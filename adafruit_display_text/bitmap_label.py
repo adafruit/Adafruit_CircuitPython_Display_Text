@@ -49,25 +49,24 @@ class Label(displayio.Group):
       Must include a capital M for measuring character size.
     :param str text: Text to display
     :param int max_glyphs: Unnecessary parameter (provided only for direct compability
-      with label.py)
+     with label.py)
     :param int color: Color of all text in RGB hex
     :param int background_color: Color of the background, use `None` for transparent
     :param double line_spacing: Line spacing of text to display
     :param boolean background_tight: Set `True` only if you want background box to tightly
-      surround text
+     surround text
     :param int padding_top: Additional pixels added to background bounding box at top
     :param int padding_bottom: Additional pixels added to background bounding box at bottom
     :param int padding_left: Additional pixels added to background bounding box at left
     :param int padding_right: Additional pixels added to background bounding box at right
     :param (double,double) anchor_point: Point that anchored_position moves relative to.
-      Tuple with decimal percentage of width and height.
-      (E.g. (0,0) is top left, (1.0, 0.5): is middle right.)
+     Tuple with decimal percentage of width and height.
+     (E.g. (0,0) is top left, (1.0, 0.5): is middle right.)
     :param (int,int) anchored_position: Position relative to the anchor_point. Tuple
-      containing x,y pixel coordinates.
+     containing x,y pixel coordinates.
     :param int scale: Integer value of the pixel scaling
     :param bool save_text: Set True to save the text string as a constant in the
-      label structure.  Set False to reduce memory use.
-    """
+     label structure.  Set False to reduce memory use."""
 
     # pylint: disable=unused-argument, too-many-instance-attributes, too-many-locals, too-many-arguments
     # pylint: disable=too-many-branches, no-self-use, too-many-statements
@@ -185,15 +184,11 @@ class Label(displayio.Group):
         if padding_right is not None:
             self._padding_right = max(0, padding_right)
         if anchor_point is not None:
-            self.anchor_point = anchor_point
+            self._anchor_point = anchor_point
         if anchored_position is not None:
             self._anchored_position = anchored_position
         if save_text is not None:
             self._save_text = save_text
-        if (
-            scale is not None
-        ):  # Scale will be defined in local_group (Note: self should have scale=1)
-            self.scale = scale  # call the setter
 
         # if text is not provided as a parameter (text is None), use the previous value.
         if (text is None) and self._save_text:
@@ -297,6 +292,11 @@ class Label(displayio.Group):
                 box_x,
                 tight_box_y,
             )
+
+        if (
+            scale is not None
+        ):  # Scale will be defined in local_group (Note: self should have scale=1)
+            self.scale = scale  # call the setter
 
         self.anchored_position = (
             self._anchored_position
