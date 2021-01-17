@@ -1,24 +1,7 @@
-# The MIT License (MIT)
+# SPDX-FileCopyrightText: 2019 Scott Shawcroft for Adafruit Industries
 #
-# Copyright (c) 2019 Scott Shawcroft for Adafruit Industries LLC
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in
-# all copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-# THE SOFTWARE.
+# SPDX-License-Identifier: MIT
+
 """
 `adafruit_display_text.label`
 ====================================================
@@ -47,16 +30,16 @@ __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_Display_Text.git"
 
 class Label(displayio.Group):
     """A label displaying a string of text. The origin point set by ``x`` and ``y``
-       properties will be the left edge of the bounding box, and in the center of a M
-       glyph (if its one line), or the (number of lines * linespacing + M)/2. That is,
-       it will try to have it be center-left as close as possible.
+    properties will be the left edge of the bounding box, and in the center of a M
+    glyph (if its one line), or the (number of lines * linespacing + M)/2. That is,
+    it will try to have it be center-left as close as possible.
 
-       :param Font font: A font class that has ``get_bounding_box`` and ``get_glyph``.
-         Must include a capital M for measuring character size.
-       :param str text: Text to display
-       :param int max_glyphs: The largest quantity of glyphs we will display
-       :param int color: Color of all text in RGB hex
-       :param double line_spacing: Line spacing of text to display"""
+    :param Font font: A font class that has ``get_bounding_box`` and ``get_glyph``.
+      Must include a capital M for measuring character size.
+    :param str text: Text to display
+    :param int max_glyphs: The largest quantity of glyphs we will display
+    :param int color: Color of all text in RGB hex
+    :param double line_spacing: Line spacing of text to display"""
 
     # pylint: disable=too-many-instance-attributes, too-many-locals
     # This has a lot of getters/setters, maybe it needs cleanup.
@@ -147,28 +130,17 @@ class Label(displayio.Group):
             y_box_offset = self._boundingbox[1]
 
         else:  # draw a "loose" bounding box to include any ascenders/descenders.
-
-            # check a few glyphs for maximum ascender and descender height
-            # Enhancement: it would be preferred to access the font "FONT_ASCENT" and
-            # "FONT_DESCENT" in the imported BDF file
-            glyphs = "M j'"  # choose glyphs with highest ascender and lowest
-            # descender, will depend upon font used
-            ascender_max = descender_max = 0
-            for char in glyphs:
-                this_glyph = self._font.get_glyph(ord(char))
-                if this_glyph:
-                    ascender_max = max(ascender_max, this_glyph.height + this_glyph.dy)
-                    descender_max = max(descender_max, -this_glyph.dy)
+            ascent, descent = self._get_ascent_descent()
 
             box_width = self._boundingbox[2] + self._padding_left + self._padding_right
             x_box_offset = -self._padding_left
             box_height = (
-                (ascender_max + descender_max)
+                (ascent + descent)
                 + int((lines - 1) * self.height * self._line_spacing)
                 + self._padding_top
                 + self._padding_bottom
             )
-            y_box_offset = -ascender_max + y_offset - self._padding_top
+            y_box_offset = -ascent + y_offset - self._padding_top
 
         box_width = max(0, box_width)  # remove any negative values
         box_height = max(0, box_height)  # remove any negative values
@@ -183,6 +155,29 @@ class Label(displayio.Group):
 
         return tile_grid
 
+    def _get_ascent_descent(self):
+        if hasattr(self.font, "ascent"):
+            return self.font.ascent, self.font.descent
+
+        # check a few glyphs for maximum ascender and descender height
+        glyphs = "M j'"  # choose glyphs with highest ascender and lowest
+        try:
+            self._font.load_glyphs(glyphs)
+        except AttributeError:
+            # Builtin font doesn't have or need load_glyphs
+            pass
+        # descender, will depend upon font used
+        ascender_max = descender_max = 0
+        for char in glyphs:
+            this_glyph = self._font.get_glyph(ord(char))
+            if this_glyph:
+                ascender_max = max(ascender_max, this_glyph.height + this_glyph.dy)
+                descender_max = max(descender_max, -this_glyph.dy)
+        return ascender_max, descender_max
+
+    def _get_ascent(self):
+        return self._get_ascent_descent()[0]
+
     def _update_background_color(self, new_color):
 
         if new_color is None:
@@ -196,7 +191,7 @@ class Label(displayio.Group):
         self._background_color = new_color
 
         lines = self._text.rstrip("\n").count("\n") + 1
-        y_offset = int((self._font.get_glyph(ord("M")).height) / 2)
+        y_offset = self._get_ascent() // 2
 
         if not self._added_background_tilegrid:  # no bitmap is in the self Group
             # add bitmap if text is present and bitmap sizes > 0 pixels
@@ -248,13 +243,7 @@ class Label(displayio.Group):
             i = 0
         tilegrid_count = i
 
-        try:
-            self._font.load_glyphs(new_text + "M")
-        except AttributeError:
-            # ignore if font does not have load_glyphs
-            pass
-
-        y_offset = int((self._font.get_glyph(ord("M")).height) / 2)
+        y_offset = self._get_ascent() // 2
 
         right = top = bottom = 0
         left = None
@@ -404,8 +393,8 @@ class Label(displayio.Group):
     @property
     def anchor_point(self):
         """Point that anchored_position moves relative to.
-           Tuple with decimal percentage of width and height.
-           (E.g. (0,0) is top left, (1.0, 0.5): is middle right.)"""
+        Tuple with decimal percentage of width and height.
+        (E.g. (0,0) is top left, (1.0, 0.5): is middle right.)"""
         return self._anchor_point
 
     @anchor_point.setter
@@ -420,7 +409,7 @@ class Label(displayio.Group):
     @property
     def anchored_position(self):
         """Position relative to the anchor_point. Tuple containing x,y
-           pixel coordinates."""
+        pixel coordinates."""
         if self._anchor_point is None:
             return None
         return (
