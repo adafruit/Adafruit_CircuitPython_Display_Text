@@ -49,12 +49,12 @@ class Label(displayio.Group):
       Must include a capital M for measuring character size.
     :param str text: Text to display
     :param int max_glyphs: Unnecessary parameter (provided only for direct compability
-    with label.py)
+     with label.py)
     :param int color: Color of all text in RGB hex
     :param int background_color: Color of the background, use `None` for transparent
     :param double line_spacing: Line spacing of text to display
     :param boolean background_tight: Set `True` only if you want background box to tightly
-    surround text
+     surround text
     :param int padding_top: Additional pixels added to background bounding box at top
     :param int padding_bottom: Additional pixels added to background bounding box at bottom
     :param int padding_left: Additional pixels added to background bounding box at left
@@ -63,11 +63,10 @@ class Label(displayio.Group):
      Tuple with decimal percentage of width and height.
      (E.g. (0,0) is top left, (1.0, 0.5): is middle right.)
     :param (int,int) anchored_position: Position relative to the anchor_point. Tuple
-    containing x,y pixel coordinates.
+     containing x,y pixel coordinates.
     :param int scale: Integer value of the pixel scaling
     :param bool save_text: Set True to save the text string as a constant in the
-     label structure.  Set False to reduce memory use.
-    """
+     label structure.  Set False to reduce memory use."""
 
     # pylint: disable=unused-argument, too-many-instance-attributes, too-many-locals, too-many-arguments
     # pylint: disable=too-many-branches, no-self-use, too-many-statements
