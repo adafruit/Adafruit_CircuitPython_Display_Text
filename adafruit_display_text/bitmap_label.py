@@ -260,9 +260,8 @@ class Label(displayio.Group):
                 self._padding_top + y_offset,
             )
 
-            label_position_yoffset = int(  # To calibrate with label.py positioning
-                (self._font.get_glyph(ord("M")).height) / 2
-            )
+            # To calibrate with label.py positioning
+            label_position_yoffset = self._get_ascent() // 2
 
             self.tilegrid = displayio.TileGrid(
                 self.bitmap,
@@ -303,6 +302,30 @@ class Label(displayio.Group):
         )  # set the anchored_position with setter after bitmap is created, sets the
         # x,y positions of the label
 
+    def _get_ascent_descent(self):
+        if hasattr(self.font, "ascent"):
+            return self.font.ascent, self.font.descent
+
+        # check a few glyphs for maximum ascender and descender height
+        glyphs = "M j'"  # choose glyphs with highest ascender and lowest
+        try:
+            self._font.load_glyphs(glyphs)
+        except AttributeError:
+            # Builtin font doesn't have or need load_glyphs
+            pass
+        # descender, will depend upon font used
+        ascender_max = descender_max = 0
+        for char in glyphs:
+            this_glyph = self._font.get_glyph(ord(char))
+            if this_glyph:
+                ascender_max = max(ascender_max, this_glyph.height + this_glyph.dy)
+                descender_max = max(descender_max, -this_glyph.dy)
+        return ascender_max, descender_max
+
+    def _get_ascent(self):
+        return self._get_ascent_descent()[0]
+
+
     @staticmethod
     def _line_spacing_ypixels(font, line_spacing):
         # Note: Scaling is provided at the Group level
@@ -310,24 +333,7 @@ class Label(displayio.Group):
         return return_value
 
     def _text_bounding_box(self, text, font, line_spacing):
-
-        # This empirical approach checks several glyphs for maximum ascender and descender height
-        # (consistent with label.py)
-        glyphs = "M j'"  # choose glyphs with highest ascender and lowest
-        # descender, will depend upon font used
-
-        try:
-            font.load_glyphs(text + glyphs)
-        except AttributeError:
-            # ignore if font does not have load_glyphs
-            pass
-
-        ascender_max = descender_max = 0
-        for char in glyphs:
-            this_glyph = font.get_glyph(ord(char))
-            if this_glyph:
-                ascender_max = max(ascender_max, this_glyph.height + this_glyph.dy)
-                descender_max = max(descender_max, -this_glyph.dy)
+        ascender_max, descender_max = self._get_ascent_descent()
 
         lines = 1
 
@@ -339,7 +345,7 @@ class Label(displayio.Group):
         right = x_start
         top = bottom = y_start
 
-        y_offset_tight = int((font.get_glyph(ord("M")).height) / 2)
+        y_offset_tight = self._get_ascent() // 2
 
         newline = False
 
