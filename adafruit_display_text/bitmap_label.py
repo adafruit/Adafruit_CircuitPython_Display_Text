@@ -325,7 +325,6 @@ class Label(displayio.Group):
     def _get_ascent(self):
         return self._get_ascent_descent()[0]
 
-
     @staticmethod
     def _line_spacing_ypixels(font, line_spacing):
         # Note: Scaling is provided at the Group level
