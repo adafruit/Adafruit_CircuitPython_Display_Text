@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: 2020 Tim C for Adafruit Industries
+# SPDX-FileCopyrightText: 2020 Tim C, 2021 Jeff Epler for Adafruit Industries
 #
 # SPDX-License-Identifier: MIT
 
@@ -6,6 +6,42 @@
 Display Text module helper functions
 """
 
+
+def wrap_text_to_pixels(text, max_width, font=None, indent0="", indent1=""):
+    if font is None:
+        def measure(s):
+            return len(s)
+    else:
+        if hasattr(font, 'load_glyphs'):
+            font.load_glyphs(text)
+
+        def measure(s):
+            return sum(font.get_glyph(ord(c)).shift_x for c in s)
+
+    lines = []
+    partial = [indent0]
+    width = measure(indent0)
+    swidth = measure(' ')
+    firstword = True
+    for word in text.split():
+        # TODO: split words that are larger than max_width
+        wwidth = measure(word)
+        print("{} - {}".format(word, wwidth))
+        if firstword:
+            partial.append(word)
+            firstword = False
+            width += wwidth
+        elif width + swidth + wwidth < max_width:
+            partial.append(" ")
+            partial.append(word)
+            width += wwidth + swidth
+        else:
+            lines.append("".join(partial))
+            partial = [indent1, word]
+            width = measure(indent1) + wwidth + swidth
+    if partial:
+        lines.append("".join(partial))
+    return "\n".join(lines)
 
 def wrap_text_to_lines(string, max_chars):
     """wrap_text_to_lines function
