@@ -18,8 +18,8 @@ def wrap_text_to_pixels(string, max_width, font=None, indent0="", indent1=""):
     :param str indent1: Additional character(s) to add to all other lines.
 
 
-    :return str lines: A string with newlines inserted appropriately to wrap
-      the input string at the given max_width in pixels
+    :return list lines: A list of the lines resulting from wrapping the
+      input text at max_width pixels size
 
     """
     # pylint: disable=too-many-locals too-many-branches
@@ -77,7 +77,7 @@ def wrap_text_to_pixels(string, max_width, font=None, indent0="", indent1=""):
                 width = measure(indent1) + wwidth
     if partial:
         lines.append("".join(partial))
-    return "\n".join(lines)
+    return lines
 
 
 def wrap_text_to_lines(string, max_chars):

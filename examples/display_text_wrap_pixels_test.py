@@ -33,7 +33,9 @@ print(text)
 print(display.width)
 
 text_area = label.Label(
-    font, text=wrap_text_to_pixels(text, WRAP_WIDTH, font), background_color=0x0000DD
+    font,
+    text="\n".join(wrap_text_to_pixels(text, WRAP_WIDTH, font)),
+    background_color=0x0000DD,
 )
 
 text_area.anchor_point = (0, 0)
