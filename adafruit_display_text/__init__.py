@@ -41,9 +41,7 @@ def wrap_text_to_pixels(string, max_width, font=None, indent0="", indent1=""):
     swidth = measure(" ")
     firstword = True
     for word in string.split():
-        # TODO: split words that are larger than max_width
         wwidth = measure(word)
-        print("{} - {}".format(word, wwidth))
         word_parts = []
         cur_part = ""
         if wwidth > max_width:
@@ -51,7 +49,6 @@ def wrap_text_to_pixels(string, max_width, font=None, indent0="", indent1=""):
                 lines.append("".join(partial))
                 partial = []
             for char in word:
-                # print(measure(cur_part) + measure(char) + measure("-"))
                 if measure(cur_part) + measure(char) + measure("-") > max_width:
                     word_parts.append(cur_part + "-")
                     cur_part = char
@@ -59,17 +56,13 @@ def wrap_text_to_pixels(string, max_width, font=None, indent0="", indent1=""):
                     cur_part += char
             if cur_part:
                 word_parts.append(cur_part)
-            # print(word_parts)
             for line in word_parts[:-1]:
                 lines.append(line)
             partial.append(word_parts[-1])
             width = measure(word_parts[-1])
             if firstword:
                 firstword = False
-            print("cur_width after splitword: {}".format(width))
-
         else:
-
             if firstword:
                 partial.append(word)
                 firstword = False
@@ -82,7 +75,6 @@ def wrap_text_to_pixels(string, max_width, font=None, indent0="", indent1=""):
                 lines.append("".join(partial))
                 partial = [indent1, word]
                 width = measure(indent1) + wwidth
-            print("cur_width: {}".format(width))
     if partial:
         lines.append("".join(partial))
     return "\n".join(lines)
