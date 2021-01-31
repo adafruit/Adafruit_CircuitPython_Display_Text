@@ -7,27 +7,43 @@ Display Text module helper functions
 """
 
 
-def wrap_text_to_pixels(text, max_width, font=None, indent0="", indent1=""):
-    if font is None:
-        def measure(s):
-            return len(s)
-    else:
-        if hasattr(font, 'load_glyphs'):
-            font.load_glyphs(text)
+def wrap_text_to_pixels(string, max_width, font=None, indent0="", indent1=""):
+    """wrap_text_to_pixels function
+    A helper that will return a list of lines with word-break wrapping
 
-        def measure(s):
-            return sum(font.get_glyph(ord(c)).shift_x for c in s)
+    :param str string: The text to be wrapped.
+    :param int max_width: The maximum number of pixels on a line before wrapping.
+    :param Font font: The font to use for measuring the text.
+    :param str indent0: Additional character(s) to add to the first line.
+    :param str indent1: Additional character(s) to add to all other lines.
+
+
+    :return str lines: A string with newlines inserted appropriately to wrap
+      the input string at the given max_width in pixels
+
+    """
+    # pylint: disable=too-many-locals too-many-branches
+    if font is None:
+
+        def measure(string):
+            return len(string)
+
+    else:
+        if hasattr(font, "load_glyphs"):
+            font.load_glyphs(string)
+
+        def measure(string):
+            return sum(font.get_glyph(ord(c)).shift_x for c in string)
 
     lines = []
     partial = [indent0]
     width = measure(indent0)
-    swidth = measure(' ')
+    swidth = measure(" ")
     firstword = True
-    for word in text.split():
+    for word in string.split():
         # TODO: split words that are larger than max_width
         wwidth = measure(word)
         print("{} - {}".format(word, wwidth))
-        part_width = 0
         word_parts = []
         cur_part = ""
         if wwidth > max_width:
@@ -35,7 +51,7 @@ def wrap_text_to_pixels(text, max_width, font=None, indent0="", indent1=""):
                 lines.append("".join(partial))
                 partial = []
             for char in word:
-                #print(measure(cur_part) + measure(char) + measure("-"))
+                # print(measure(cur_part) + measure(char) + measure("-"))
                 if measure(cur_part) + measure(char) + measure("-") > max_width:
                     word_parts.append(cur_part + "-")
                     cur_part = char
@@ -43,7 +59,7 @@ def wrap_text_to_pixels(text, max_width, font=None, indent0="", indent1=""):
                     cur_part += char
             if cur_part:
                 word_parts.append(cur_part)
-            #print(word_parts)
+            # print(word_parts)
             for line in word_parts[:-1]:
                 lines.append(line)
             partial.append(word_parts[-1])
@@ -70,6 +86,7 @@ def wrap_text_to_pixels(text, max_width, font=None, indent0="", indent1=""):
     if partial:
         lines.append("".join(partial))
     return "\n".join(lines)
+
 
 def wrap_text_to_lines(string, max_chars):
     """wrap_text_to_lines function
