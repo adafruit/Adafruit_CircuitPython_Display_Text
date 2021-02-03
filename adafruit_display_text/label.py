@@ -83,7 +83,7 @@ class Label(displayio.Group):
         anchor_point=None,
         anchored_position=None,
         scale=1,
-        **kwargs,
+        **kwargs
     ):
         if not max_glyphs and not text:
             raise RuntimeError("Please provide a max size, or initial text")
