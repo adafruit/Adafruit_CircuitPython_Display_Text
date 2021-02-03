@@ -83,7 +83,7 @@ class Label(displayio.Group):
         anchor_point=None,
         anchored_position=None,
         scale=1,
-        **kwargs
+        **kwargs,
     ):
         if not max_glyphs and not text:
             raise RuntimeError("Please provide a max size, or initial text")
@@ -94,12 +94,10 @@ class Label(displayio.Group):
         # instance the Group
         # self Group will contain a single local_group which contains a Group (self.local_group)
         # which contains a TileGrid
-        super().__init__(
-            max_size=1, scale=1, **kwargs
-        )  # The self scale should always be 1
-        self.local_group = displayio.Group(
-            max_size=max_glyphs + 1, scale=scale
-        )  # local_group will set the scale
+        # The self scale should always be 1
+        super().__init__(max_size=1, scale=1, **kwargs)
+        # local_group will set the scale
+        self.local_group = displayio.Group(max_size=max_glyphs + 1, scale=scale)
         self.append(self.local_group)
 
         self.width = max_glyphs
@@ -203,7 +201,7 @@ class Label(displayio.Group):
         return self._get_ascent_descent()[0]
 
     def _update_background_color(self, new_color):
-        """ Private class function that allows updating the font box background color
+        """Private class function that allows updating the font box background color
         :param new_color: int color as an RGB hex number."""
 
         if new_color is None:
@@ -230,9 +228,8 @@ class Label(displayio.Group):
                     self._boundingbox[3] + self._padding_top + self._padding_bottom > 0
                 )
             ):
-                if (
-                    len(self.local_group) > 0
-                ):  # This can be simplified in CP v6.0, when group.append(0) bug is corrected
+                # This can be simplified in CP v6.0, when group.append(0) bug is corrected
+                if len(self.local_group) > 0:
                     self.local_group.insert(
                         0, self._create_background_box(lines, y_offset)
                     )
