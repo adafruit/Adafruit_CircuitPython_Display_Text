@@ -39,7 +39,27 @@ class Label(displayio.Group):
     :param str text: Text to display
     :param int max_glyphs: The largest quantity of glyphs we will display
     :param int color: Color of all text in RGB hex
-    :param double line_spacing: Line spacing of text to display"""
+    :param float line_spacing: Line spacing of text to display
+    :param bool background_tight: Set `True` only if you want background box to tightly
+     surround text. When set to 'True' Padding parameters will be ignored.
+    :param int padding_top: Additional pixels added to background bounding box at top.
+     This parameter could be negative indicating additional pixels subtracted to background
+     bounding box.
+    :param int padding_bottom: Additional pixels added to background bounding box at bottom.
+     This parameter could be negative indicating additional pixels subtracted to background
+     bounding box.
+    :param int padding_left: Additional pixels added to background bounding box at left.
+     This parameter could be negative indicating additional pixels subtracted to background
+     bounding box.
+    :param int padding_right: Additional pixels added to background bounding box at right.
+     This parameter could be negative indicating additional pixels subtracted to background
+     bounding box.
+    :param (float,float) anchor_point: Point that anchored_position moves relative to.
+     Tuple with decimal percentage of width and height.
+     (E.g. (0,0) is top left, (1.0, 0.5): is middle right.)
+    :param (int,int) anchored_position: Position relative to the anchor_point. Tuple
+     containing x,y pixel coordinates.
+    :param int scale: Integer value of the pixel scaling"""
 
     # pylint: disable=too-many-instance-attributes, too-many-locals
     # This has a lot of getters/setters, maybe it needs cleanup.
@@ -74,12 +94,10 @@ class Label(displayio.Group):
         # instance the Group
         # self Group will contain a single local_group which contains a Group (self.local_group)
         # which contains a TileGrid
-        super().__init__(
-            max_size=1, scale=1, **kwargs
-        )  # The self scale should always be 1
-        self.local_group = displayio.Group(
-            max_size=max_glyphs + 1, scale=scale
-        )  # local_group will set the scale
+        # The self scale should always be 1
+        super().__init__(max_size=1, scale=1, **kwargs)
+        # local_group will set the scale
+        self.local_group = displayio.Group(max_size=max_glyphs + 1, scale=scale)
         self.append(self.local_group)
 
         self.width = max_glyphs
@@ -120,6 +138,9 @@ class Label(displayio.Group):
             self.anchored_position = anchored_position
 
     def _create_background_box(self, lines, y_offset):
+        """Private Class function to create a background_box
+        :param lines: int number of lines
+        :param y_offset: int y pixel bottom coordinate for the background_box"""
 
         left = self._boundingbox[0]
 
@@ -156,6 +177,7 @@ class Label(displayio.Group):
         return tile_grid
 
     def _get_ascent_descent(self):
+        """ Private function to calculate ascent and descent font values """
         if hasattr(self.font, "ascent"):
             return self.font.ascent, self.font.descent
 
@@ -179,6 +201,8 @@ class Label(displayio.Group):
         return self._get_ascent_descent()[0]
 
     def _update_background_color(self, new_color):
+        """Private class function that allows updating the font box background color
+        :param new_color: int color as an RGB hex number."""
 
         if new_color is None:
             self._background_palette.make_transparent(0)
@@ -204,9 +228,8 @@ class Label(displayio.Group):
                     self._boundingbox[3] + self._padding_top + self._padding_bottom > 0
                 )
             ):
-                if (
-                    len(self.local_group) > 0
-                ):  # This can be simplified in CP v6.0, when group.append(0) bug is corrected
+                # This can be simplified in CP v6.0, when group.append(0) bug is corrected
+                if len(self.local_group) > 0:
                     self.local_group.insert(
                         0, self._create_background_box(lines, y_offset)
                     )
