@@ -178,7 +178,7 @@ class Label(displayio.Group):
 
     def _get_ascent_descent(self):
         """ Private function to calculate ascent and descent font values """
-        if hasattr(self.font, "ascent"):
+        if hasattr(self.font, "ascent") and self.font.ascent:
             return self.font.ascent, self.font.descent
 
         # check a few glyphs for maximum ascender and descender height
