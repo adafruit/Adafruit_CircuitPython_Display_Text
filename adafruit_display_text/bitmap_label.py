@@ -303,7 +303,12 @@ class Label(displayio.Group):
         # x,y positions of the label
 
     def _get_ascent_descent(self):
-        if hasattr(self.font, "ascent"):
+        if (
+            hasattr(self.font, "ascent")
+            and self.font.ascent
+            and hasattr(self.font, "descent")
+            and self.font.descent
+        ):
             return self.font.ascent, self.font.descent
 
         # check a few glyphs for maximum ascender and descender height
