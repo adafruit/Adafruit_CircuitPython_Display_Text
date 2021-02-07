@@ -5,11 +5,12 @@
 This examples shows the use of base_alignment parameter.
 """
 
-import board
-from adafruit_display_text import label
-from adafruit_bitmap_font import bitmap_font
-import displayio
 import time
+import board
+import displayio
+from adafruit_bitmap_font import bitmap_font
+from adafruit_display_text import label
+
 
 display = board.DISPLAY
 
