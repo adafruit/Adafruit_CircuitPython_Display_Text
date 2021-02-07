@@ -304,10 +304,8 @@ class Label(displayio.Group):
 
     def _get_ascent_descent(self):
         if (
-            hasattr(self.font, "ascent")
-            and self.font.ascent
-            and hasattr(self.font, "descent")
-            and self.font.descent
+            getattr(self.font, "ascent") is not None and
+            getattr(self.font, "descent") is not None
         ):
             return self.font.ascent, self.font.descent
 
