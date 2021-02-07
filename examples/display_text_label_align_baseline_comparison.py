@@ -1,3 +1,10 @@
+# SPDX-FileCopyrightText: 2021 ladyada for Adafruit Industries
+# SPDX-License-Identifier: MIT
+
+"""
+This examples shows the use of base_alignment parameter.
+"""
+
 import board
 from adafruit_display_text import label
 from adafruit_bitmap_font import bitmap_font
