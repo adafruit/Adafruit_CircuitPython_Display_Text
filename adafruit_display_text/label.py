@@ -179,8 +179,8 @@ class Label(displayio.Group):
     def _get_ascent_descent(self):
         """ Private function to calculate ascent and descent font values """
         if (
-                getattr(self.font, "ascent") is not None and
-                getattr(self.font, "descent") is not None
+            getattr(self.font, "ascent") is not None
+            and getattr(self.font, "descent") is not None
         ):
             return self.font.ascent, self.font.descent
 
