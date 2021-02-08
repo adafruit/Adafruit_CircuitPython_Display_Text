@@ -130,8 +130,6 @@ class Label(displayio.Group):
         self._padding_left = padding_left
         self._padding_right = padding_right
 
-        self._scale = scale
-
         if text is not None:
             self._update_text(str(text))
         if (anchored_position is not None) and (anchor_point is not None):
@@ -389,12 +387,11 @@ class Label(displayio.Group):
     @property
     def scale(self):
         """Set the scaling of the label, in integer values"""
-        return self._scale
+        return self.local_group.scale
 
     @scale.setter
     def scale(self, new_scale):
         current_anchored_position = self.anchored_position
-        self._scale = new_scale
         self.local_group.scale = new_scale
         self.anchored_position = current_anchored_position
 
