@@ -435,13 +435,13 @@ class Label(displayio.Group):
         return (
             int(
                 self.x
-                + (self._boundingbox[0] * self._scale)
-                + round(self._anchor_point[0] * self._boundingbox[2] * self._scale)
+                + (self._boundingbox[0] * self.scale)
+                + round(self._anchor_point[0] * self._boundingbox[2] * self.scale)
             ),
             int(
                 self.y
-                + (self._boundingbox[1] * self._scale)
-                + round(self._anchor_point[1] * self._boundingbox[3] * self._scale)
+                + (self._boundingbox[1] * self.scale)
+                + round(self._anchor_point[1] * self._boundingbox[3] * self.scale)
             ),
         )
 
@@ -451,11 +451,11 @@ class Label(displayio.Group):
             return  # Note: anchor_point must be set before setting anchored_position
         self.x = int(
             new_position[0]
-            - (self._boundingbox[0] * self._scale)
-            - round(self._anchor_point[0] * (self._boundingbox[2] * self._scale))
+            - (self._boundingbox[0] * self.scale)
+            - round(self._anchor_point[0] * (self._boundingbox[2] * self.scale))
         )
         self.y = int(
             new_position[1]
-            - (self._boundingbox[1] * self._scale)
-            - round(self._anchor_point[1] * self._boundingbox[3] * self._scale)
+            - (self._boundingbox[1] * self.scale)
+            - round(self._anchor_point[1] * self._boundingbox[3] * self.scale)
         )
