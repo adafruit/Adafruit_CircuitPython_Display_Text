@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 """
-This examples shows the use color and background_color
+This example shows the use color and background_color
 """
 import time
 import board
