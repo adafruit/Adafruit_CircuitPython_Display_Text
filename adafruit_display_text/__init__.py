@@ -47,13 +47,11 @@ def wrap_text_to_pixels(string, max_width, font=None, indent0="", indent1=""):
             cur_part = ""
 
             if wwidth > max_width:
-                if partial:
-                    lines.append("".join(partial))
-                    partial = []
                 for char in word:
-                    if measure(cur_part) + measure(char) + measure("-") > max_width:
-                        word_parts.append(cur_part + "-")
+                    if measure("".join(partial)) + measure(cur_part) + measure(char) + measure("-") > max_width:
+                        word_parts.append("".join(partial) + cur_part + "-")
                         cur_part = char
+                        partial = [indent1]
                     else:
                         cur_part += char
                 if cur_part:
