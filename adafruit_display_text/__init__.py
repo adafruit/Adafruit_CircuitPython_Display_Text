@@ -9,7 +9,10 @@ Display Text module helper functions
 
 def wrap_text_to_pixels(string, max_width, font=None, indent0="", indent1=""):
     """wrap_text_to_pixels function
-    A helper that will return a list of lines with word-break wrapping
+    A helper that will return a list of lines with word-break wrapping.
+    Leading and trailing whitespace in your string will be removed. If
+    you wish to use leading whitespace see `indend0` and `indent1`
+    parameters.
 
     :param str string: The text to be wrapped.
     :param int max_width: The maximum number of pixels on a line before wrapping.
