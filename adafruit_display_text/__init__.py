@@ -41,10 +41,7 @@ def wrap_text_to_pixels(string, max_width, font=None, indent0="", indent1=""):
     swidth = measure(" ")
     firstword = True
     for line_in_input in string.split("\n"):
-
-        print("line: {}".format(line_in_input))
         for index, word in enumerate(line_in_input.split(" ")):
-            print("word: {}".format(word))
             wwidth = measure(word)
             word_parts = []
             cur_part = ""
