@@ -132,7 +132,6 @@ class Label(displayio.Group):
         self._padding_bottom = padding_bottom
         self._padding_left = padding_left
         self._padding_right = padding_right
-
         self.base_alignment = base_alignment
 
         if text is not None:
