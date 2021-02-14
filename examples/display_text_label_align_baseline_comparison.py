@@ -42,7 +42,7 @@ right_text = label.Label(
     background_color=0x999999,
     x=80,
     y=50,
-    base_alignment=False
+    base_alignment=False,
 )
 main_group.append(right_text)
 
@@ -54,7 +54,7 @@ left_text_aligned = label.Label(
     background_color=0x999999,
     x=10,
     y=100,
-    base_alignment=True
+    base_alignment=True,
 )
 main_group.append(left_text_aligned)
 
@@ -65,7 +65,7 @@ right_text_aligned = label.Label(
     background_color=0x999999,
     x=80,
     y=100,
-    base_alignment=True
+    base_alignment=True,
 )
 
 main_group.append(right_text_aligned)
