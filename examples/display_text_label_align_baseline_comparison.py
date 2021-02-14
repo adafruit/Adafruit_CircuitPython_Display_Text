@@ -2,10 +2,9 @@
 # SPDX-License-Identifier: MIT
 
 """
-This examples shows the use of base_alignment parameter.
+This example shows the use of base_alignment parameter.
 """
 
-import time
 import board
 import displayio
 from adafruit_bitmap_font import bitmap_font
@@ -21,63 +20,56 @@ BIG_FONT = bitmap_font.load_font("IBMPlexMono-Medium-24_jep.bdf")
 TEXT_RIGHT = "MG"
 TEXT_LEFT = "32.47"
 
+main_group = displayio.Group()
+
+# Create labels
+# Base Alignment parameter False
+left_text = label.Label(
+    BIG_FONT,
+    text=TEXT_LEFT,
+    color=0x000000,
+    background_color=0x999999,
+    x=10,
+    y=50,
+    base_alignment=False,
+)
+main_group.append(left_text)
+
+right_text = label.Label(
+    MEDIUM_FONT,
+    text=TEXT_RIGHT,
+    color=0x000000,
+    background_color=0x999999,
+    x=80,
+    y=50,
+    base_alignment=False
+)
+main_group.append(right_text)
+
+# Base Alignment parameter True
+left_text_aligned = label.Label(
+    BIG_FONT,
+    text=TEXT_LEFT,
+    color=0x000000,
+    background_color=0x999999,
+    x=10,
+    y=100,
+    base_alignment=True
+)
+main_group.append(left_text_aligned)
+
+right_text_aligned = label.Label(
+    MEDIUM_FONT,
+    text=TEXT_RIGHT,
+    color=0x000000,
+    background_color=0x999999,
+    x=80,
+    y=100,
+    base_alignment=True
+)
+
+main_group.append(right_text_aligned)
+display.show(main_group)
+
 while True:
-    main_group = displayio.Group()
-    print("Base Alignment parameter False")
-
-    # Create label
-    left_text = label.Label(
-        BIG_FONT,
-        text=TEXT_LEFT,
-        color=0x000000,
-        background_color=0x999999,
-        x=10,
-        y=50,
-        base_alignment=False,
-    )
-    main_group.append(left_text)
-
-    right_text = label.Label(
-        MEDIUM_FONT,
-        text=TEXT_RIGHT,
-        color=0x000000,
-        background_color=0x999999,
-        x=80,
-        y=50,
-        base_alignment=False
-    )
-
-    main_group.append(right_text)
-    display.show(main_group)
-    display.refresh()
-
-    time.sleep(1)
-    main_group = displayio.Group()
-    print("Base Alignment parameter True")
-
-    left_text_aligned = label.Label(
-        BIG_FONT,
-        text=TEXT_LEFT,
-        color=0x000000,
-        background_color=0x999999,
-        x=10,
-        y=50,
-        base_alignment=True
-    )
-    main_group.append(left_text_aligned)
-
-    right_text_aligned = label.Label(
-        MEDIUM_FONT,
-        text=TEXT_RIGHT,
-        color=0x000000,
-        background_color=0x999999,
-        x=80,
-        y=50,
-        base_alignment=True
-    )
-
-    main_group.append(right_text_aligned)
-    display.show(main_group)
-    display.refresh()
-    time.sleep(1)
-
+    pass
