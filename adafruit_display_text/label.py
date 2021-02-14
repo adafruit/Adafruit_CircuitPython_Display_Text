@@ -133,7 +133,6 @@ class Label(displayio.Group):
         self._padding_left = padding_left
         self._padding_right = padding_right
 
-        self._scale = scale
         self.base_alignment = base_alignment
 
         if text is not None:
@@ -398,12 +397,11 @@ class Label(displayio.Group):
     @property
     def scale(self):
         """Set the scaling of the label, in integer values"""
-        return self._scale
+        return self.local_group.scale
 
     @scale.setter
     def scale(self, new_scale):
         current_anchored_position = self.anchored_position
-        self._scale = new_scale
         self.local_group.scale = new_scale
         self.anchored_position = current_anchored_position
 
@@ -447,13 +445,13 @@ class Label(displayio.Group):
         return (
             int(
                 self.x
-                + (self._boundingbox[0] * self._scale)
-                + round(self._anchor_point[0] * self._boundingbox[2] * self._scale)
+                + (self._boundingbox[0] * self.scale)
+                + round(self._anchor_point[0] * self._boundingbox[2] * self.scale)
             ),
             int(
                 self.y
-                + (self._boundingbox[1] * self._scale)
-                + round(self._anchor_point[1] * self._boundingbox[3] * self._scale)
+                + (self._boundingbox[1] * self.scale)
+                + round(self._anchor_point[1] * self._boundingbox[3] * self.scale)
             ),
         )
 
@@ -463,11 +461,11 @@ class Label(displayio.Group):
             return  # Note: anchor_point must be set before setting anchored_position
         self.x = int(
             new_position[0]
-            - (self._boundingbox[0] * self._scale)
-            - round(self._anchor_point[0] * (self._boundingbox[2] * self._scale))
+            - (self._boundingbox[0] * self.scale)
+            - round(self._anchor_point[0] * (self._boundingbox[2] * self.scale))
         )
         self.y = int(
             new_position[1]
-            - (self._boundingbox[1] * self._scale)
-            - round(self._anchor_point[1] * self._boundingbox[3] * self._scale)
+            - (self._boundingbox[1] * self.scale)
+            - round(self._anchor_point[1] * self._boundingbox[3] * self.scale)
         )
