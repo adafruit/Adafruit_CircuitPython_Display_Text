@@ -563,12 +563,11 @@ class Label(displayio.Group):
     @property
     def scale(self):
         """Set the scaling of the label, in integer values"""
-        return self._scale
+        return self.local_group.scale
 
     @scale.setter
     def scale(self, new_scale):
         self.local_group.scale = new_scale
-        self._scale = new_scale
         self.anchored_position = self._anchored_position  # update the anchored_position
 
     @property
@@ -580,7 +579,7 @@ class Label(displayio.Group):
     @line_spacing.setter
     def line_spacing(self, new_line_spacing):
         if self._save_text:
-            self._reset_text(line_spacing=new_line_spacing)
+            self._reset_text(line_spacing=new_line_spacing, scale=self.scale)
         else:
             raise RuntimeError("line_spacing is immutable when save_text is False")
 
@@ -621,7 +620,7 @@ class Label(displayio.Group):
 
     @text.setter  # Cannot set color or background color with text setter, use separate setter
     def text(self, new_text):
-        self._reset_text(text=new_text)
+        self._reset_text(text=new_text, scale=self.scale)
 
     @property
     def font(self):
@@ -632,7 +631,7 @@ class Label(displayio.Group):
     def font(self, new_font):
         self._font = new_font
         if self._save_text:
-            self._reset_text(font=new_font)
+            self._reset_text(font=new_font, scale=self.scale)
         else:
             raise RuntimeError("font is immutable when save_text is False")
 
