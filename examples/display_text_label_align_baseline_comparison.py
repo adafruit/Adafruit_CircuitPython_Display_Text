@@ -80,3 +80,4 @@ while True:
     display.show(main_group)
     display.refresh()
     time.sleep(1)
+
