@@ -90,8 +90,6 @@ def wrap_text_to_pixels(string, max_width, font=None, indent0="", indent1=""):
         partial = [indent1]
         width = measure(indent1)
 
-    if partial:
-        lines.append("".join(partial))
     return lines
 
 
