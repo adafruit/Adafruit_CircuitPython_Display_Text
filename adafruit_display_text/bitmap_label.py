@@ -131,7 +131,7 @@ class Label(displayio.Group):
         self._anchor_point = anchor_point
         self._anchored_position = anchored_position
 
-        self._base_alignment = base_alignment
+        self.base_alignment = base_alignment
 
         # call the text updater with all the arguments.
         self._reset_text(
@@ -197,7 +197,7 @@ class Label(displayio.Group):
         if save_text is not None:
             self._save_text = save_text
         if base_alignment is not None:
-            self._base_alignment = base_alignment
+            self.base_alignment = base_alignment
 
         # if text is not provided as a parameter (text is None), use the previous value.
         if (text is None) and self._save_text:
@@ -269,7 +269,7 @@ class Label(displayio.Group):
                 self._padding_top + y_offset,
             )
 
-            if self._base_alignment:
+            if self.base_alignment:
                 label_position_yoffset = 0
             else:
                 label_position_yoffset = self._get_ascent() // 2
