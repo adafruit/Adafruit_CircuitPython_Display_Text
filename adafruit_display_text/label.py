@@ -59,7 +59,9 @@ class Label(displayio.Group):
      (E.g. (0,0) is top left, (1.0, 0.5): is middle right.)
     :param (int,int) anchored_position: Position relative to the anchor_point. Tuple
      containing x,y pixel coordinates.
-    :param int scale: Integer value of the pixel scaling"""
+    :param int scale: Integer value of the pixel scaling
+    :param bool base_alignment: when True allows to align text label to the baseline.
+     This is helpful when two or more labels need to be aligned to the same baseline"""
 
     # pylint: disable=too-many-instance-attributes, too-many-locals
     # This has a lot of getters/setters, maybe it needs cleanup.
@@ -83,6 +85,7 @@ class Label(displayio.Group):
         anchor_point=None,
         anchored_position=None,
         scale=1,
+        base_alignment=False,
         **kwargs
     ):
         if not max_glyphs and not text:
@@ -129,6 +132,7 @@ class Label(displayio.Group):
         self._padding_bottom = padding_bottom
         self._padding_left = padding_left
         self._padding_right = padding_right
+        self.base_alignment = base_alignment
 
         if text is not None:
             self._update_text(str(text))
@@ -159,7 +163,10 @@ class Label(displayio.Group):
                 + self._padding_top
                 + self._padding_bottom
             )
-            y_box_offset = -ascent + y_offset - self._padding_top
+            if self.base_alignment:
+                y_box_offset = -ascent - self._padding_top
+            else:
+                y_box_offset = -ascent + y_offset - self._padding_top
 
         box_width = max(0, box_width)  # remove any negative values
         box_height = max(0, box_height)  # remove any negative values
@@ -263,8 +270,10 @@ class Label(displayio.Group):
         else:
             i = 0
         tilegrid_count = i
-
-        y_offset = self._get_ascent() // 2
+        if self.base_alignment:
+            y_offset = 0
+        else:
+            y_offset = self._get_ascent() // 2
 
         right = top = bottom = 0
         left = None
