@@ -93,6 +93,7 @@ class Label(displayio.Group):
         if not max_glyphs:
             text = "    ".join(text.split("\t"))
             max_glyphs = len(text)
+        text = "    ".join(text.split("\t"))
         # add one to max_size for the background bitmap tileGrid
 
         # instance the Group
