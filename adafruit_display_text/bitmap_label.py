@@ -34,7 +34,7 @@ class Label(displayio.Group):
     Note: This ``bitmap_label.py`` library utilizes a bitmap to display the text.
     This method is memory-conserving relative to ``label.py``.
     The ``max_glyphs`` parameter is ignored and is present
-    only for direct compatability with label.py.
+    only for direct compatibility with label.py.
 
     For further reduction in memory usage, set ``save_text=False`` (text string will not
     be stored and ``line_spacing`` and ``font`` are immutable with ``save_text``
@@ -54,19 +54,21 @@ class Label(displayio.Group):
     :param int background_color: Color of the background, use `None` for transparent
     :param double line_spacing: Line spacing of text to display
     :param boolean background_tight: Set `True` only if you want background box to tightly
-     surround text
+     surround text. When set to 'True' Padding parameters will be ignored.
     :param int padding_top: Additional pixels added to background bounding box at top
     :param int padding_bottom: Additional pixels added to background bounding box at bottom
     :param int padding_left: Additional pixels added to background bounding box at left
     :param int padding_right: Additional pixels added to background bounding box at right
-    :param (double,double) anchor_point: Point that anchored_position moves relative to.
+    :param (float,float) anchor_point: Point that anchored_position moves relative to.
      Tuple with decimal percentage of width and height.
      (E.g. (0,0) is top left, (1.0, 0.5): is middle right.)
     :param (int,int) anchored_position: Position relative to the anchor_point. Tuple
      containing x,y pixel coordinates.
     :param int scale: Integer value of the pixel scaling
     :param bool save_text: Set True to save the text string as a constant in the
-     label structure.  Set False to reduce memory use."""
+     label structure.  Set False to reduce memory use.
+    :param: bool base_alignment: when True allows to align text label to the baseline.
+     This is helpful when two or more labels need to be aligned to the same baseline"""
 
     # pylint: disable=unused-argument, too-many-instance-attributes, too-many-locals, too-many-arguments
     # pylint: disable=too-many-branches, no-self-use, too-many-statements
@@ -93,6 +95,7 @@ class Label(displayio.Group):
         anchored_position=None,
         save_text=True,  # can reduce memory use if save_text = False
         scale=1,
+        base_alignment=False,
         **kwargs,
     ):
 
@@ -128,6 +131,8 @@ class Label(displayio.Group):
         self._anchor_point = anchor_point
         self._anchored_position = anchored_position
 
+        self.base_alignment = base_alignment
+
         # call the text updater with all the arguments.
         self._reset_text(
             font=font,
@@ -144,6 +149,7 @@ class Label(displayio.Group):
             anchored_position=anchored_position,
             save_text=save_text,
             scale=scale,
+            base_alignment=base_alignment,
         )
 
     def _reset_text(
@@ -162,6 +168,7 @@ class Label(displayio.Group):
         anchored_position=None,
         save_text=None,
         scale=None,
+        base_alignment=None,
     ):
 
         # Store all the instance variables
@@ -189,6 +196,8 @@ class Label(displayio.Group):
             self._anchored_position = anchored_position
         if save_text is not None:
             self._save_text = save_text
+        if base_alignment is not None:
+            self.base_alignment = base_alignment
 
         # if text is not provided as a parameter (text is None), use the previous value.
         if (text is None) and self._save_text:
@@ -260,8 +269,10 @@ class Label(displayio.Group):
                 self._padding_top + y_offset,
             )
 
-            # To calibrate with label.py positioning
-            label_position_yoffset = self._get_ascent() // 2
+            if self.base_alignment:
+                label_position_yoffset = 0
+            else:
+                label_position_yoffset = self._get_ascent() // 2
 
             self.tilegrid = displayio.TileGrid(
                 self.bitmap,
@@ -303,6 +314,7 @@ class Label(displayio.Group):
         # x,y positions of the label
 
     def _get_ascent_descent(self):
+        """ Private function to calculate ascent and descent font values """
         if hasattr(self.font, "ascent"):
             return self.font.ascent, self.font.descent
 
@@ -615,7 +627,7 @@ class Label(displayio.Group):
 
     @property
     def text(self):
-        """Text to displayed."""
+        """Text to be displayed."""
         return self._text
 
     @text.setter  # Cannot set color or background color with text setter, use separate setter
