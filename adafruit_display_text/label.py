@@ -90,10 +90,10 @@ class Label(displayio.Group):
     ):
         if not max_glyphs and not text:
             raise RuntimeError("Please provide a max size, or initial text")
-        if not max_glyphs:
-            text = "    ".join(text.split("\t"))
-            max_glyphs = len(text)
         text = "    ".join(text.split("\t"))
+        if not max_glyphs:
+            max_glyphs = len(text)
+
         # add one to max_size for the background bitmap tileGrid
 
         # instance the Group
