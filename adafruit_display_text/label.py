@@ -95,7 +95,6 @@ class Label(displayio.Group):
             max_glyphs = len(text)
 
         # add one to max_size for the background bitmap tileGrid
-
         # instance the Group
         # self Group will contain a single local_group which contains a Group (self.local_group)
         # which contains a TileGrid
