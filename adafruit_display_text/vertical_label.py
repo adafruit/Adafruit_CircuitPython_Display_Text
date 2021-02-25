@@ -60,32 +60,33 @@ class Label(displayio.Group):
     :param (int,int) anchored_position: Position relative to the anchor_point. Tuple
      containing x,y pixel coordinates.
     :param int scale: Integer value of the pixel scaling
-    :param bool base_alignment: To be implemented"""
+    :param bool base_alignment: when True allows to align text label to the baseline.
+     This is helpful when two or more labels need to be aligned to the same baseline"""
 
     # pylint: disable=too-many-instance-attributes, too-many-locals
     # This has a lot of getters/setters, maybe it needs cleanup.
 
     def __init__(
-        self,
-        font,
-        *,
-        x=0,
-        y=0,
-        text="",
-        max_glyphs=None,
-        color=0xFFFFFF,
-        background_color=None,
-        line_spacing=1.25,
-        background_tight=False,
-        padding_top=0,
-        padding_bottom=0,
-        padding_left=0,
-        padding_right=0,
-        anchor_point=None,
-        anchored_position=None,
-        scale=1,
-        base_alignment=False,  # TODO add base alignment
-        **kwargs
+            self,
+            font,
+            *,
+            x=0,
+            y=0,
+            text="",
+            max_glyphs=None,
+            color=0xFFFFFF,
+            background_color=None,
+            line_spacing=1.25,
+            background_tight=False,
+            padding_top=0,
+            padding_bottom=0,
+            padding_left=0,
+            padding_right=0,
+            anchor_point=None,
+            anchored_position=None,
+            scale=1,
+            base_alignment=False,
+            **kwargs
     ):
         if not max_glyphs and not text:
             raise RuntimeError("Please provide a max size, or initial text")
@@ -158,8 +159,7 @@ class Label(displayio.Group):
             box_height = self._boundingbox[3] + self._padding_top + self._padding_bottom
 
             x_box_offset = -self._padding_bottom
-            box_width = (
-                (ascent + descent)
+            box_width = ((ascent + descent)
                 + int((lines - 1) * self.width * self._line_spacing)
                 + self._padding_left
                 + self._padding_right
@@ -177,7 +177,8 @@ class Label(displayio.Group):
             background_bitmap,
             pixel_shader=self._background_palette,
             x=y_box_offset,
-            y=-box_height - x_box_offset,
+            y=-box_height-x_box_offset
+
         )
         return tile_grid
 
@@ -225,13 +226,13 @@ class Label(displayio.Group):
         if not self._added_background_tilegrid:  # no bitmap is in the self Group
             # add bitmap if text is present and bitmap sizes > 0 pixels
             if (
-                (len(self._text) > 0)
+                    (len(self._text) > 0)
                 and (
                     self._boundingbox[2] + self._padding_left + self._padding_right > 0
-                )
+                    )
                 and (
                     self._boundingbox[3] + self._padding_top + self._padding_bottom > 0
-                )
+                    )
             ):
                 # This can be simplified in CP v6.0, when group.append(0) bug is corrected
                 if len(self.local_group) > 0:
@@ -248,10 +249,10 @@ class Label(displayio.Group):
             # update bitmap if text is present and bitmap sizes > 0 pixels
             if (
                 (len(self._text) > 0)
-                and (
+                    and (
                     self._boundingbox[2] + self._padding_left + self._padding_right > 0
                 )
-                and (
+                    and (
                     self._boundingbox[3] + self._padding_top + self._padding_bottom > 0
                 )
             ):
@@ -295,10 +296,10 @@ class Label(displayio.Group):
                     bottom = max(bottom, glyph.dx)
 
             if x == 0:
-                left = min(left, -glyph.height - glyph.dy + x_offset)
+                left = min(left, - glyph.height - glyph.dy + x_offset)
             right = max(right, y - glyph.dy + x_offset)
             position_x = y - glyph.height - glyph.dy + x_offset
-            position_y = x - glyph.width - glyph.dx
+            position_y = x - glyph.width- glyph.dx
 
             if glyph.width > 0 and glyph.height > 0:
                 try:
@@ -337,7 +338,7 @@ class Label(displayio.Group):
         while len(self.local_group) > tilegrid_count:
             self.local_group.pop()
         self._text = new_text
-        self._boundingbox = (left, bottom, -left + right, -top)
+        self._boundingbox = (left, bottom, -left+right, -top)
 
         if self.background_color is not None:
             self._update_background_color(self._background_color)
