@@ -387,6 +387,7 @@ class Label(displayio.Group):
 
     @text.setter
     def text(self, new_text):
+        "    ".join(new_text.split("\t"))
         try:
             current_anchored_position = self.anchored_position
             self._update_text(str(new_text))
