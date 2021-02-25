@@ -121,7 +121,7 @@ class Label(displayio.Group):
         )  # the local_group will always stay in the self Group
 
         self._font = font
-        self._text = text
+        self._text = "    ".join(text.split("\t"))
 
         # Create the two-color palette
         self.palette = displayio.Palette(2)
@@ -204,7 +204,7 @@ class Label(displayio.Group):
             text = self._text
 
         if self._save_text:  # text string will be saved
-            self._text = text
+            self._text = "    ".join(text.split("\t"))
         else:
             self._text = None  # save a None value since text string is not saved
 
@@ -239,7 +239,7 @@ class Label(displayio.Group):
                 loose_box_y,
                 loose_y_offset,
             ) = self._text_bounding_box(
-                text,
+                self._text,
                 self._font,
                 self._line_spacing,
             )  # calculate the box size for a tight and loose backgrounds
@@ -262,7 +262,7 @@ class Label(displayio.Group):
             # Place the text into the Bitmap
             self._place_text(
                 self.bitmap,
-                text,
+                self._text,
                 self._font,
                 self._line_spacing,
                 self._padding_left - x_offset,
@@ -632,6 +632,7 @@ class Label(displayio.Group):
 
     @text.setter  # Cannot set color or background color with text setter, use separate setter
     def text(self, new_text):
+        new_text = "    ".join(new_text.split("\t"))
         self._reset_text(text=new_text, scale=self.scale)
 
     @property
