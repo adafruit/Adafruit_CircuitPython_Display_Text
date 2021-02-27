@@ -68,7 +68,9 @@ class Label(displayio.Group):
     :param bool save_text: Set True to save the text string as a constant in the
      label structure.  Set False to reduce memory use.
     :param: bool base_alignment: when True allows to align text label to the baseline.
-     This is helpful when two or more labels need to be aligned to the same baseline"""
+     This is helpful when two or more labels need to be aligned to the same baseline
+    :param tuple(int, str): tuple with tab character replace information. When (4, " ")
+     will indicate a tab replacement of 4 spaces, defaults to 4 spaces by tab character"""
 
     # pylint: disable=unused-argument, too-many-instance-attributes, too-many-locals, too-many-arguments
     # pylint: disable=too-many-branches, no-self-use, too-many-statements
@@ -96,6 +98,7 @@ class Label(displayio.Group):
         save_text=True,  # can reduce memory use if save_text = False
         scale=1,
         base_alignment=False,
+        tab_replacement=(4, " "),
         **kwargs,
     ):
 
@@ -121,7 +124,8 @@ class Label(displayio.Group):
         )  # the local_group will always stay in the self Group
 
         self._font = font
-        self._text = "    ".join(text.split("\t"))
+        self.tab_text = tab_replacement[1] * tab_replacement[0]
+        self._text = self.tab_text.join(text.split("\t"))
 
         # Create the two-color palette
         self.palette = displayio.Palette(2)
@@ -150,6 +154,7 @@ class Label(displayio.Group):
             save_text=save_text,
             scale=scale,
             base_alignment=base_alignment,
+            tab_replacement=tab_replacement,
         )
 
     def _reset_text(
@@ -169,6 +174,7 @@ class Label(displayio.Group):
         save_text=None,
         scale=None,
         base_alignment=None,
+        tab_replacement=None,
     ):
 
         # Store all the instance variables
@@ -198,13 +204,14 @@ class Label(displayio.Group):
             self._save_text = save_text
         if base_alignment is not None:
             self.base_alignment = base_alignment
-
+        if tab_replacement is not None:
+            self.tab_replacement = tab_replacement
         # if text is not provided as a parameter (text is None), use the previous value.
         if (text is None) and self._save_text:
             text = self._text
 
         if self._save_text:  # text string will be saved
-            self._text = "    ".join(text.split("\t"))
+            self._text = self.tab_text.join(text.split("\t"))
         else:
             self._text = None  # save a None value since text string is not saved
 
@@ -632,7 +639,7 @@ class Label(displayio.Group):
 
     @text.setter  # Cannot set color or background color with text setter, use separate setter
     def text(self, new_text):
-        new_text = "    ".join(new_text.split("\t"))
+        new_text = self.tab_text.join(new_text.split("\t"))
         self._reset_text(text=new_text, scale=self.scale)
 
     @property

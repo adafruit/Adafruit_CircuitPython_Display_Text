@@ -61,7 +61,9 @@ class Label(displayio.Group):
      containing x,y pixel coordinates.
     :param int scale: Integer value of the pixel scaling
     :param bool base_alignment: when True allows to align text label to the baseline.
-     This is helpful when two or more labels need to be aligned to the same baseline"""
+     This is helpful when two or more labels need to be aligned to the same baseline
+    :param tuple(int, str): tuple with tab character replace information. When (4, " ")
+     will indicate a tab replacement of 4 spaces, defaults to 4 spaces by tab character"""
 
     # pylint: disable=too-many-instance-attributes, too-many-locals
     # This has a lot of getters/setters, maybe it needs cleanup.
@@ -86,11 +88,13 @@ class Label(displayio.Group):
         anchored_position=None,
         scale=1,
         base_alignment=False,
+        tab_replacement=(4, " "),
         **kwargs
     ):
         if not max_glyphs and not text:
             raise RuntimeError("Please provide a max size, or initial text")
-        text = "    ".join(text.split("\t"))
+        self.tab_text = tab_replacement[1] * tab_replacement[0]
+        text = self.tab_text.join(text.split("\t"))
         if not max_glyphs:
             max_glyphs = len(text)
 
@@ -387,7 +391,7 @@ class Label(displayio.Group):
 
     @text.setter
     def text(self, new_text):
-        new_text = "    ".join(new_text.split("\t"))
+        new_text = self.tab_text.join(new_text.split("\t"))
         try:
             current_anchored_position = self.anchored_position
             self._update_text(str(new_text))
