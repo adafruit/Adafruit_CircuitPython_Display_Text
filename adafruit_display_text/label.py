@@ -140,7 +140,7 @@ class Label(displayio.Group):
         if (anchored_position is not None) and (anchor_point is not None):
             self.anchored_position = anchored_position
 
-    def _create_background_box(self, lines: int, y_offset: int):
+    def _create_background_box(self, lines: int, y_offset: int) -> None:
         """Private Class function to create a background_box
         :param lines: int number of lines
         :param y_offset: int y pixel bottom coordinate for the background_box"""
@@ -456,7 +456,7 @@ class Label(displayio.Group):
         )
 
     @anchored_position.setter
-    def anchored_position(self, new_position: Tuple[int, int]) -> Tuple[int, int]:
+    def anchored_position(self, new_position: Tuple[int, int]) -> None:
         if (self._anchor_point is None) or (new_position is None):
             return  # Note: anchor_point must be set before setting anchored_position
         self.x = int(
