@@ -21,7 +21,7 @@ Implementation Notes
   https://github.com/adafruit/circuitpython/releases
 
 """
-
+from typing import Tuple
 import displayio
 
 __version__ = "0.0.0-auto.0"
@@ -70,24 +70,24 @@ class Label(displayio.Group):
         self,
         font,
         *,
-        x=0,
-        y=0,
-        text="",
-        max_glyphs=None,
-        color=0xFFFFFF,
-        background_color=None,
-        line_spacing=1.25,
-        background_tight=False,
-        padding_top=0,
-        padding_bottom=0,
-        padding_left=0,
-        padding_right=0,
-        anchor_point=None,
-        anchored_position=None,
-        scale=1,
-        base_alignment=False,
+        x: int = 0,
+        y: int = 0,
+        text: str = "",
+        max_glyphs: int = None,
+        color: int = 0xFFFFFF,
+        background_color: int = None,
+        line_spacing: float = 1.25,
+        background_tight: bool = False,
+        padding_top: int = 0,
+        padding_bottom: int = 0,
+        padding_left: int = 0,
+        padding_right: int = 0,
+        anchor_point: Tuple[float, float] = None,
+        anchored_position: Tuple[int, int] = None,
+        scale: int = 1,
+        base_alignment: bool = False,
         **kwargs
-    ):
+    ) -> None:
         if not max_glyphs and not text:
             raise RuntimeError("Please provide a max size, or initial text")
         text = "    ".join(text.split("\t"))
@@ -140,7 +140,7 @@ class Label(displayio.Group):
         if (anchored_position is not None) and (anchor_point is not None):
             self.anchored_position = anchored_position
 
-    def _create_background_box(self, lines, y_offset):
+    def _create_background_box(self, lines: int, y_offset: int):
         """Private Class function to create a background_box
         :param lines: int number of lines
         :param y_offset: int y pixel bottom coordinate for the background_box"""
@@ -182,7 +182,7 @@ class Label(displayio.Group):
 
         return tile_grid
 
-    def _get_ascent_descent(self):
+    def _get_ascent_descent(self) -> Tuple[int, int]:
         """ Private function to calculate ascent and descent font values """
         if hasattr(self.font, "ascent"):
             return self.font.ascent, self.font.descent
@@ -203,10 +203,10 @@ class Label(displayio.Group):
                 descender_max = max(descender_max, -this_glyph.dy)
         return ascender_max, descender_max
 
-    def _get_ascent(self):
+    def _get_ascent(self) -> int:
         return self._get_ascent_descent()[0]
 
-    def _update_background_color(self, new_color):
+    def _update_background_color(self, new_color: int) -> None:
         """Private class function that allows updating the font box background color
         :param new_color: int color as an RGB hex number."""
 
@@ -261,9 +261,8 @@ class Label(displayio.Group):
                 self.local_group.pop(0)
                 self._added_background_tilegrid = False
 
-    def _update_text(
-        self, new_text
-    ):  # pylint: disable=too-many-locals ,too-many-branches, too-many-statements
+    def _update_text(self, new_text: str) -> None:
+        # pylint: disable=too-many-locals ,too-many-branches, too-many-statements
         x = 0
         y = 0
         if self._added_background_tilegrid:
@@ -340,19 +339,19 @@ class Label(displayio.Group):
             self._update_background_color(self._background_color)
 
     @property
-    def bounding_box(self):
+    def bounding_box(self) -> Tuple[int, int, int, int]:
         """An (x, y, w, h) tuple that completely covers all glyphs. The
         first two numbers are offset from the x, y origin of this group"""
         return tuple(self._boundingbox)
 
     @property
-    def line_spacing(self):
+    def line_spacing(self) -> float:
         """The amount of space between lines of text, in multiples of the font's
         bounding-box height. (E.g. 1.0 is the bounding-box height)"""
         return self._line_spacing
 
     @line_spacing.setter
-    def line_spacing(self, spacing):
+    def line_spacing(self, spacing: float) -> None:
         self._line_spacing = spacing
         self.text = self._text  # redraw the box
 
@@ -362,7 +361,7 @@ class Label(displayio.Group):
         return self.palette[1]
 
     @color.setter
-    def color(self, new_color):
+    def color(self, new_color: int) -> None:
         self._color = new_color
         if new_color is not None:
             self.palette[1] = new_color
@@ -372,21 +371,21 @@ class Label(displayio.Group):
             self.palette.make_transparent(1)
 
     @property
-    def background_color(self):
+    def background_color(self) -> int:
         """Color of the background as an RGB hex number."""
         return self._background_color
 
     @background_color.setter
-    def background_color(self, new_color):
+    def background_color(self, new_color: int) -> None:
         self._update_background_color(new_color)
 
     @property
-    def text(self):
+    def text(self) -> str:
         """Text to display."""
         return self._text
 
     @text.setter
-    def text(self, new_text):
+    def text(self, new_text: str) -> None:
         new_text = "    ".join(new_text.split("\t"))
         try:
             current_anchored_position = self.anchored_position
@@ -396,12 +395,12 @@ class Label(displayio.Group):
             raise RuntimeError("Text length exceeds max_glyphs") from run_error
 
     @property
-    def scale(self):
+    def scale(self) -> int:
         """Set the scaling of the label, in integer values"""
         return self.local_group.scale
 
     @scale.setter
-    def scale(self, new_scale):
+    def scale(self, new_scale: int) -> None:
         current_anchored_position = self.anchored_position
         self.local_group.scale = new_scale
         self.anchored_position = current_anchored_position
@@ -412,7 +411,7 @@ class Label(displayio.Group):
         return self._font
 
     @font.setter
-    def font(self, new_font):
+    def font(self, new_font) -> None:
         old_text = self._text
         current_anchored_position = self.anchored_position
         self._text = ""
@@ -422,14 +421,14 @@ class Label(displayio.Group):
         self.anchored_position = current_anchored_position
 
     @property
-    def anchor_point(self):
+    def anchor_point(self) -> Tuple[float, float]:
         """Point that anchored_position moves relative to.
         Tuple with decimal percentage of width and height.
         (E.g. (0,0) is top left, (1.0, 0.5): is middle right.)"""
         return self._anchor_point
 
     @anchor_point.setter
-    def anchor_point(self, new_anchor_point):
+    def anchor_point(self, new_anchor_point: Tuple[float, float]) -> None:
         if self._anchor_point is not None:
             current_anchored_position = self.anchored_position
             self._anchor_point = new_anchor_point
@@ -438,7 +437,7 @@ class Label(displayio.Group):
             self._anchor_point = new_anchor_point
 
     @property
-    def anchored_position(self):
+    def anchored_position(self) -> Tuple[int, int]:
         """Position relative to the anchor_point. Tuple containing x,y
         pixel coordinates."""
         if self._anchor_point is None:
@@ -457,7 +456,7 @@ class Label(displayio.Group):
         )
 
     @anchored_position.setter
-    def anchored_position(self, new_position):
+    def anchored_position(self, new_position: Tuple[int, int]) -> Tuple[int, int]:
         if (self._anchor_point is None) or (new_position is None):
             return  # Note: anchor_point must be set before setting anchored_position
         self.x = int(
