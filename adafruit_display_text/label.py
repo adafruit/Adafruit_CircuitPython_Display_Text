@@ -66,6 +66,8 @@ class Label(displayio.Group):
     # pylint: disable=too-many-instance-attributes, too-many-locals
     # This has a lot of getters/setters, maybe it needs cleanup.
 
+    #TODO like label.anchor_point = (0.0, Label.baseline)
+
     def __init__(
         self,
         font,
@@ -134,6 +136,7 @@ class Label(displayio.Group):
         self._padding_left = padding_left
         self._padding_right = padding_right
         self.base_alignment = base_alignment
+        self.baseline = -1.0 # TODO Better Ideas, BOOL, DICT? a little hacky
 
         if text is not None:
             self._update_text(str(text))
@@ -270,10 +273,12 @@ class Label(displayio.Group):
         else:
             i = 0
         tilegrid_count = i
+        #TODO Verify if we need this class variable to do the logic of the y
+        # displacement
         if self.base_alignment:
-            y_offset = 0
+            self.y_offset = 0
         else:
-            y_offset = self._get_ascent() // 2
+            self.y_offset = self._get_ascent() // 2
 
         right = top = bottom = 0
         left = None
@@ -293,9 +298,9 @@ class Label(displayio.Group):
                 else:
                     left = min(left, glyph.dx)
             if y == 0:  # first line, find the Ascender height
-                top = min(top, -glyph.height - glyph.dy + y_offset)
-            bottom = max(bottom, y - glyph.dy + y_offset)
-            position_y = y - glyph.height - glyph.dy + y_offset
+                top = min(top, -glyph.height - glyph.dy + self.y_offset)
+            bottom = max(bottom, y - glyph.dy + self.y_offset)
+            position_y = y - glyph.height - glyph.dy + self.y_offset
             position_x = x + glyph.dx
             if glyph.width > 0 and glyph.height > 0:
                 try:
@@ -429,12 +434,20 @@ class Label(displayio.Group):
 
     @anchor_point.setter
     def anchor_point(self, new_anchor_point: Tuple[float, float]) -> None:
+        #TODO Verify with more setter getter this logic
         if self._anchor_point is not None:
             current_anchored_position = self.anchored_position
-            self._anchor_point = new_anchor_point
-            self.anchored_position = current_anchored_position
+            if new_anchor_point[1] == self.baseline:
+                self._anchor_point = (new_anchor_point[0], -1)
+                self.anchored_position = current_anchored_position
+            else:
+                self._anchor_point = new_anchor_point
+                self.anchored_position = current_anchored_position
         else:
-            self._anchor_point = new_anchor_point
+            if new_anchor_point[1] == self.baseline:
+                self._anchor_point = (new_anchor_point[0], -1.0)
+            else:
+                self._anchor_point = new_anchor_point
 
     @property
     def anchored_position(self) -> Tuple[int, int]:
@@ -459,13 +472,20 @@ class Label(displayio.Group):
     def anchored_position(self, new_position: Tuple[int, int]) -> None:
         if (self._anchor_point is None) or (new_position is None):
             return  # Note: anchor_point must be set before setting anchored_position
+        #TODO Do more testing
         self.x = int(
             new_position[0]
             - (self._boundingbox[0] * self.scale)
             - round(self._anchor_point[0] * (self._boundingbox[2] * self.scale))
         )
-        self.y = int(
-            new_position[1]
-            - (self._boundingbox[1] * self.scale)
-            - round(self._anchor_point[1] * self._boundingbox[3] * self.scale)
-        )
+        if self._anchor_point[1] == self.baseline:
+            self.y = int(
+                self.y
+                + ((-self.y_offset)* self.scale)            )
+        else:
+            self.y = int(
+                new_position[1]
+                - (self._boundingbox[1] * self.scale)
+                - round(self._anchor_point[1] * self._boundingbox[3] * self.scale)
+            )
+
