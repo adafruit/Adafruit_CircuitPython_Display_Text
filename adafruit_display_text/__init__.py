@@ -145,13 +145,45 @@ def wrap_text_to_lines(string, max_chars):
 
 
 class LabelBase(Group):
+    """Super class that all other types of labels will extend. This contains
+    all of the properties and functions that work the same way in all labels.
+
+    subclasses should implement _set_text, _set_font, and _set_line_spacing to
+    have the correct behavior fo rthat type of label.
+
+    :param Font font: A font class that has ``get_bounding_box`` and ``get_glyph``.
+      Must include a capital M for measuring character size.
+    :param str text: Text to display
+    :param int max_glyphs: Unnecessary parameter (provided only for direct compability
+     with label.py)
+    :param int color: Color of all text in RGB hex
+    :param int background_color: Color of the background, use `None` for transparent
+    :param double line_spacing: Line spacing of text to display
+    :param boolean background_tight: Set `True` only if you want background box to tightly
+     surround text. When set to 'True' Padding parameters will be ignored.
+    :param int padding_top: Additional pixels added to background bounding box at top
+    :param int padding_bottom: Additional pixels added to background bounding box at bottom
+    :param int padding_left: Additional pixels added to background bounding box at left
+    :param int padding_right: Additional pixels added to background bounding box at right
+    :param (float,float) anchor_point: Point that anchored_position moves relative to.
+     Tuple with decimal percentage of width and height.
+     (E.g. (0,0) is top left, (1.0, 0.5): is middle right.)
+    :param (int,int) anchored_position: Position relative to the anchor_point. Tuple
+     containing x,y pixel coordinates.
+    :param int scale: Integer value of the pixel scaling
+    :param bool save_text: Set True to save the text string as a constant in the
+     label structure.  Set False to reduce memory use.
+    :param: bool base_alignment: when True allows to align text label to the baseline.
+     This is helpful when two or more labels need to be aligned to the same baseline"""
+
+    # pylint: disable=unused-argument,  too-many-instance-attributes, too-many-locals, too-many-arguments
     def __init__(
         self,
         font,
         x=0,
         y=0,
         text="",
-        max_glyphs=None,  # This input parameter is ignored, only present for compatibility
+        max_glyphs=None,
         # with label.py
         color=0xFFFFFF,
         background_color=None,
@@ -296,7 +328,7 @@ class LabelBase(Group):
         self.local_group.scale = new_scale
         self.anchored_position = self._anchored_position  # update the anchored_position
 
-    def _set_text(self, text, scale):
+    def _set_text(self, new_text, scale):
         # subclasses should override this
         pass
 

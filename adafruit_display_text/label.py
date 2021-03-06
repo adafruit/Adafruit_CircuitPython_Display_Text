@@ -123,7 +123,6 @@ class Label(LabelBase):
         self.base_alignment = kwargs.get("base_alignment", False)
 
         if text is not None:
-            print("calling _update_text")
             self._update_text(str(text))
         if (kwargs.get("anchored_position", None) is not None) and (
             kwargs.get("anchor_point", None) is not None
@@ -300,13 +299,12 @@ class Label(LabelBase):
         while len(self.local_group) > tilegrid_count:  # i:
             self.local_group.pop()
         self._text = new_text
-        print("setting bounding box")
         self._bounding_box = (left, top, right - left, bottom - top)
 
         if self.background_color is not None:
             self._update_background_color(self._background_color)
 
-    def _reset_text(self, new_text, scale):
+    def _reset_text(self, new_text):
         try:
             current_anchored_position = self.anchored_position
             self._update_text(str(new_text))
@@ -327,5 +325,5 @@ class Label(LabelBase):
         self._line_spacing = new_line_spacing
         self.text = self._text  # redraw the box
 
-    def _set_text(self, text, scale):
-        self._reset_text(text, scale)
+    def _set_text(self, new_text, scale):
+        self._reset_text(new_text)
