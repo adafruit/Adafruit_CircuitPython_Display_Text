@@ -514,7 +514,6 @@ class Label(LabelBase):
                     elif y_placement > bitmap.height:
                         break
 
-
     def _set_line_spacing(self, new_line_spacing):
         if self._save_text:
             self._reset_text(line_spacing=new_line_spacing, scale=self.scale)
