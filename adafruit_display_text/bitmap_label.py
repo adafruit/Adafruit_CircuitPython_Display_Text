@@ -526,3 +526,6 @@ class Label(LabelBase):
             self._reset_text(font=new_font, scale=self.scale)
         else:
             raise RuntimeError("font is immutable when save_text is False")
+
+    def _set_text(self, new_text, scale):
+        self._reset_text(text=new_text, scale=self.scale)

@@ -307,7 +307,7 @@ class LabelBase(Group):
 
     @text.setter  # Cannot set color or background color with text setter, use separate setter
     def text(self, new_text):
-        self._set_text(text=new_text, scale=self.scale)
+        self._set_text(new_text, self.scale)
 
     @property
     def bounding_box(self):
