@@ -296,7 +296,7 @@ class LabelBase(Group):
         self.local_group.scale = new_scale
         self.anchored_position = self._anchored_position  # update the anchored_position
 
-    def _reset_text(self, text, scale):
+    def _set_text(self, text, scale):
         # subclasses should override this
         pass
 
@@ -307,4 +307,24 @@ class LabelBase(Group):
 
     @text.setter  # Cannot set color or background color with text setter, use separate setter
     def text(self, new_text):
-        self._reset_text(text=new_text, scale=self.scale)
+        self._set_text(text=new_text, scale=self.scale)
+
+    @property
+    def bounding_box(self):
+        """An (x, y, w, h) tuple that completely covers all glyphs. The
+        first two numbers are offset from the x, y origin of this group"""
+        return tuple(self._bounding_box)
+
+    @property
+    def line_spacing(self):
+        """The amount of space between lines of text, in multiples of the font's
+        bounding-box height. (E.g. 1.0 is the bounding-box height)"""
+        return self._line_spacing
+
+    def _set_line_spacing(self, new_line_spacing):
+        # subclass should override this.
+        pass
+
+    @line_spacing.setter
+    def line_spacing(self, new_line_spacing):
+        self._set_line_spacing(new_line_spacing)

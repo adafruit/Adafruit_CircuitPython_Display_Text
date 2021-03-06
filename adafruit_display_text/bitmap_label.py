@@ -514,21 +514,8 @@ class Label(LabelBase):
                     elif y_placement > bitmap.height:
                         break
 
-    @property
-    def bounding_box(self):
-        """An (x, y, w, h) tuple that completely covers all glyphs. The
-        first two numbers are offset from the x, y origin of this group"""
-        return self._bounding_box
 
-
-    @property
-    def line_spacing(self):
-        """The amount of space between lines of text, in multiples of the font's
-        bounding-box height. (E.g. 1.0 is the bounding-box height)"""
-        return self._line_spacing
-
-    @line_spacing.setter
-    def line_spacing(self, new_line_spacing):
+    def _set_line_spacing(self, new_line_spacing):
         if self._save_text:
             self._reset_text(line_spacing=new_line_spacing, scale=self.scale)
         else:
