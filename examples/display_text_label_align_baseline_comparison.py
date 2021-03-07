@@ -15,7 +15,7 @@ display = board.DISPLAY
 
 # Font definition. You can choose any two fonts available in your system
 MEDIUM_FONT = bitmap_font.load_font("LeagueSpartan-Bold-16.bdf")
-BIG_FONT = bitmap_font.load_font("IBMPlexMono-Medium-24_jep.bdf")
+BIG_FONT = bitmap_font.load_font("LibreBodoniv2002-Bold-27.bdf")
 
 TEXT_RIGHT = "MG"
 TEXT_LEFT = "32.47"
@@ -40,7 +40,7 @@ right_text = label.Label(
     text=TEXT_RIGHT,
     color=0x000000,
     background_color=0x999999,
-    x=80,
+    x=90,
     y=50,
     base_alignment=False,
 )
@@ -63,7 +63,7 @@ right_text_aligned = label.Label(
     text=TEXT_RIGHT,
     color=0x000000,
     background_color=0x999999,
-    x=80,
+    x=90,
     y=100,
     base_alignment=True,
 )
