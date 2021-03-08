@@ -488,7 +488,14 @@ class Label(displayio.Group):
                         y_blit_target = 0  # draw the clipped bitmap at y=0
 
                         print(
-                            'Warning: Glyph exceeds Ascent/Descent properties: "{}"'.format(
+                            'Warning: Glyph clipped, exceeds Ascent property: "{}"'.format(
+                                char
+                            )
+                        )
+
+                    if (y_blit_target + my_glyph.height) > bitmap.height:
+                        print(
+                            'Warning: Glyph clipped, exceeds descent property: "{}"'.format(
                                 char
                             )
                         )
@@ -496,15 +503,12 @@ class Label(displayio.Group):
                     self._blit(
                         bitmap,
                         xposition + my_glyph.dx,
-                        y_clip
-                        + yposition
-                        - my_glyph.height
-                        - my_glyph.dy,  ##### ******
+                        y_blit_target,
                         my_glyph.bitmap,
                         x_1=glyph_offset_x,
                         y_1=y_clip,
                         x_2=glyph_offset_x + my_glyph.width,
-                        y_2=0 + my_glyph.height,
+                        y_2=my_glyph.height,
                         skip_index=skip_index,  # do not copy over any 0 background pixels
                     )
 
