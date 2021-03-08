@@ -211,6 +211,9 @@ class LabelBase(Group):
         self._anchor_point = anchor_point
         self._anchored_position = anchored_position
 
+        # local group will hold background and text
+        # the self group scale should always remain at 1, the self.local_group will
+        # be used to set the scale of the label
         self.local_group = None
 
         self._text = text

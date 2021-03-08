@@ -80,11 +80,6 @@ class Label(LabelBase):
             max_glyphs = len(text)
         # add one to max_size for the background bitmap tileGrid
 
-        # instance the Group
-        # self Group will contain a single local_group which contains a Group (self.local_group)
-        # which contains a TileGrid
-        # The self scale should always be 1
-
         # local_group will set the scale
         self.local_group = displayio.Group(
             max_size=max_glyphs + 1, scale=kwargs.get("scale", 1)

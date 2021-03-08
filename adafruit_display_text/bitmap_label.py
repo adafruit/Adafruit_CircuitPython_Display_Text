@@ -81,14 +81,6 @@ class Label(LabelBase):
 
         super().__init__(font, **kwargs)
 
-        # instance the Group
-        # self Group will contain a single local_group which contains a Group (self.local_group)
-        # which contains a TileGrid (self.tilegrid) which contains the text bitmap (self.bitmap)
-
-        # the self group scale should always remain at 1, the self.local_group will
-        # be used to set the scale
-        # **kwargs will pass any additional arguments provided to the Label
-
         self.local_group = displayio.Group(
             max_size=1, scale=kwargs.get("scale", 1)
         )  # local_group holds the tileGrid and sets the scaling
