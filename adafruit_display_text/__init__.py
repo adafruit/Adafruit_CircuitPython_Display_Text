@@ -5,6 +5,7 @@
 """
 Display Text module helper functions
 """
+from displayio import Group, Palette
 
 
 def wrap_text_to_pixels(string, max_width, font=None, indent0="", indent1=""):
@@ -141,3 +142,224 @@ def wrap_text_to_lines(string, max_chars):
     if the_lines[0][0] == " ":
         the_lines[0] = the_lines[0][1:]
     return the_lines
+
+
+class LabelBase(Group):
+    """Super class that all other types of labels will extend. This contains
+    all of the properties and functions that work the same way in all labels.
+
+    subclasses should implement _set_text, _set_font, and _set_line_spacing to
+    have the correct behavior fo rthat type of label.
+
+    :param Font font: A font class that has ``get_bounding_box`` and ``get_glyph``.
+      Must include a capital M for measuring character size.
+    :param str text: Text to display
+    :param int max_glyphs: Unnecessary parameter (provided only for direct compability
+     with label.py)
+    :param int color: Color of all text in RGB hex
+    :param int background_color: Color of the background, use `None` for transparent
+    :param double line_spacing: Line spacing of text to display
+    :param boolean background_tight: Set `True` only if you want background box to tightly
+     surround text. When set to 'True' Padding parameters will be ignored.
+    :param int padding_top: Additional pixels added to background bounding box at top
+    :param int padding_bottom: Additional pixels added to background bounding box at bottom
+    :param int padding_left: Additional pixels added to background bounding box at left
+    :param int padding_right: Additional pixels added to background bounding box at right
+    :param (float,float) anchor_point: Point that anchored_position moves relative to.
+     Tuple with decimal percentage of width and height.
+     (E.g. (0,0) is top left, (1.0, 0.5): is middle right.)
+    :param (int,int) anchored_position: Position relative to the anchor_point. Tuple
+     containing x,y pixel coordinates.
+    :param int scale: Integer value of the pixel scaling
+    :param bool save_text: Set True to save the text string as a constant in the
+     label structure.  Set False to reduce memory use.
+    :param: bool base_alignment: when True allows to align text label to the baseline.
+     This is helpful when two or more labels need to be aligned to the same baseline"""
+
+    # pylint: disable=unused-argument,  too-many-instance-attributes, too-many-locals, too-many-arguments
+    def __init__(
+        self,
+        font,
+        x=0,
+        y=0,
+        text="",
+        max_glyphs=None,
+        # with label.py
+        color=0xFFFFFF,
+        background_color=None,
+        line_spacing=1.25,
+        background_tight=False,
+        padding_top=0,
+        padding_bottom=0,
+        padding_left=0,
+        padding_right=0,
+        anchor_point=None,
+        anchored_position=None,
+        save_text=True,  # can reduce memory use if save_text = False
+        scale=1,
+        base_alignment=False,
+        **kwargs,
+    ):
+        super().__init__(max_size=1, x=x, y=y, scale=1)
+
+        self._font = font
+        self.palette = Palette(2)
+        self._color = color
+        self._background_color = background_color
+
+        self._bounding_box = None
+        self._anchor_point = anchor_point
+        self._anchored_position = anchored_position
+
+        # local group will hold background and text
+        # the self group scale should always remain at 1, the self.local_group will
+        # be used to set the scale of the label
+        self.local_group = None
+
+        self._text = text
+
+    def _get_ascent_descent(self):
+        """ Private function to calculate ascent and descent font values """
+        if hasattr(self.font, "ascent"):
+            return self.font.ascent, self.font.descent
+
+        # check a few glyphs for maximum ascender and descender height
+        glyphs = "M j'"  # choose glyphs with highest ascender and lowest
+        try:
+            self._font.load_glyphs(glyphs)
+        except AttributeError:
+            # Builtin font doesn't have or need load_glyphs
+            pass
+        # descender, will depend upon font used
+        ascender_max = descender_max = 0
+        for char in glyphs:
+            this_glyph = self._font.get_glyph(ord(char))
+            if this_glyph:
+                ascender_max = max(ascender_max, this_glyph.height + this_glyph.dy)
+                descender_max = max(descender_max, -this_glyph.dy)
+        return ascender_max, descender_max
+
+    def _get_ascent(self):
+        return self._get_ascent_descent()[0]
+
+    @property
+    def font(self):
+        """Font to use for text display."""
+        return self._font
+
+    def _set_font(self, new_font):
+        # subclasses should override this
+        pass
+
+    @font.setter
+    def font(self, new_font):
+        self._set_font(new_font)
+
+    @property
+    def color(self):
+        """Color of the text as an RGB hex number."""
+        return self._color
+
+    @color.setter
+    def color(self, new_color):
+        self._color = new_color
+        if new_color is not None:
+            self.palette[1] = new_color
+            self.palette.make_opaque(1)
+        else:
+            self.palette[1] = 0
+            self.palette.make_transparent(1)
+
+    @property
+    def background_color(self):
+        """Color of the background as an RGB hex number."""
+        return self._background_color
+
+    @background_color.setter
+    def background_color(self, new_color):
+        self._background_color = new_color
+        if new_color is not None:
+            self.palette[0] = new_color
+            self.palette.make_opaque(0)
+        else:
+            self.palette[0] = 0
+            self.palette.make_transparent(0)
+
+    @property
+    def anchor_point(self):
+        """Point that anchored_position moves relative to.
+        Tuple with decimal percentage of width and height.
+        (E.g. (0,0) is top left, (1.0, 0.5): is middle right.)"""
+        return self._anchor_point
+
+    @anchor_point.setter
+    def anchor_point(self, new_anchor_point):
+        self._anchor_point = new_anchor_point
+        self.anchored_position = (
+            self._anchored_position
+        )  # update the anchored_position using setter
+
+    @property
+    def anchored_position(self):
+        """Position relative to the anchor_point. Tuple containing x,y
+        pixel coordinates."""
+        return self._anchored_position
+
+    @anchored_position.setter
+    def anchored_position(self, new_position):
+        self._anchored_position = new_position
+        # Set anchored_position
+        if (self._anchor_point is not None) and (self._anchored_position is not None):
+            self.x = int(
+                new_position[0]
+                - (self._bounding_box[0] * self.scale)
+                - round(self._anchor_point[0] * (self._bounding_box[2] * self.scale))
+            )
+            self.y = int(
+                new_position[1]
+                - (self._bounding_box[1] * self.scale)
+                - round(self._anchor_point[1] * self._bounding_box[3] * self.scale)
+            )
+
+    @property
+    def scale(self):
+        """Set the scaling of the label, in integer values"""
+        return self.local_group.scale
+
+    @scale.setter
+    def scale(self, new_scale):
+        self.local_group.scale = new_scale
+        self.anchored_position = self._anchored_position  # update the anchored_position
+
+    def _set_text(self, new_text, scale):
+        # subclasses should override this
+        pass
+
+    @property
+    def text(self):
+        """Text to be displayed."""
+        return self._text
+
+    @text.setter  # Cannot set color or background color with text setter, use separate setter
+    def text(self, new_text):
+        self._set_text(new_text, self.scale)
+
+    @property
+    def bounding_box(self):
+        """An (x, y, w, h) tuple that completely covers all glyphs. The
+        first two numbers are offset from the x, y origin of this group"""
+        return tuple(self._bounding_box)
+
+    @property
+    def line_spacing(self):
+        """The amount of space between lines of text, in multiples of the font's
+        bounding-box height. (E.g. 1.0 is the bounding-box height)"""
+        return self._line_spacing
+
+    def _set_line_spacing(self, new_line_spacing):
+        # subclass should override this.
+        pass
+
+    @line_spacing.setter
+    def line_spacing(self, new_line_spacing):
+        self._set_line_spacing(new_line_spacing)
