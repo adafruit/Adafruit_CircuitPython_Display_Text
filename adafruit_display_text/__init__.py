@@ -184,7 +184,10 @@ class LabelBase(Group):
      This is helpful when two or more labels need to be aligned to the same baseline
     :param: (int,str) tab_replacement: tuple with tab character replace information. When
      (4, " ") will indicate a tab replacement of 4 spaces, defaults to 4 spaces by
-     tab character"""
+     tab character
+    :param: str label_direction: string defining the label text orientation. There are 5
+     configurations possibles ``LTR``:Left-To-Right ``RTL``:Right-To-Left
+     ``TTB``:TTB Top-To-Bottom ``UPR``:Upwards ``DWR``:Downwards. It defaults to ``LTR`` """
 
     # pylint: disable=unused-argument,  too-many-instance-attributes, too-many-locals, too-many-arguments
     def __init__(
@@ -208,6 +211,7 @@ class LabelBase(Group):
         scale: int = 1,
         base_alignment: bool = False,
         tab_replacement: Tuple[int, str] = (4, " "),
+        label_direction: str = "LTR",
         **kwargs,
     ) -> None:
         super().__init__(max_size=1, x=x, y=y, scale=1)
