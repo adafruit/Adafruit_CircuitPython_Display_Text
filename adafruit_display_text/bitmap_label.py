@@ -22,7 +22,10 @@ Implementation Notes
   https://github.com/adafruit/circuitpython/releases
 
 """
-
+try:
+    from typing import Tuple
+except:
+    pass
 import displayio
 
 __version__ = "0.0.0-auto.0"
@@ -80,7 +83,7 @@ class Label(LabelBase):
     # Note: max_glyphs parameter is unnecessary, this is used for direct
     # compatibility with label.py
 
-    def __init__(self, font, **kwargs):
+    def __init__(self, font, **kwargs) -> None:
 
         super().__init__(font, **kwargs)
 
@@ -126,22 +129,22 @@ class Label(LabelBase):
     def _reset_text(
         self,
         font=None,
-        x=None,
-        y=None,
-        text=None,
-        line_spacing=None,
-        background_tight=None,
-        padding_top=None,
-        padding_bottom=None,
-        padding_left=None,
-        padding_right=None,
-        anchor_point=None,
-        anchored_position=None,
-        save_text=None,
-        scale=None,
-        base_alignment=None,
-        tab_replacement=None,
-    ):
+        x: int = None,
+        y: int = None,
+        text: str = None,
+        line_spacing: float = None,
+        background_tight: bool = None,
+        padding_top: int = None,
+        padding_bottom: int = None,
+        padding_left: int = None,
+        padding_right: int = None,
+        anchor_point: Tuple[float, float] = None,
+        anchored_position: Tuple[int, int] = None,
+        save_text: bool = None,
+        scale: int = None,
+        base_alignment: bool = None,
+        tab_replacement: Tuple[int, str] = None,
+    ) -> None:
 
         # Store all the instance variables
         if font is not None:
@@ -288,12 +291,14 @@ class Label(LabelBase):
         # x,y positions of the label
 
     @staticmethod
-    def _line_spacing_ypixels(font, line_spacing):
+    def _line_spacing_ypixels(font, line_spacing: float) -> int:
         # Note: Scaling is provided at the Group level
         return_value = int(line_spacing * font.get_bounding_box()[1])
         return return_value
 
-    def _text_bounding_box(self, text, font, line_spacing):
+    def _text_bounding_box(
+        self, text: str, font, line_spacing: float
+    ) -> Tuple[int, int, int, int, int, int]:
         ascender_max, descender_max = self._get_ascent_descent()
 
         lines = 1
@@ -371,17 +376,17 @@ class Label(LabelBase):
     def _place_text(
         self,
         bitmap,
-        text,
+        text: str,
         font,
-        line_spacing,
-        xposition,
-        yposition,
-        text_palette_index=1,
-        background_palette_index=0,
-        skip_index=0,  # set to None to write all pixels, other wise skip this palette index
+        line_spacing: float,
+        xposition: int,
+        yposition: int,
+        text_palette_index: int = 1,
+        background_palette_index: int = 0,
+        skip_index: int = 0,  # set to None to write all pixels, other wise skip this palette index
         # when copying glyph bitmaps (this is important for slanted text
         # where rectangulary glyph boxes overlap)
-    ):
+    ) -> Tuple[int, int, int, int]:
         # placeText - Writes text into a bitmap at the specified location.
         #
         # Note: scale is pushed up to Group level
@@ -469,16 +474,16 @@ class Label(LabelBase):
     def _blit(
         self,
         bitmap,  # target bitmap
-        x,  # target x upper left corner
-        y,  # target y upper left corner
+        x: int,  # target x upper left corner
+        y: int,  # target y upper left corner
         source_bitmap,  # source bitmap
-        x_1=0,  # source x start
-        y_1=0,  # source y start
-        x_2=None,  # source x end
-        y_2=None,  # source y end
-        skip_index=None,  # palette index that will not be copied
+        x_1: int = 0,  # source x start
+        y_1: int = 0,  # source y start
+        x_2: int = None,  # source x end
+        y_2: int = None,  # source y end
+        skip_index: int = None,  # palette index that will not be copied
         # (for example: the background color of a glyph)
-    ):
+    ) -> None:
 
         if hasattr(bitmap, "blit"):  # if bitmap has a built-in blit function, call it
             # this function should perform its own input checks
@@ -538,19 +543,19 @@ class Label(LabelBase):
                     elif y_placement > bitmap.height:
                         break
 
-    def _set_line_spacing(self, new_line_spacing):
+    def _set_line_spacing(self, new_line_spacing: float) -> None:
         if self._save_text:
             self._reset_text(line_spacing=new_line_spacing, scale=self.scale)
         else:
             raise RuntimeError("line_spacing is immutable when save_text is False")
 
-    def _set_font(self, new_font):
+    def _set_font(self, new_font) -> None:
         self._font = new_font
         if self._save_text:
             self._reset_text(font=new_font, scale=self.scale)
         else:
             raise RuntimeError("font is immutable when save_text is False")
 
-    def _set_text(self, new_text, scale):
+    def _set_text(self, new_text: str, scale: int) -> None:
         new_text = self._tab_text.join(new_text.split("\t"))
         self._reset_text(text=new_text, scale=self.scale)

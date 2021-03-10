@@ -5,11 +5,12 @@
 """
 Display Text module helper functions
 """
-from displayio import Group, Palette
 try:
     from typing import Tuple
 except:
     pass
+from displayio import Group, Palette
+
 
 def wrap_text_to_pixels(string, max_width, font=None, indent0="", indent1=""):
     """wrap_text_to_pixels function
@@ -201,7 +202,7 @@ class LabelBase(Group):
         anchor_point: Tuple[float, float] = None,
         anchored_position: Tuple[int, int] = None,
         save_text: bool = True,  # can reduce memory use if save_text = False
-        scale:int = 1,
+        scale: int = 1,
         base_alignment: bool = False,
         tab_replacement: Tuple[int, str] = (4, " "),
         **kwargs,

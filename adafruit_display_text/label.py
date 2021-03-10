@@ -23,10 +23,6 @@ Implementation Notes
 """
 
 import displayio
-try:
-    from typing import Tuple
-except:
-    pass
 
 __version__ = "0.0.0-auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_Display_Text.git"
