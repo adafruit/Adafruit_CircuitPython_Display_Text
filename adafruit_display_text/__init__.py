@@ -174,7 +174,10 @@ class LabelBase(Group):
     :param bool save_text: Set True to save the text string as a constant in the
      label structure.  Set False to reduce memory use.
     :param: bool base_alignment: when True allows to align text label to the baseline.
-     This is helpful when two or more labels need to be aligned to the same baseline"""
+     This is helpful when two or more labels need to be aligned to the same baseline
+    :param: (int,str) tab_replacement: tuple with tab character replace information. When
+     (4, " ") will indicate a tab replacement of 4 spaces, defaults to 4 spaces by
+     tab character"""
 
     # pylint: disable=unused-argument,  too-many-instance-attributes, too-many-locals, too-many-arguments
     def __init__(
@@ -198,6 +201,7 @@ class LabelBase(Group):
         save_text=True,  # can reduce memory use if save_text = False
         scale=1,
         base_alignment=False,
+        tab_replacement=(4, " "),
         **kwargs,
     ):
         super().__init__(max_size=1, x=x, y=y, scale=1)
