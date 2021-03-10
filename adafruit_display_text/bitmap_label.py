@@ -24,7 +24,7 @@ Implementation Notes
 """
 try:
     from typing import Tuple
-except:
+except ImportError:
     pass
 import displayio
 

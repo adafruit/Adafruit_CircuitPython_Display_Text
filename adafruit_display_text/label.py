@@ -227,6 +227,7 @@ class Label(LabelBase):
                 self.local_group.pop(0)
                 self._added_background_tilegrid = False
 
+    # pylint: disable = too-many-branches, too-many-statements
     def _update_text(
         self, new_text: str
     ) -> None:  # pylint: disable=too-many-locals ,too-many-branches, too-many-statements

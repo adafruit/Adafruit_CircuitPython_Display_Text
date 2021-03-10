@@ -5,14 +5,17 @@
 """
 Display Text module helper functions
 """
+
 try:
     from typing import Tuple
-except:
+except ImportError:
     pass
 from displayio import Group, Palette
 
 
-def wrap_text_to_pixels(string, max_width, font=None, indent0="", indent1=""):
+def wrap_text_to_pixels(
+    string: str, max_width: int, font=None, indent0: str = "", indent1: str = ""
+) -> None:
     """wrap_text_to_pixels function
     A helper that will return a list of lines with word-break wrapping.
     Leading and trailing whitespace in your string will be removed. If
@@ -30,7 +33,7 @@ def wrap_text_to_pixels(string, max_width, font=None, indent0="", indent1=""):
       input text at max_width pixels size
 
     """
-    # pylint: disable=too-many-locals too-many-branches
+    # pylint: disable=too-many-locals, too-many-branches
     if font is None:
 
         def measure(string):
