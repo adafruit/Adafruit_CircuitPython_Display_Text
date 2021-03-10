@@ -221,7 +221,7 @@ class LabelBase(Group):
         self.local_group = None
 
         self._text = text
-        self._baseline = -1.0
+        self.baseline = -1.0
 
         self.base_alignment = base_alignment
 
@@ -306,7 +306,7 @@ class LabelBase(Group):
 
     @anchor_point.setter
     def anchor_point(self, new_anchor_point):
-        if new_anchor_point[1] == self._baseline:
+        if new_anchor_point[1] == self.baseline:
             self._anchor_point = (new_anchor_point[0], -1.0)
         else:
             self._anchor_point = new_anchor_point
@@ -330,7 +330,7 @@ class LabelBase(Group):
                 - (self._bounding_box[0] * self.scale)
                 - round(self._anchor_point[0] * (self._bounding_box[2] * self.scale))
             )
-            if self._anchor_point[1] == self._baseline:
+            if self._anchor_point[1] == self.baseline:
                 self.y = int(
                     new_position[1]
                     - (self._y_offset * self.scale)
