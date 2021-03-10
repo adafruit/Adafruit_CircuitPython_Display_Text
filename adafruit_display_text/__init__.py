@@ -221,6 +221,14 @@ class LabelBase(Group):
         self.local_group = None
 
         self._text = text
+        self._baseline = -1.0
+
+        self.base_alignment = base_alignment
+
+        if self.base_alignment:
+            self._y_offset = 0
+        else:
+            self._y_offset = self._get_ascent() // 2
 
     def _get_ascent_descent(self):
         """ Private function to calculate ascent and descent font values """
@@ -298,7 +306,10 @@ class LabelBase(Group):
 
     @anchor_point.setter
     def anchor_point(self, new_anchor_point):
-        self._anchor_point = new_anchor_point
+        if new_anchor_point[1] == self._baseline:
+            self._anchor_point = (new_anchor_point[0], -1.0)
+        else:
+            self._anchor_point = new_anchor_point
         self.anchored_position = (
             self._anchored_position
         )  # update the anchored_position using setter
@@ -319,11 +330,17 @@ class LabelBase(Group):
                 - (self._bounding_box[0] * self.scale)
                 - round(self._anchor_point[0] * (self._bounding_box[2] * self.scale))
             )
-            self.y = int(
-                new_position[1]
-                - (self._bounding_box[1] * self.scale)
-                - round(self._anchor_point[1] * self._bounding_box[3] * self.scale)
-            )
+            if self._anchor_point[1] == self._baseline:
+                self.y = int(
+                    new_position[1]
+                    - (self._y_offset * self.scale)
+                )
+            else:
+                self.y = int(
+                    new_position[1]
+                    - (self._bounding_box[1] * self.scale)
+                    - round(self._anchor_point[1] * self._bounding_box[3] * self.scale)
+                )
 
     @property
     def scale(self):

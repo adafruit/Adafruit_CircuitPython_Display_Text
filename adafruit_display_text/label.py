@@ -238,9 +238,9 @@ class Label(LabelBase):
             i = 0
         tilegrid_count = i
         if self.base_alignment:
-            y_offset = 0
+            self._y_offset = 0
         else:
-            y_offset = self._get_ascent() // 2
+            self._y_offset = self._get_ascent() // 2
 
         right = top = bottom = 0
         left = None
@@ -260,9 +260,9 @@ class Label(LabelBase):
                 else:
                     left = min(left, glyph.dx)
             if y == 0:  # first line, find the Ascender height
-                top = min(top, -glyph.height - glyph.dy + y_offset)
-            bottom = max(bottom, y - glyph.dy + y_offset)
-            position_y = y - glyph.height - glyph.dy + y_offset
+                top = min(top, -glyph.height - glyph.dy + self._y_offset)
+            bottom = max(bottom, y - glyph.dy + self._y_offset)
+            position_y = y - glyph.height - glyph.dy + self._y_offset
             position_x = x + glyph.dx
             if glyph.width > 0 and glyph.height > 0:
                 try:
