@@ -64,9 +64,12 @@ class Label(LabelBase):
     :param int scale: Integer value of the pixel scaling
     :param bool base_alignment: when True allows to align text label to the baseline.
      This is helpful when two or more labels need to be aligned to the same baseline
-    :param: (int,str) tab_replacement: tuple with tab character replace information. When
+    :param (int,str) tab_replacement: tuple with tab character replace information. When
      (4, " ") will indicate a tab replacement of 4 spaces, defaults to 4 spaces by
-     tab character"""
+     tab character
+    :param str label_direction: string defining the label text orientation. There are 5
+     configurations possibles ``LTR``-Left-To-Right ``RTL``-Right-To-Left
+     ``TTB``-Top-To-Bottom ``UPR``-Upwards ``DWR``-Downwards. It defaults to ``LTR``"""
 
     # pylint: disable=too-many-instance-attributes, too-many-locals
     # This has a lot of getters/setters, maybe it needs cleanup.
