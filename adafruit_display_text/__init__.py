@@ -187,7 +187,7 @@ class LabelBase(Group):
      tab character
     :param: str label_direction: string defining the label text orientation. There are 5
      configurations possibles ``LTR``:Left-To-Right ``RTL``:Right-To-Left
-     ``TTB``:TTB Top-To-Bottom ``UPR``:Upwards ``DWR``:Downwards. It defaults to ``LTR`` """
+     ``TTB``:TTB Top-To-Bottom ``UPR``:Upwards ``DWR``:Downwards. It defaults to ``LTR``"""
 
     # pylint: disable=unused-argument,  too-many-instance-attributes, too-many-locals, too-many-arguments
     def __init__(
