@@ -91,10 +91,10 @@ class Label(LabelBase):
             self.local_group
         )  # the local_group will always stay in the self Group
 
-        self.tab_replacement = kwargs.get("tab_replacement", (4, " "))
-        self.tab_text = self.tab_replacement[1] * self.tab_replacement[0]
+        self._tab_replacement = kwargs.get("tab_replacement", (4, " "))
+        self._tab_text = self._tab_replacement[1] * self._tab_replacement[0]
         text = kwargs.get("text", "")
-        self._text = self.tab_text.join(text.split("\t"))
+        self._text = self._tab_text.join(text.split("\t"))
 
         # Create the two-color palette
 
@@ -171,14 +171,14 @@ class Label(LabelBase):
         if base_alignment is not None:
             self.base_alignment = base_alignment
         if tab_replacement is not None:
-            self.tab_replacement = tab_replacement
+            self._tab_replacement = tab_replacement
 
         # if text is not provided as a parameter (text is None), use the previous value.
         if (text is None) and self._save_text:
             text = self._text
 
         if self._save_text:  # text string will be saved
-            self._text = self.tab_text.join(text.split("\t"))
+            self._text = self._tab_text.join(text.split("\t"))
         else:
             self._text = None  # save a None value since text string is not saved
 
@@ -552,5 +552,5 @@ class Label(LabelBase):
             raise RuntimeError("font is immutable when save_text is False")
 
     def _set_text(self, new_text, scale):
-        new_text = self.tab_text.join(new_text.split("\t"))
+        new_text = self._tab_text.join(new_text.split("\t"))
         self._reset_text(text=new_text, scale=self.scale)
