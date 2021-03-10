@@ -63,7 +63,10 @@ class Label(LabelBase):
      containing x,y pixel coordinates.
     :param int scale: Integer value of the pixel scaling
     :param bool base_alignment: when True allows to align text label to the baseline.
-     This is helpful when two or more labels need to be aligned to the same baseline"""
+     This is helpful when two or more labels need to be aligned to the same baseline
+    :param: (int,str) tab_replacement: tuple with tab character replace information. When
+     (4, " ") will indicate a tab replacement of 4 spaces, defaults to 4 spaces by
+     tab character"""
 
     # pylint: disable=too-many-instance-attributes, too-many-locals
     # This has a lot of getters/setters, maybe it needs cleanup.
@@ -76,6 +79,9 @@ class Label(LabelBase):
 
         if not max_glyphs and not text:
             raise RuntimeError("Please provide a max size, or initial text")
+        self._tab_replacement = kwargs.get("tab_replacement", (4, " "))
+        self._tab_text = self._tab_replacement[1] * self._tab_replacement[0]
+        text = self._tab_text.join(text.split("\t"))
         if not max_glyphs:
             max_glyphs = len(text)
         # add one to max_size for the background bitmap tileGrid
@@ -300,6 +306,7 @@ class Label(LabelBase):
             self._update_background_color(self._background_color)
 
     def _reset_text(self, new_text):
+        new_text = self._tab_text.join(new_text.split("\t"))
         try:
             current_anchored_position = self.anchored_position
             self._update_text(str(new_text))

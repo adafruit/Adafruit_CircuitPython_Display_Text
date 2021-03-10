@@ -70,7 +70,10 @@ class Label(LabelBase):
     :param bool save_text: Set True to save the text string as a constant in the
      label structure.  Set False to reduce memory use.
     :param: bool base_alignment: when True allows to align text label to the baseline.
-     This is helpful when two or more labels need to be aligned to the same baseline"""
+     This is helpful when two or more labels need to be aligned to the same baseline
+    :param: (int,str) tab_replacement: tuple with tab character replace information. When
+     (4, " ") will indicate a tab replacement of 4 spaces, defaults to 4 spaces by
+     tab character"""
 
     # pylint: disable=unused-argument, too-many-instance-attributes, too-many-locals, too-many-arguments
     # pylint: disable=too-many-branches, no-self-use, too-many-statements
@@ -88,7 +91,10 @@ class Label(LabelBase):
             self.local_group
         )  # the local_group will always stay in the self Group
 
-        self._text = kwargs.get("text", "")
+        self._tab_replacement = kwargs.get("tab_replacement", (4, " "))
+        self._tab_text = self._tab_replacement[1] * self._tab_replacement[0]
+        text = kwargs.get("text", "")
+        self._text = self._tab_text.join(text.split("\t"))
 
         # Create the two-color palette
 
@@ -114,6 +120,7 @@ class Label(LabelBase):
             save_text=kwargs.get("save_text", True),
             scale=kwargs.get("scale", 1),
             base_alignment=kwargs.get("base_alignment", False),
+            tab_replacement=kwargs.get("tab_replacement", (4, " ")),
         )
 
     def _reset_text(
@@ -133,6 +140,7 @@ class Label(LabelBase):
         save_text=None,
         scale=None,
         base_alignment=None,
+        tab_replacement=None,
     ):
 
         # Store all the instance variables
@@ -162,13 +170,15 @@ class Label(LabelBase):
             self._save_text = save_text
         if base_alignment is not None:
             self.base_alignment = base_alignment
+        if tab_replacement is not None:
+            self._tab_replacement = tab_replacement
 
         # if text is not provided as a parameter (text is None), use the previous value.
         if (text is None) and self._save_text:
             text = self._text
 
         if self._save_text:  # text string will be saved
-            self._text = text
+            self._text = self._tab_text.join(text.split("\t"))
         else:
             self._text = None  # save a None value since text string is not saved
 
@@ -203,7 +213,7 @@ class Label(LabelBase):
                 loose_box_y,
                 loose_y_offset,
             ) = self._text_bounding_box(
-                text,
+                self._text,
                 self._font,
                 self._line_spacing,
             )  # calculate the box size for a tight and loose backgrounds
@@ -226,7 +236,7 @@ class Label(LabelBase):
             # Place the text into the Bitmap
             self._place_text(
                 self.bitmap,
-                text,
+                self._text,
                 self._font,
                 self._line_spacing,
                 self._padding_left - x_offset,
@@ -542,4 +552,5 @@ class Label(LabelBase):
             raise RuntimeError("font is immutable when save_text is False")
 
     def _set_text(self, new_text, scale):
+        new_text = self._tab_text.join(new_text.split("\t"))
         self._reset_text(text=new_text, scale=self.scale)
