@@ -554,3 +554,12 @@ class Label(LabelBase):
     def _set_text(self, new_text, scale):
         new_text = self._tab_text.join(new_text.split("\t"))
         self._reset_text(text=new_text, scale=self.scale)
+
+    def _set_background_color(self, new_color):
+        self._background_color = new_color
+        if new_color is not None:
+            self.palette[0] = new_color
+            self.palette.make_opaque(0)
+        else:
+            self.palette[0] = 0
+            self.palette.make_transparent(0)
