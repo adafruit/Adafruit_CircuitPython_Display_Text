@@ -28,8 +28,10 @@ import displayio
 __version__ = "0.0.0-auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_Display_Text.git"
 
+from adafruit_display_text import LabelBase
 
-class Label(displayio.Group):
+
+class Label(LabelBase):
     """A label displaying a string of text that is stored in a bitmap.
     Note: This ``bitmap_label.py`` library utilizes a bitmap to display the text.
     This method is memory-conserving relative to ``label.py``.
@@ -75,81 +77,43 @@ class Label(displayio.Group):
     # Note: max_glyphs parameter is unnecessary, this is used for direct
     # compatibility with label.py
 
-    def __init__(
-        self,
-        font,
-        x=0,
-        y=0,
-        text="",
-        max_glyphs=None,  # This input parameter is ignored, only present for compatibility
-        # with label.py
-        color=0xFFFFFF,
-        background_color=None,
-        line_spacing=1.25,
-        background_tight=False,
-        padding_top=0,
-        padding_bottom=0,
-        padding_left=0,
-        padding_right=0,
-        anchor_point=None,
-        anchored_position=None,
-        save_text=True,  # can reduce memory use if save_text = False
-        scale=1,
-        base_alignment=False,
-        **kwargs,
-    ):
+    def __init__(self, font, **kwargs):
 
-        # instance the Group
-        # self Group will contain a single local_group which contains a Group (self.local_group)
-        # which contains a TileGrid (self.tilegrid) which contains the text bitmap (self.bitmap)
-        super().__init__(
-            max_size=1,
-            x=x,
-            y=y,
-            scale=1,
-            **kwargs,
-        )
-        # the self group scale should always remain at 1, the self.local_group will
-        # be used to set the scale
-        # **kwargs will pass any additional arguments provided to the Label
+        super().__init__(font, **kwargs)
 
         self.local_group = displayio.Group(
-            max_size=1, scale=scale
+            max_size=1, scale=kwargs.get("scale", 1)
         )  # local_group holds the tileGrid and sets the scaling
         self.append(
             self.local_group
         )  # the local_group will always stay in the self Group
 
-        self._font = font
-        self._text = text
+        self._text = kwargs.get("text", "")
 
         # Create the two-color palette
-        self.palette = displayio.Palette(2)
-        self.color = color
-        self.background_color = background_color
 
-        self._anchor_point = anchor_point
-        self._anchored_position = anchored_position
+        self.color = kwargs.get("color", 0xFFFFFF)
+        self.background_color = kwargs.get("background_color", None)
 
-        self.base_alignment = base_alignment
+        self.base_alignment = kwargs.get("base_alignment", False)
 
         # call the text updater with all the arguments.
         self._reset_text(
             font=font,
-            x=x,
-            y=y,
-            text=text,
-            line_spacing=line_spacing,
-            background_tight=background_tight,
-            padding_top=padding_top,
-            padding_bottom=padding_bottom,
-            padding_left=padding_left,
-            padding_right=padding_right,
-            anchor_point=anchor_point,
-            anchored_position=anchored_position,
-            save_text=save_text,
-            scale=scale,
-            base_alignment=base_alignment,
+            x=kwargs.get("x", 0),
+            y=kwargs.get("y", 0),
+            text=kwargs.get("text", ""),
+            line_spacing=kwargs.get("line_spacing", 1.25),
+            background_tight=kwargs.get("background_tight", False),
+            padding_top=kwargs.get("padding_top", 0),
+            padding_bottom=kwargs.get("padding_bottom", 0),
+            padding_left=kwargs.get("padding_left", 0),
+            padding_right=kwargs.get("padding_right", 0),
+            anchor_point=kwargs.get("anchor_point", None),
+            anchored_position=kwargs.get("anchored_position", None),
+            save_text=kwargs.get("save_text", True),
+            scale=kwargs.get("scale", 1),
+            base_alignment=kwargs.get("base_alignment", False),
         )
 
     def _reset_text(
@@ -312,30 +276,6 @@ class Label(displayio.Group):
             self._anchored_position
         )  # set the anchored_position with setter after bitmap is created, sets the
         # x,y positions of the label
-
-    def _get_ascent_descent(self):
-        """ Private function to calculate ascent and descent font values """
-        if hasattr(self.font, "ascent"):
-            return self.font.ascent, self.font.descent
-
-        # check a few glyphs for maximum ascender and descender height
-        glyphs = "M j'"  # choose glyphs with highest ascender and lowest
-        try:
-            self._font.load_glyphs(glyphs)
-        except AttributeError:
-            # Builtin font doesn't have or need load_glyphs
-            pass
-        # descender, will depend upon font used
-        ascender_max = descender_max = 0
-        for char in glyphs:
-            this_glyph = self._font.get_glyph(ord(char))
-            if this_glyph:
-                ascender_max = max(ascender_max, this_glyph.height + this_glyph.dy)
-                descender_max = max(descender_max, -this_glyph.dy)
-        return ascender_max, descender_max
-
-    def _get_ascent(self):
-        return self._get_ascent_descent()[0]
 
     @staticmethod
     def _line_spacing_ypixels(font, line_spacing):
@@ -588,119 +528,18 @@ class Label(displayio.Group):
                     elif y_placement > bitmap.height:
                         break
 
-    @property
-    def bounding_box(self):
-        """An (x, y, w, h) tuple that completely covers all glyphs. The
-        first two numbers are offset from the x, y origin of this group"""
-        return self._bounding_box
-
-    @property
-    def scale(self):
-        """Set the scaling of the label, in integer values"""
-        return self.local_group.scale
-
-    @scale.setter
-    def scale(self, new_scale):
-        self.local_group.scale = new_scale
-        self.anchored_position = self._anchored_position  # update the anchored_position
-
-    @property
-    def line_spacing(self):
-        """The amount of space between lines of text, in multiples of the font's
-        bounding-box height. (E.g. 1.0 is the bounding-box height)"""
-        return self._line_spacing
-
-    @line_spacing.setter
-    def line_spacing(self, new_line_spacing):
+    def _set_line_spacing(self, new_line_spacing):
         if self._save_text:
             self._reset_text(line_spacing=new_line_spacing, scale=self.scale)
         else:
             raise RuntimeError("line_spacing is immutable when save_text is False")
 
-    @property
-    def color(self):
-        """Color of the text as an RGB hex number."""
-        return self._color
-
-    @color.setter
-    def color(self, new_color):
-        self._color = new_color
-        if new_color is not None:
-            self.palette[1] = new_color
-            self.palette.make_opaque(1)
-        else:
-            self.palette[1] = 0
-            self.palette.make_transparent(1)
-
-    @property
-    def background_color(self):
-        """Color of the background as an RGB hex number."""
-        return self._background_color
-
-    @background_color.setter
-    def background_color(self, new_color):
-        self._background_color = new_color
-        if new_color is not None:
-            self.palette[0] = new_color
-            self.palette.make_opaque(0)
-        else:
-            self.palette[0] = 0
-            self.palette.make_transparent(0)
-
-    @property
-    def text(self):
-        """Text to be displayed."""
-        return self._text
-
-    @text.setter  # Cannot set color or background color with text setter, use separate setter
-    def text(self, new_text):
-        self._reset_text(text=new_text, scale=self.scale)
-
-    @property
-    def font(self):
-        """Font to use for text display."""
-        return self._font
-
-    @font.setter
-    def font(self, new_font):
+    def _set_font(self, new_font):
         self._font = new_font
         if self._save_text:
             self._reset_text(font=new_font, scale=self.scale)
         else:
             raise RuntimeError("font is immutable when save_text is False")
 
-    @property
-    def anchor_point(self):
-        """Point that anchored_position moves relative to.
-        Tuple with decimal percentage of width and height.
-        (E.g. (0,0) is top left, (1.0, 0.5): is middle right.)"""
-        return self._anchor_point
-
-    @anchor_point.setter
-    def anchor_point(self, new_anchor_point):
-        self._anchor_point = new_anchor_point
-        self.anchored_position = (
-            self._anchored_position
-        )  # update the anchored_position using setter
-
-    @property
-    def anchored_position(self):
-        """Position relative to the anchor_point. Tuple containing x,y
-        pixel coordinates."""
-        return self._anchored_position
-
-    @anchored_position.setter
-    def anchored_position(self, new_position):
-        self._anchored_position = new_position
-        # Set anchored_position
-        if (self._anchor_point is not None) and (self._anchored_position is not None):
-            self.x = int(
-                new_position[0]
-                - (self._bounding_box[0] * self.scale)
-                - round(self._anchor_point[0] * (self._bounding_box[2] * self.scale))
-            )
-            self.y = int(
-                new_position[1]
-                - (self._bounding_box[1] * self.scale)
-                - round(self._anchor_point[1] * self._bounding_box[3] * self.scale)
-            )
+    def _set_text(self, new_text, scale):
+        self._reset_text(text=new_text, scale=self.scale)

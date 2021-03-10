@@ -27,8 +27,10 @@ import displayio
 __version__ = "0.0.0-auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_Display_Text.git"
 
+from adafruit_display_text import LabelBase
 
-class Label(displayio.Group):
+
+class Label(LabelBase):
     """A label displaying a string of text. The origin point set by ``x`` and ``y``
     properties will be the left edge of the bounding box, and in the center of a M
     glyph (if its one line), or the (number of lines * linespacing + M)/2. That is,
@@ -66,96 +68,79 @@ class Label(displayio.Group):
     # pylint: disable=too-many-instance-attributes, too-many-locals
     # This has a lot of getters/setters, maybe it needs cleanup.
 
-    def __init__(
-        self,
-        font,
-        *,
-        x=0,
-        y=0,
-        text="",
-        max_glyphs=None,
-        color=0xFFFFFF,
-        background_color=None,
-        line_spacing=1.25,
-        background_tight=False,
-        padding_top=0,
-        padding_bottom=0,
-        padding_left=0,
-        padding_right=0,
-        anchor_point=None,
-        anchored_position=None,
-        scale=1,
-        base_alignment=False,
-        **kwargs
-    ):
+    def __init__(self, font, **kwargs):
+        super().__init__(font, **kwargs)
+
+        max_glyphs = kwargs.get("max_glyphs", None)
+        text = kwargs.get("text", None)
+
         if not max_glyphs and not text:
             raise RuntimeError("Please provide a max size, or initial text")
         if not max_glyphs:
             max_glyphs = len(text)
         # add one to max_size for the background bitmap tileGrid
 
-        # instance the Group
-        # self Group will contain a single local_group which contains a Group (self.local_group)
-        # which contains a TileGrid
-        # The self scale should always be 1
-        super().__init__(max_size=1, scale=1, **kwargs)
         # local_group will set the scale
-        self.local_group = displayio.Group(max_size=max_glyphs + 1, scale=scale)
+        self.local_group = displayio.Group(
+            max_size=max_glyphs + 1, scale=kwargs.get("scale", 1)
+        )
         self.append(self.local_group)
 
         self.width = max_glyphs
         self._font = font
         self._text = None
-        self._anchor_point = anchor_point
-        self.x = x
-        self.y = y
+        self._anchor_point = kwargs.get("anchor_point", None)
+        self.x = kwargs.get("x", 0)
+        self.y = kwargs.get("y", 0)
 
         self.height = self._font.get_bounding_box()[1]
-        self._line_spacing = line_spacing
-        self._boundingbox = None
+        self._line_spacing = kwargs.get("line_spacing", 1.25)
+        self._bounding_box = None
 
-        self._background_tight = (
-            background_tight  # sets padding status for text background box
-        )
+        self._background_tight = kwargs.get(
+            "background_tight", False
+        )  # sets padding status for text background box
 
         # Create the two-color text palette
         self.palette = displayio.Palette(2)
         self.palette[0] = 0
         self.palette.make_transparent(0)
-        self.color = color
+        self.color = kwargs.get("color", 0xFFFFFF)
 
-        self._background_color = background_color
+        self._background_color = kwargs.get("background_color", None)
         self._background_palette = displayio.Palette(1)
         self._added_background_tilegrid = False
 
-        self._padding_top = padding_top
-        self._padding_bottom = padding_bottom
-        self._padding_left = padding_left
-        self._padding_right = padding_right
-        self.base_alignment = base_alignment
+        self._padding_top = kwargs.get("padding_top", 0)
+        self._padding_bottom = kwargs.get("padding_bottom", 0)
+        self._padding_left = kwargs.get("padding_left", 0)
+        self._padding_right = kwargs.get("padding_right", 0)
+        self.base_alignment = kwargs.get("base_alignment", False)
 
         if text is not None:
             self._update_text(str(text))
-        if (anchored_position is not None) and (anchor_point is not None):
-            self.anchored_position = anchored_position
+        if (kwargs.get("anchored_position", None) is not None) and (
+            kwargs.get("anchor_point", None) is not None
+        ):
+            self.anchored_position = kwargs.get("anchored_position", None)
 
     def _create_background_box(self, lines, y_offset):
         """Private Class function to create a background_box
         :param lines: int number of lines
         :param y_offset: int y pixel bottom coordinate for the background_box"""
 
-        left = self._boundingbox[0]
+        left = self._bounding_box[0]
 
         if self._background_tight:  # draw a tight bounding box
-            box_width = self._boundingbox[2]
-            box_height = self._boundingbox[3]
+            box_width = self._bounding_box[2]
+            box_height = self._bounding_box[3]
             x_box_offset = 0
-            y_box_offset = self._boundingbox[1]
+            y_box_offset = self._bounding_box[1]
 
         else:  # draw a "loose" bounding box to include any ascenders/descenders.
             ascent, descent = self._get_ascent_descent()
 
-            box_width = self._boundingbox[2] + self._padding_left + self._padding_right
+            box_width = self._bounding_box[2] + self._padding_left + self._padding_right
             x_box_offset = -self._padding_left
             box_height = (
                 (ascent + descent)
@@ -181,30 +166,6 @@ class Label(displayio.Group):
 
         return tile_grid
 
-    def _get_ascent_descent(self):
-        """ Private function to calculate ascent and descent font values """
-        if hasattr(self.font, "ascent"):
-            return self.font.ascent, self.font.descent
-
-        # check a few glyphs for maximum ascender and descender height
-        glyphs = "M j'"  # choose glyphs with highest ascender and lowest
-        try:
-            self._font.load_glyphs(glyphs)
-        except AttributeError:
-            # Builtin font doesn't have or need load_glyphs
-            pass
-        # descender, will depend upon font used
-        ascender_max = descender_max = 0
-        for char in glyphs:
-            this_glyph = self._font.get_glyph(ord(char))
-            if this_glyph:
-                ascender_max = max(ascender_max, this_glyph.height + this_glyph.dy)
-                descender_max = max(descender_max, -this_glyph.dy)
-        return ascender_max, descender_max
-
-    def _get_ascent(self):
-        return self._get_ascent_descent()[0]
-
     def _update_background_color(self, new_color):
         """Private class function that allows updating the font box background color
         :param new_color: int color as an RGB hex number."""
@@ -227,10 +188,10 @@ class Label(displayio.Group):
             if (
                 (len(self._text) > 0)
                 and (
-                    self._boundingbox[2] + self._padding_left + self._padding_right > 0
+                    self._bounding_box[2] + self._padding_left + self._padding_right > 0
                 )
                 and (
-                    self._boundingbox[3] + self._padding_top + self._padding_bottom > 0
+                    self._bounding_box[3] + self._padding_top + self._padding_bottom > 0
                 )
             ):
                 # This can be simplified in CP v6.0, when group.append(0) bug is corrected
@@ -249,10 +210,10 @@ class Label(displayio.Group):
             if (
                 (len(self._text) > 0)
                 and (
-                    self._boundingbox[2] + self._padding_left + self._padding_right > 0
+                    self._bounding_box[2] + self._padding_left + self._padding_right > 0
                 )
                 and (
-                    self._boundingbox[3] + self._padding_top + self._padding_bottom > 0
+                    self._bounding_box[3] + self._padding_top + self._padding_bottom > 0
                 )
             ):
                 self.local_group[0] = self._create_background_box(lines, y_offset)
@@ -333,59 +294,12 @@ class Label(displayio.Group):
         while len(self.local_group) > tilegrid_count:  # i:
             self.local_group.pop()
         self._text = new_text
-        self._boundingbox = (left, top, right - left, bottom - top)
+        self._bounding_box = (left, top, right - left, bottom - top)
 
         if self.background_color is not None:
             self._update_background_color(self._background_color)
 
-    @property
-    def bounding_box(self):
-        """An (x, y, w, h) tuple that completely covers all glyphs. The
-        first two numbers are offset from the x, y origin of this group"""
-        return tuple(self._boundingbox)
-
-    @property
-    def line_spacing(self):
-        """The amount of space between lines of text, in multiples of the font's
-        bounding-box height. (E.g. 1.0 is the bounding-box height)"""
-        return self._line_spacing
-
-    @line_spacing.setter
-    def line_spacing(self, spacing):
-        self._line_spacing = spacing
-        self.text = self._text  # redraw the box
-
-    @property
-    def color(self):
-        """Color of the text as an RGB hex number."""
-        return self.palette[1]
-
-    @color.setter
-    def color(self, new_color):
-        self._color = new_color
-        if new_color is not None:
-            self.palette[1] = new_color
-            self.palette.make_opaque(1)
-        else:
-            self.palette[1] = 0
-            self.palette.make_transparent(1)
-
-    @property
-    def background_color(self):
-        """Color of the background as an RGB hex number."""
-        return self._background_color
-
-    @background_color.setter
-    def background_color(self, new_color):
-        self._update_background_color(new_color)
-
-    @property
-    def text(self):
-        """Text to display."""
-        return self._text
-
-    @text.setter
-    def text(self, new_text):
+    def _reset_text(self, new_text):
         try:
             current_anchored_position = self.anchored_position
             self._update_text(str(new_text))
@@ -393,24 +307,7 @@ class Label(displayio.Group):
         except RuntimeError as run_error:
             raise RuntimeError("Text length exceeds max_glyphs") from run_error
 
-    @property
-    def scale(self):
-        """Set the scaling of the label, in integer values"""
-        return self.local_group.scale
-
-    @scale.setter
-    def scale(self, new_scale):
-        current_anchored_position = self.anchored_position
-        self.local_group.scale = new_scale
-        self.anchored_position = current_anchored_position
-
-    @property
-    def font(self):
-        """Font to use for text display."""
-        return self._font
-
-    @font.setter
-    def font(self, new_font):
+    def _set_font(self, new_font):
         old_text = self._text
         current_anchored_position = self.anchored_position
         self._text = ""
@@ -419,52 +316,9 @@ class Label(displayio.Group):
         self._update_text(str(old_text))
         self.anchored_position = current_anchored_position
 
-    @property
-    def anchor_point(self):
-        """Point that anchored_position moves relative to.
-        Tuple with decimal percentage of width and height.
-        (E.g. (0,0) is top left, (1.0, 0.5): is middle right.)"""
-        return self._anchor_point
+    def _set_line_spacing(self, new_line_spacing):
+        self._line_spacing = new_line_spacing
+        self.text = self._text  # redraw the box
 
-    @anchor_point.setter
-    def anchor_point(self, new_anchor_point):
-        if self._anchor_point is not None:
-            current_anchored_position = self.anchored_position
-            self._anchor_point = new_anchor_point
-            self.anchored_position = current_anchored_position
-        else:
-            self._anchor_point = new_anchor_point
-
-    @property
-    def anchored_position(self):
-        """Position relative to the anchor_point. Tuple containing x,y
-        pixel coordinates."""
-        if self._anchor_point is None:
-            return None
-        return (
-            int(
-                self.x
-                + (self._boundingbox[0] * self.scale)
-                + round(self._anchor_point[0] * self._boundingbox[2] * self.scale)
-            ),
-            int(
-                self.y
-                + (self._boundingbox[1] * self.scale)
-                + round(self._anchor_point[1] * self._boundingbox[3] * self.scale)
-            ),
-        )
-
-    @anchored_position.setter
-    def anchored_position(self, new_position):
-        if (self._anchor_point is None) or (new_position is None):
-            return  # Note: anchor_point must be set before setting anchored_position
-        self.x = int(
-            new_position[0]
-            - (self._boundingbox[0] * self.scale)
-            - round(self._anchor_point[0] * (self._boundingbox[2] * self.scale))
-        )
-        self.y = int(
-            new_position[1]
-            - (self._boundingbox[1] * self.scale)
-            - round(self._anchor_point[1] * self._boundingbox[3] * self.scale)
-        )
+    def _set_text(self, new_text, scale):
+        self._reset_text(new_text)
