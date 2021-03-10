@@ -331,10 +331,7 @@ class LabelBase(Group):
                 - round(self._anchor_point[0] * (self._bounding_box[2] * self.scale))
             )
             if self._anchor_point[1] == self.baseline:
-                self.y = int(
-                    new_position[1]
-                    - (self._y_offset * self.scale)
-                )
+                self.y = int(new_position[1] - (self._y_offset * self.scale))
             else:
                 self.y = int(
                     new_position[1]
