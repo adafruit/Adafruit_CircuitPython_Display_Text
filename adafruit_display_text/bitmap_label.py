@@ -418,15 +418,37 @@ class Label(LabelBase):
                     )  # for type BuiltinFont, this creates the x-offset in the glyph bitmap.
                     # for BDF loaded fonts, this should equal 0
 
+                    y_blit_target = yposition - my_glyph.height - my_glyph.dy
+
+                    # Clip glyph y-direction if outside the font ascent/descent metrics.
+                    # Note: bitmap.blit will automatically clip the bottom of the glyph.
+                    y_clip = 0
+                    if (y_blit_target) < 0:
+                        y_clip = -(y_blit_target)  # clip this amount from top of bitmap
+                        y_blit_target = 0  # draw the clipped bitmap at y=0
+
+                        print(
+                            'Warning: Glyph clipped, exceeds Ascent property: "{}"'.format(
+                                char
+                            )
+                        )
+
+                    if (y_blit_target + my_glyph.height) > bitmap.height:
+                        print(
+                            'Warning: Glyph clipped, exceeds descent property: "{}"'.format(
+                                char
+                            )
+                        )
+
                     self._blit(
                         bitmap,
                         xposition + my_glyph.dx,
-                        yposition - my_glyph.height - my_glyph.dy,
+                        y_blit_target,
                         my_glyph.bitmap,
                         x_1=glyph_offset_x,
-                        y_1=0,
+                        y_1=y_clip,
                         x_2=glyph_offset_x + my_glyph.width,
-                        y_2=0 + my_glyph.height,
+                        y_2=my_glyph.height,
                         skip_index=skip_index,  # do not copy over any 0 background pixels
                     )
 
