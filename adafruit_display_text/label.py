@@ -330,3 +330,6 @@ class Label(LabelBase):
 
     def _set_text(self, new_text: str, scale: int) -> None:
         self._reset_text(new_text)
+
+    def _set_background_color(self, new_color):
+        self._update_background_color(new_color)
