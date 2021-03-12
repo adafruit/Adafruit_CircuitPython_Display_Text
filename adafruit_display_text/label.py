@@ -343,6 +343,7 @@ class LabelT(Label):
     :param theme str: Theme to utilize to display the label
     """
 
+    # pylint: disable=import-outside-toplevel
     def __init__(self, font, theme: str, **kwargs):
         from adafruit_display_text import get_hex
         from adafruit_display_text import styles
@@ -357,4 +358,5 @@ class LabelT(Label):
         :param int columns: number of columns to display the list
         """
         themes = list(self.styles.keys())
-        [print(themes[i: i + columns]) for i in range(0, len(themes), columns)]
+        for i in range(0, len(themes), columns):
+            print(themes[i : i + columns])
