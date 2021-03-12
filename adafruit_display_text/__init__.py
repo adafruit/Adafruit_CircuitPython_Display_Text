@@ -144,6 +144,12 @@ def wrap_text_to_lines(string, max_chars):
     return the_lines
 
 
+def get_hex(color: str) -> int:
+    """Function to convert Color styles to HEX
+    :param str color: string representation of Hex color"""
+    return int(color[1:], 16)
+
+
 class LabelBase(Group):
     """Super class that all other types of labels will extend. This contains
     all of the properties and functions that work the same way in all labels.

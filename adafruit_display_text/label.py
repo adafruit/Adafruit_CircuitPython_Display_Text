@@ -332,3 +332,27 @@ class Label(LabelBase):
 
     def _set_background_color(self, new_color):
         self._update_background_color(new_color)
+
+
+class LabelT(Label):
+    """This label has the same functionalities as Label. It use a theme to display
+    different colors according to selected theme.
+
+    :param Font font: A font class that has ``get_bounding_box`` and ``get_glyph``.
+      Must include a capital M for measuring character size.
+    :param theme str: Theme to utilize to display the label
+    """
+    def __init__(self, font, theme: str, **kwargs):
+        from adafruit_display_text import get_hex
+        from adafruit_display_text import styles
+        self.styles = styles.THEME
+        colorth = get_hex(self.styles[theme]["TEXT"])
+        backgroundth = get_hex(self.styles[theme]["BACKGROUND"])
+        super().__init__(font, color=colorth, background_color=backgroundth, **kwargs)
+
+    def display_themes(self, columns: int) -> None:
+        """Returns the list of themes
+        :param int columns: number of columns to display the list
+        """
+        themes = list(self.styles.keys())
+        [print(themes[i: i + columns]) for i in range(0, len(themes), columns)]
