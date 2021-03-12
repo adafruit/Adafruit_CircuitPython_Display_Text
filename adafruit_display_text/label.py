@@ -342,9 +342,11 @@ class LabelT(Label):
       Must include a capital M for measuring character size.
     :param theme str: Theme to utilize to display the label
     """
+
     def __init__(self, font, theme: str, **kwargs):
         from adafruit_display_text import get_hex
         from adafruit_display_text import styles
+
         self.styles = styles.THEME
         colorth = get_hex(self.styles[theme]["TEXT"])
         backgroundth = get_hex(self.styles[theme]["BACKGROUND"])
