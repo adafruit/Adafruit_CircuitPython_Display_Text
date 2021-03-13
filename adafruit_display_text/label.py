@@ -75,7 +75,7 @@ class Label(LabelBase):
         super().__init__(font, **kwargs)
 
         max_glyphs = kwargs.get("max_glyphs", None)
-        text = kwargs.get("text", None)
+        text = kwargs.get("text", "")
 
         if not max_glyphs and not text:
             raise RuntimeError("Please provide a max size, or initial text")
