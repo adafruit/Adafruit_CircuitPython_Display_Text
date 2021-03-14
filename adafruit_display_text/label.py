@@ -205,7 +205,6 @@ class Label(LabelBase):
             y=movy,
         )
 
-
         return tile_grid
 
     def _update_background_color(self, new_color: int) -> None:
@@ -258,11 +257,12 @@ class Label(LabelBase):
                     self._bounding_box[3] + self._padding_top + self._padding_bottom > 0
                 )
             ):
-                self.local_group[0] = self._create_background_box(lines, y_offset)
+                self.local_group[0] = self._create_background_box(lines, self._y_offset)
             else:  # delete the existing bitmap
                 self.local_group.pop(0)
                 self._added_background_tilegrid = False
 
+    # pylint: disable = too-many-branches, too-many-statements
     def _update_text(
         self, new_text: str
     ) -> None:  # pylint: disable=too-many-locals ,too-many-branches, too-many-statements
@@ -298,10 +298,10 @@ class Label(LabelBase):
                 continue
 
             if self.label_type == "LTR" or self.label_type == "RTL":
-                bottom = max(bottom, y - glyph.dy + y_offset)
+                bottom = max(bottom, y - glyph.dy + self._y_offset)
                 if y == 0:  # first line, find the Ascender height
-                    top = min(top, -glyph.height - glyph.dy + y_offset)
-                position_y = y - glyph.height - glyph.dy + y_offset
+                    top = min(top, -glyph.height - glyph.dy + self._y_offset)
+                position_y = y - glyph.height - glyph.dy + self._y_offset
 
                 if self.label_type == "LTR":
                     right = max(right, x + glyph.shift_x, x + glyph.width + glyph.dx)
@@ -336,7 +336,7 @@ class Label(LabelBase):
                     right, x + glyph.width + glyph.dx, x + glyph.shift_x + glyph.dx
                 )
                 position_y = y + glyph.dy
-                position_x = x - glyph.width // 2 + y_offset
+                position_x = x - glyph.width // 2 + self._y_offset
 
             if self.label_type == "UPR":
                 if x == 0:
@@ -345,11 +345,11 @@ class Label(LabelBase):
 
                 if y == 0:  # first line, find the Ascender height
                     bottom = min(bottom, -glyph.dy)
-                left = min(left, x - glyph.height + y_offset)
+                left = min(left, x - glyph.height + self._y_offset)
                 top = min(top, y - glyph.width - glyph.dx, y - glyph.shift_x)
                 right = max(right, x + glyph.height, x + glyph.height - glyph.dy)
                 position_y = y - glyph.width - glyph.dx
-                position_x = x - glyph.height - glyph.dy + y_offset
+                position_x = x - glyph.height - glyph.dy + self._y_offset
 
             if self.label_type == "DWR":
                 if y == 0:
@@ -358,11 +358,11 @@ class Label(LabelBase):
                 top = min(top, -glyph.dx)
                 if x == 0:
                     left = min(left, -glyph.dy)
-                left = min(left, x, x - glyph.dy - y_offset)
+                left = min(left, x, x - glyph.dy - self._y_offset)
                 bottom = max(bottom, y + glyph.width + glyph.dx, y + glyph.shift_x)
                 right = max(right, x + glyph.height)
                 position_y = y + glyph.dx
-                position_x = x + glyph.dy - y_offset
+                position_x = x + glyph.dy - self._y_offset
 
             if glyph.width > 0 and glyph.height > 0:
                 try:
@@ -424,7 +424,7 @@ class Label(LabelBase):
 
         while len(self.local_group) > tilegrid_count:  # i:
             self.local_group.pop()
-
+        # pylint: disable=invalid-unary-operand-type
         if self.label_type == "RTL":
             self._bounding_box = (-left, top, left - right, bottom - top)
         if self.label_type == "TTB":
