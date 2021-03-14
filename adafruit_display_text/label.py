@@ -64,14 +64,14 @@ class Label(LabelBase):
     :param int scale: Integer value of the pixel scaling
     :param bool base_alignment: when True allows to align text label to the baseline.
      This is helpful when two or more labels need to be aligned to the same baseline
-    :param: (int,str) tab_replacement: tuple with tab character replace information. When
+    :param (int,str) tab_replacement: tuple with tab character replace information. When
      (4, " ") will indicate a tab replacement of 4 spaces, defaults to 4 spaces by
      tab character"""
 
     # pylint: disable=too-many-instance-attributes, too-many-locals
     # This has a lot of getters/setters, maybe it needs cleanup.
 
-    def __init__(self, font, **kwargs):
+    def __init__(self, font, **kwargs) -> None:
         super().__init__(font, **kwargs)
 
         max_glyphs = kwargs.get("max_glyphs", None)
@@ -130,7 +130,7 @@ class Label(LabelBase):
         ):
             self.anchored_position = kwargs.get("anchored_position", None)
 
-    def _create_background_box(self, lines, y_offset):
+    def _create_background_box(self, lines: int, y_offset: int) -> None:
         """Private Class function to create a background_box
         :param lines: int number of lines
         :param y_offset: int y pixel bottom coordinate for the background_box"""
@@ -172,7 +172,7 @@ class Label(LabelBase):
 
         return tile_grid
 
-    def _update_background_color(self, new_color):
+    def _update_background_color(self, new_color: int) -> None:
         """Private class function that allows updating the font box background color
         :param new_color: int color as an RGB hex number."""
 
@@ -227,9 +227,10 @@ class Label(LabelBase):
                 self.local_group.pop(0)
                 self._added_background_tilegrid = False
 
+    # pylint: disable = too-many-branches, too-many-statements
     def _update_text(
-        self, new_text
-    ):  # pylint: disable=too-many-locals ,too-many-branches, too-many-statements
+        self, new_text: str
+    ) -> None:  # pylint: disable=too-many-locals ,too-many-branches, too-many-statements
         x = 0
         y = 0
         if self._added_background_tilegrid:
@@ -238,9 +239,9 @@ class Label(LabelBase):
             i = 0
         tilegrid_count = i
         if self.base_alignment:
-            y_offset = 0
+            self._y_offset = 0
         else:
-            y_offset = self._get_ascent() // 2
+            self._y_offset = self._get_ascent() // 2
 
         right = top = bottom = 0
         left = None
@@ -260,9 +261,9 @@ class Label(LabelBase):
                 else:
                     left = min(left, glyph.dx)
             if y == 0:  # first line, find the Ascender height
-                top = min(top, -glyph.height - glyph.dy + y_offset)
-            bottom = max(bottom, y - glyph.dy + y_offset)
-            position_y = y - glyph.height - glyph.dy + y_offset
+                top = min(top, -glyph.height - glyph.dy + self._y_offset)
+            bottom = max(bottom, y - glyph.dy + self._y_offset)
+            position_y = y - glyph.height - glyph.dy + self._y_offset
             position_x = x + glyph.dx
             if glyph.width > 0 and glyph.height > 0:
                 try:
@@ -305,7 +306,7 @@ class Label(LabelBase):
         if self.background_color is not None:
             self._update_background_color(self._background_color)
 
-    def _reset_text(self, new_text):
+    def _reset_text(self, new_text: str) -> None:
         new_text = self._tab_text.join(new_text.split("\t"))
         try:
             current_anchored_position = self.anchored_position
@@ -314,7 +315,7 @@ class Label(LabelBase):
         except RuntimeError as run_error:
             raise RuntimeError("Text length exceeds max_glyphs") from run_error
 
-    def _set_font(self, new_font):
+    def _set_font(self, new_font) -> None:
         old_text = self._text
         current_anchored_position = self.anchored_position
         self._text = ""
@@ -323,11 +324,11 @@ class Label(LabelBase):
         self._update_text(str(old_text))
         self.anchored_position = current_anchored_position
 
-    def _set_line_spacing(self, new_line_spacing):
+    def _set_line_spacing(self, new_line_spacing: float) -> None:
         self._line_spacing = new_line_spacing
         self.text = self._text  # redraw the box
 
-    def _set_text(self, new_text, scale):
+    def _set_text(self, new_text: str, scale: int) -> None:
         self._reset_text(new_text)
 
     def _set_background_color(self, new_color):
