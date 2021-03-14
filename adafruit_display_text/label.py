@@ -125,6 +125,7 @@ class Label(LabelBase):
         self._padding_left = kwargs.get("padding_left", 0)
         self._padding_right = kwargs.get("padding_right", 0)
         self.base_alignment = kwargs.get("base_alignment", False)
+        self.label_type = kwargs.get("label_direction", "LTR")
 
         if text is not None:
             self._update_text(str(text))
@@ -139,7 +140,6 @@ class Label(LabelBase):
         :param y_offset: int y pixel bottom coordinate for the background_box"""
 
         left = self._bounding_box[0]
-
         if self._background_tight:  # draw a tight bounding box
             box_width = self._bounding_box[2]
             box_height = self._bounding_box[3]
@@ -149,14 +149,33 @@ class Label(LabelBase):
         else:  # draw a "loose" bounding box to include any ascenders/descenders.
             ascent, descent = self._get_ascent_descent()
 
-            box_width = self._bounding_box[2] + self._padding_left + self._padding_right
-            x_box_offset = -self._padding_left
-            box_height = (
-                (ascent + descent)
-                + int((lines - 1) * self.height * self._line_spacing)
-                + self._padding_top
-                + self._padding_bottom
-            )
+            if (
+                self.label_type == "UPR"
+                or self.label_type == "DWR"
+                or self.label_type == "TTB"
+            ):
+                box_height = (
+                    self._bounding_box[3] + self._padding_top + self._padding_bottom
+                )
+                x_box_offset = -self._padding_bottom
+                box_width = (
+                    (ascent + descent)
+                    + int((lines - 1) * self.width * self._line_spacing)
+                    + self._padding_left
+                    + self._padding_right
+                )
+            else:
+                box_width = (
+                    self._bounding_box[2] + self._padding_left + self._padding_right
+                )
+                x_box_offset = -self._padding_left
+                box_height = (
+                    (ascent + descent)
+                    + int((lines - 1) * self.height * self._line_spacing)
+                    + self._padding_top
+                    + self._padding_bottom
+                )
+
             if self.base_alignment:
                 y_box_offset = -ascent - self._padding_top
             else:
@@ -165,17 +184,31 @@ class Label(LabelBase):
         box_width = max(0, box_width)  # remove any negative values
         box_height = max(0, box_height)  # remove any negative values
 
+        if self.label_type == "UPR":
+            movx = left + x_box_offset
+            movy = -box_height - x_box_offset
+        elif self.label_type == "DWR":
+            movx = left + x_box_offset
+            movy = x_box_offset
+        elif self.label_type == "TTB":
+            movx = left + x_box_offset
+            movy = x_box_offset
+        else:
+            movx = left + x_box_offset
+            movy = y_box_offset
+
         background_bitmap = displayio.Bitmap(box_width, box_height, 1)
         tile_grid = displayio.TileGrid(
             background_bitmap,
             pixel_shader=self._background_palette,
-            x=left + x_box_offset,
-            y=y_box_offset,
+            x=movx,
+            y=movy,
         )
+
 
         return tile_grid
 
-    def _update_background_color(self, new_color):
+    def _update_background_color(self, new_color: int) -> None:
         """Private class function that allows updating the font box background color
         :param new_color: int color as an RGB hex number."""
 
@@ -231,8 +264,8 @@ class Label(LabelBase):
                 self._added_background_tilegrid = False
 
     def _update_text(
-        self, new_text
-    ):  # pylint: disable=too-many-locals ,too-many-branches, too-many-statements
+        self, new_text: str
+    ) -> None:  # pylint: disable=too-many-locals ,too-many-branches, too-many-statements
         x = 0
         y = 0
         if self._added_background_tilegrid:
@@ -245,8 +278,15 @@ class Label(LabelBase):
         else:
             self._y_offset = self._get_ascent() // 2
 
-        right = top = bottom = 0
-        left = None
+        if self.label_type == "RTL":
+            left = top = bottom = 0
+            right = None
+        elif self.label_type == "LTR":
+            right = top = bottom = 0
+            left = None
+        else:
+            top = right = left = 0
+            bottom = 0
 
         for character in new_text:
             if character == "\n":
@@ -256,17 +296,74 @@ class Label(LabelBase):
             glyph = self._font.get_glyph(ord(character))
             if not glyph:
                 continue
-            right = max(right, x + glyph.shift_x, x + glyph.width + glyph.dx)
-            if x == 0:
-                if left is None:
-                    left = glyph.dx
+
+            if self.label_type == "LTR" or self.label_type == "RTL":
+                bottom = max(bottom, y - glyph.dy + y_offset)
+                if y == 0:  # first line, find the Ascender height
+                    top = min(top, -glyph.height - glyph.dy + y_offset)
+                position_y = y - glyph.height - glyph.dy + y_offset
+
+                if self.label_type == "LTR":
+                    right = max(right, x + glyph.shift_x, x + glyph.width + glyph.dx)
+                    if x == 0:
+                        if left is None:
+                            left = glyph.dx
+                        else:
+                            left = min(left, glyph.dx)
+                    position_x = x + glyph.dx
                 else:
-                    left = min(left, glyph.dx)
-            if y == 0:  # first line, find the Ascender height
-                top = min(top, -glyph.height - glyph.dy + self._y_offset)
-            bottom = max(bottom, y - glyph.dy + self._y_offset)
-            position_y = y - glyph.height - glyph.dy + self._y_offset
-            position_x = x + glyph.dx
+                    left = max(
+                        left, abs(x) + glyph.shift_x, abs(x) + glyph.width + glyph.dx
+                    )
+                    if x == 0:
+                        if right is None:
+                            right = glyph.dx
+                        else:
+                            right = max(right, glyph.dx)
+                    position_x = x - glyph.width
+
+            if self.label_type == "TTB":
+                if x == 0:
+                    if left is None:
+                        left = glyph.dx
+                    else:
+                        left = min(left, glyph.dx)
+                if y == 0:
+                    top = min(top, -glyph.dy)
+
+                bottom = max(bottom, y + glyph.height, y + glyph.height + glyph.dy)
+                right = max(
+                    right, x + glyph.width + glyph.dx, x + glyph.shift_x + glyph.dx
+                )
+                position_y = y + glyph.dy
+                position_x = x - glyph.width // 2 + y_offset
+
+            if self.label_type == "UPR":
+                if x == 0:
+                    if bottom is None:
+                        bottom = -glyph.dx
+
+                if y == 0:  # first line, find the Ascender height
+                    bottom = min(bottom, -glyph.dy)
+                left = min(left, x - glyph.height + y_offset)
+                top = min(top, y - glyph.width - glyph.dx, y - glyph.shift_x)
+                right = max(right, x + glyph.height, x + glyph.height - glyph.dy)
+                position_y = y - glyph.width - glyph.dx
+                position_x = x - glyph.height - glyph.dy + y_offset
+
+            if self.label_type == "DWR":
+                if y == 0:
+                    if top is None:
+                        top = -glyph.dx
+                top = min(top, -glyph.dx)
+                if x == 0:
+                    left = min(left, -glyph.dy)
+                left = min(left, x, x - glyph.dy - y_offset)
+                bottom = max(bottom, y + glyph.width + glyph.dx, y + glyph.shift_x)
+                right = max(right, x + glyph.height)
+                position_y = y + glyph.dx
+                position_x = x + glyph.dy - y_offset
+
             if glyph.width > 0 and glyph.height > 0:
                 try:
                     # pylint: disable=unexpected-keyword-arg
@@ -288,27 +385,63 @@ class Label(LabelBase):
                         x=position_x,
                         y=position_y,
                     )
+
+                if self.label_type == "UPR":
+                    face.transpose_xy = True
+                    face.flip_x = True
+                if self.label_type == "DWR":
+                    face.transpose_xy = True
+                    face.flip_y = True
+
                 if tilegrid_count < len(self.local_group):
                     self.local_group[tilegrid_count] = face
                 else:
                     self.local_group.append(face)
                 tilegrid_count += 1
-            x += glyph.shift_x
-            i += 1
-        # Remove the rest
 
-        if left is None:
+            if self.label_type == "RTL":
+                x = x - glyph.shift_x
+            if self.label_type == "TTB":
+                if glyph.height < 2:
+                    y = y + glyph.shift_x
+                else:
+                    y = y + glyph.height + 1
+            if self.label_type == "UPR":
+                y = y - glyph.shift_x
+            if self.label_type == "DWR":
+                y = y + glyph.shift_x
+            if self.label_type == "LTR":
+                x = x + glyph.shift_x
+
+            i += 1
+
+        if self.label_type == "LTR" and left is None:
             left = 0
+        if self.label_type == "RTL" and right is None:
+            right = 0
+        if self.label_type == "TTB" and top is None:
+            top = 0
 
         while len(self.local_group) > tilegrid_count:  # i:
             self.local_group.pop()
+
+        if self.label_type == "RTL":
+            self._bounding_box = (-left, top, left - right, bottom - top)
+        if self.label_type == "TTB":
+            self._bounding_box = (left, top, right - left, bottom - top)
+        if self.label_type == "UPR":
+            self._bounding_box = (left, top, right, bottom - top)
+        if self.label_type == "DWR":
+            self._bounding_box = (left, top, right, bottom - top)
+        if self.label_type == "LTR":
+            self._bounding_box = (left, top, right - left, bottom - top)
+
         self._text = new_text
-        self._bounding_box = (left, top, right - left, bottom - top)
 
         if self.background_color is not None:
             self._update_background_color(self._background_color)
 
-    def _reset_text(self, new_text):
+    def _reset_text(self, new_text: str) -> None:
         new_text = self._tab_text.join(new_text.split("\t"))
         try:
             current_anchored_position = self.anchored_position
@@ -317,7 +450,7 @@ class Label(LabelBase):
         except RuntimeError as run_error:
             raise RuntimeError("Text length exceeds max_glyphs") from run_error
 
-    def _set_font(self, new_font):
+    def _set_font(self, new_font) -> None:
         old_text = self._text
         current_anchored_position = self.anchored_position
         self._text = ""
@@ -326,11 +459,11 @@ class Label(LabelBase):
         self._update_text(str(old_text))
         self.anchored_position = current_anchored_position
 
-    def _set_line_spacing(self, new_line_spacing):
+    def _set_line_spacing(self, new_line_spacing: float) -> None:
         self._line_spacing = new_line_spacing
         self.text = self._text  # redraw the box
 
-    def _set_text(self, new_text, scale):
+    def _set_text(self, new_text: str, scale: int) -> None:
         self._reset_text(new_text)
 
     def _set_background_color(self, new_color):
