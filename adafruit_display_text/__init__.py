@@ -5,7 +5,6 @@
 """
 Display Text module helper functions
 """
-
 try:
     from typing import Tuple
 except ImportError:
@@ -297,12 +296,12 @@ class LabelBase(Group):
         """Color of the background as an RGB hex number."""
         return self._background_color
 
-    def _set_background_color(self, new_color: int) -> None:
+    def _set_background_color(self, new_color):
         # subclasses should override this
         pass
 
     @background_color.setter
-    def background_color(self, new_color: int):
+    def background_color(self, new_color: int) -> None:
         self._set_background_color(new_color)
 
     @property
