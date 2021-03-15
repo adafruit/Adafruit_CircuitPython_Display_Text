@@ -278,7 +278,7 @@ class Label(LabelBase):
         else:
             self._y_offset = self._get_ascent() // 2
 
-        if self._label_direction== "RTL":
+        if self._label_direction == "RTL":
             left = top = bottom = 0
             right = None
         elif self._label_direction == "LTR":
@@ -469,7 +469,7 @@ class Label(LabelBase):
     def _set_background_color(self, new_color: int) -> None:
         self._update_background_color(new_color)
 
-    def _set_label_direction(self, new_line_direction: str) -> None:
-        self._label_direction = new_line_direction
+    def _set_label_direction(self, new_label_direction: str) -> None:
+        self._label_direction = new_label_direction
         old_text = self._text
         self._update_text(str(old_text))
