@@ -125,7 +125,7 @@ class Label(LabelBase):
         self._padding_left = kwargs.get("padding_left", 0)
         self._padding_right = kwargs.get("padding_right", 0)
         self.base_alignment = kwargs.get("base_alignment", False)
-        self.label_type = kwargs.get("label_direction", "LTR")
+        self._label_direction = kwargs.get("label_direction", "LTR")
 
         if text is not None:
             self._update_text(str(text))
@@ -150,9 +150,9 @@ class Label(LabelBase):
             ascent, descent = self._get_ascent_descent()
 
             if (
-                self.label_type == "UPR"
-                or self.label_type == "DWR"
-                or self.label_type == "TTB"
+                self._label_direction == "UPR"
+                or self._label_direction == "DWR"
+                or self._label_direction == "TTB"
             ):
                 box_height = (
                     self._bounding_box[3] + self._padding_top + self._padding_bottom
@@ -184,13 +184,13 @@ class Label(LabelBase):
         box_width = max(0, box_width)  # remove any negative values
         box_height = max(0, box_height)  # remove any negative values
 
-        if self.label_type == "UPR":
+        if self._label_direction == "UPR":
             movx = left + x_box_offset
             movy = -box_height - x_box_offset
-        elif self.label_type == "DWR":
+        elif self._label_direction == "DWR":
             movx = left + x_box_offset
             movy = x_box_offset
-        elif self.label_type == "TTB":
+        elif self._label_direction == "TTB":
             movx = left + x_box_offset
             movy = x_box_offset
         else:
@@ -278,10 +278,10 @@ class Label(LabelBase):
         else:
             self._y_offset = self._get_ascent() // 2
 
-        if self.label_type == "RTL":
+        if self._label_direction== "RTL":
             left = top = bottom = 0
             right = None
-        elif self.label_type == "LTR":
+        elif self._label_direction == "LTR":
             right = top = bottom = 0
             left = None
         else:
@@ -297,13 +297,13 @@ class Label(LabelBase):
             if not glyph:
                 continue
 
-            if self.label_type == "LTR" or self.label_type == "RTL":
+            if self._label_direction == "LTR" or self._label_direction == "RTL":
                 bottom = max(bottom, y - glyph.dy + self._y_offset)
                 if y == 0:  # first line, find the Ascender height
                     top = min(top, -glyph.height - glyph.dy + self._y_offset)
                 position_y = y - glyph.height - glyph.dy + self._y_offset
 
-                if self.label_type == "LTR":
+                if self._label_direction == "LTR":
                     right = max(right, x + glyph.shift_x, x + glyph.width + glyph.dx)
                     if x == 0:
                         if left is None:
@@ -322,7 +322,7 @@ class Label(LabelBase):
                             right = max(right, glyph.dx)
                     position_x = x - glyph.width
 
-            if self.label_type == "TTB":
+            if self._label_direction == "TTB":
                 if x == 0:
                     if left is None:
                         left = glyph.dx
@@ -338,7 +338,7 @@ class Label(LabelBase):
                 position_y = y + glyph.dy
                 position_x = x - glyph.width // 2 + self._y_offset
 
-            if self.label_type == "UPR":
+            if self._label_direction == "UPR":
                 if x == 0:
                     if bottom is None:
                         bottom = -glyph.dx
@@ -351,7 +351,7 @@ class Label(LabelBase):
                 position_y = y - glyph.width - glyph.dx
                 position_x = x - glyph.height - glyph.dy + self._y_offset
 
-            if self.label_type == "DWR":
+            if self._label_direction == "DWR":
                 if y == 0:
                     if top is None:
                         top = -glyph.dx
@@ -386,10 +386,10 @@ class Label(LabelBase):
                         y=position_y,
                     )
 
-                if self.label_type == "UPR":
+                if self._label_direction == "UPR":
                     face.transpose_xy = True
                     face.flip_x = True
-                if self.label_type == "DWR":
+                if self._label_direction == "DWR":
                     face.transpose_xy = True
                     face.flip_y = True
 
@@ -399,41 +399,41 @@ class Label(LabelBase):
                     self.local_group.append(face)
                 tilegrid_count += 1
 
-            if self.label_type == "RTL":
+            if self._label_direction == "RTL":
                 x = x - glyph.shift_x
-            if self.label_type == "TTB":
+            if self._label_direction == "TTB":
                 if glyph.height < 2:
                     y = y + glyph.shift_x
                 else:
                     y = y + glyph.height + 1
-            if self.label_type == "UPR":
+            if self._label_direction == "UPR":
                 y = y - glyph.shift_x
-            if self.label_type == "DWR":
+            if self._label_direction == "DWR":
                 y = y + glyph.shift_x
-            if self.label_type == "LTR":
+            if self._label_direction == "LTR":
                 x = x + glyph.shift_x
 
             i += 1
 
-        if self.label_type == "LTR" and left is None:
+        if self._label_direction == "LTR" and left is None:
             left = 0
-        if self.label_type == "RTL" and right is None:
+        if self._label_direction == "RTL" and right is None:
             right = 0
-        if self.label_type == "TTB" and top is None:
+        if self._label_direction == "TTB" and top is None:
             top = 0
 
         while len(self.local_group) > tilegrid_count:  # i:
             self.local_group.pop()
         # pylint: disable=invalid-unary-operand-type
-        if self.label_type == "RTL":
+        if self._label_direction == "RTL":
             self._bounding_box = (-left, top, left - right, bottom - top)
-        if self.label_type == "TTB":
+        if self._label_direction == "TTB":
             self._bounding_box = (left, top, right - left, bottom - top)
-        if self.label_type == "UPR":
+        if self._label_direction == "UPR":
             self._bounding_box = (left, top, right, bottom - top)
-        if self.label_type == "DWR":
+        if self._label_direction == "DWR":
             self._bounding_box = (left, top, right, bottom - top)
-        if self.label_type == "LTR":
+        if self._label_direction == "LTR":
             self._bounding_box = (left, top, right - left, bottom - top)
 
         self._text = new_text
@@ -466,5 +466,10 @@ class Label(LabelBase):
     def _set_text(self, new_text: str, scale: int) -> None:
         self._reset_text(new_text)
 
-    def _set_background_color(self, new_color):
+    def _set_background_color(self, new_color: int) -> None:
         self._update_background_color(new_color)
+
+    def _set_label_direction(self, new_line_direction: str) -> None:
+        self._label_direction = new_line_direction
+        old_text = self._text
+        self._update_text(str(old_text))

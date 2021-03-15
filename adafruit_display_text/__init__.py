@@ -230,6 +230,11 @@ class LabelBase(Group):
         self.local_group = None
 
         self._text = text
+
+        if label_direction not in ["LTR", "RTL", "UPR", "DWR", "TTB"]:
+            raise RuntimeError("Please provide a valid text direction")
+        self._label_direction = label_direction
+
         self.baseline = -1.0
 
         self.base_alignment = base_alignment
@@ -388,3 +393,19 @@ class LabelBase(Group):
     @line_spacing.setter
     def line_spacing(self, new_line_spacing: float) -> None:
         self._set_line_spacing(new_line_spacing)
+
+    @property
+    def label_direction(self) -> str:
+        """Set the text direction of the label"""
+        return self._label_direction
+
+    def _set_label_direction(self, new_label_direction: str) -> None:
+        # subclass should override this.
+        pass
+
+    @label_direction.setter
+    def label_direction(self, new_label_direction: str) -> None:
+        """Set the text direction of the label"""
+        if new_label_direction not in ["LTR", "RTL", "UPR", "DWR", "TTB"]:
+            raise RuntimeError("Please provide a valid text direction")
+        self._set_label_direction(new_label_direction)
