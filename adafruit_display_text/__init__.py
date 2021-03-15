@@ -186,7 +186,8 @@ class LabelBase(Group):
      tab character
     :param str label_direction: string defining the label text orientation. There are 5
      configurations possibles ``LTR``-Left-To-Right ``RTL``-Right-To-Left
-     ``TTB``-Top-To-Bottom ``UPR``-Upwards ``DWR``-Downwards. It defaults to ``LTR``"""
+     ``TTB``-Top-To-Bottom ``UPR``-Upwards ``DWR``-Downwards. It defaults to ``LTR``
+    :param str label_style: string indicating style to be applied to the label"""
 
     # pylint: disable=unused-argument,  too-many-instance-attributes, too-many-locals, too-many-arguments
     def __init__(
@@ -211,6 +212,7 @@ class LabelBase(Group):
         base_alignment: bool = False,
         tab_replacement: Tuple[int, str] = (4, " "),
         label_direction: str = "LTR",
+        label_style: str = "Default",
         **kwargs,
     ) -> None:
         super().__init__(max_size=1, x=x, y=y, scale=1)
@@ -234,6 +236,7 @@ class LabelBase(Group):
         if label_direction not in ["LTR", "RTL", "UPR", "DWR", "TTB"]:
             raise RuntimeError("Please provide a valid text direction")
         self._label_direction = label_direction
+        self._label_style = label_style
 
         self.baseline = -1.0
 
@@ -409,3 +412,17 @@ class LabelBase(Group):
         if new_label_direction not in ["LTR", "RTL", "UPR", "DWR", "TTB"]:
             raise RuntimeError("Please provide a valid text direction")
         self._set_label_direction(new_label_direction)
+
+    @property
+    def label_style(self) -> str:
+        """Set the text direction of the label"""
+        return self._label_style
+
+    def _set_label_style(self, new_label_style: str) -> None:
+        # subclass should override this.
+        pass
+
+    @label_style.setter
+    def label_style(self, new_label_style: str) -> None:
+        """Set the text direction of the label"""
+        self._set_label_style(new_label_style)

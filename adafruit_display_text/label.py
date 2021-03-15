@@ -126,9 +126,16 @@ class Label(LabelBase):
         self._padding_right = kwargs.get("padding_right", 0)
         self.base_alignment = kwargs.get("base_alignment", False)
         self._label_direction = kwargs.get("label_direction", "LTR")
+        self._label_style = kwargs.get("label_style", "Default")
+
+        if self.label_style != "Default":
+            self._update_text(str(text))
 
         if text is not None:
-            self._update_text(str(text))
+            if self.label_style != "Default":
+                self._set_label_style(self._label_style)
+            else:
+                self._update_text(str(text))
         if (kwargs.get("anchored_position", None) is not None) and (
             kwargs.get("anchor_point", None) is not None
         ):
@@ -471,5 +478,19 @@ class Label(LabelBase):
 
     def _set_label_direction(self, new_label_direction: str) -> None:
         self._label_direction = new_label_direction
+        old_text = self._text
+        self._update_text(str(old_text))
+
+    def _set_label_style(self, new_label_style: str) -> None:
+        # import would change after library packaging
+        # pylint: disable=import-outside-toplevel
+        from adafruit_colorsys import get_hex
+        from adafruit_colorsys import styles
+
+        self._label_style = new_label_style
+        colorset = styles.THEME
+        self.color = get_hex(colorset[self._label_style]["TEXT"])
+        self._background_color = get_hex(colorset[self._label_style]["BACKGROUND"])
+
         old_text = self._text
         self._update_text(str(old_text))
