@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 """
-`bitmap_label`
+`adafruit_display_text.bitmap_label`
 ================================================================================
 
 Text graphics handling for CircuitPython, including text boxes
