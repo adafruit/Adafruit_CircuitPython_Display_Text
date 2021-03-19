@@ -3,10 +3,12 @@
 # SPDX-License-Identifier: MIT
 
 """
-Display Text module helper functions
+`adafruit_display_text`
+=======================
 """
+
 try:
-    from typing import Tuple
+    from typing import List, Tuple
 except ImportError:
     pass
 from displayio import Group, Palette
@@ -14,11 +16,11 @@ from displayio import Group, Palette
 
 def wrap_text_to_pixels(
     string: str, max_width: int, font=None, indent0: str = "", indent1: str = ""
-) -> None:
+) -> List[str]:
     """wrap_text_to_pixels function
     A helper that will return a list of lines with word-break wrapping.
     Leading and trailing whitespace in your string will be removed. If
-    you wish to use leading whitespace see `indend0` and `indent1`
+    you wish to use leading whitespace see ``indent0`` and ``indent1``
     parameters.
 
     :param str string: The text to be wrapped.
@@ -27,9 +29,9 @@ def wrap_text_to_pixels(
     :param str indent0: Additional character(s) to add to the first line.
     :param str indent1: Additional character(s) to add to all other lines.
 
-
-    :return list lines: A list of the lines resulting from wrapping the
-      input text at max_width pixels size
+    :return: A list of the lines resulting from wrapping the
+        input text at ``max_width`` pixels size
+    :rtype: List[str]
 
     """
     # pylint: disable=too-many-locals, too-many-branches
@@ -100,16 +102,16 @@ def wrap_text_to_pixels(
     return lines
 
 
-def wrap_text_to_lines(string, max_chars):
+def wrap_text_to_lines(string: str, max_chars: int) -> List[str]:
     """wrap_text_to_lines function
     A helper that will return a list of lines with word-break wrapping
 
     :param str string: The text to be wrapped
     :param int max_chars: The maximum number of characters on a line before wrapping
 
-    :return list the_lines: A list of lines where each line is separated based on the amount
-        of max_chars provided
-
+    :return: A list of lines where each line is separated based on the amount
+        of ``max_chars`` provided
+    :rtype: List[str]
     """
 
     def chunks(lst, n):
@@ -151,21 +153,23 @@ def wrap_text_to_lines(string, max_chars):
 
 
 class LabelBase(Group):
-    """Super class that all other types of labels will extend. This contains
+    """Superclass that all other types of labels will extend. This contains
     all of the properties and functions that work the same way in all labels.
 
-    subclasses should implement _set_text, _set_font, and _set_line_spacing to
-    have the correct behavior fo rthat type of label.
+    **Note:** This should be treated as an abstract base class.
+
+    Subclasses should implement ``_set_text``, ``_set_font``, and ``_set_line_spacing`` to
+    have the correct behavior for that type of label.
 
     :param Font font: A font class that has ``get_bounding_box`` and ``get_glyph``.
       Must include a capital M for measuring character size.
     :param str text: Text to display
     :param int max_glyphs: Unnecessary parameter (provided only for direct compability
-     with label.py)
+     with :py:func:`~adafruit_display_text.label.Label`)
     :param int color: Color of all text in RGB hex
     :param int background_color: Color of the background, use `None` for transparent
-    :param double line_spacing: Line spacing of text to display
-    :param boolean background_tight: Set `True` only if you want background box to tightly
+    :param float line_spacing: Line spacing of text to display
+    :param bool background_tight: Set `True` only if you want background box to tightly
      surround text. When set to 'True' Padding parameters will be ignored.
     :param int padding_top: Additional pixels added to background bounding box at top
     :param int padding_bottom: Additional pixels added to background bounding box at bottom
