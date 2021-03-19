@@ -76,7 +76,10 @@ class Label(LabelBase):
      This is helpful when two or more labels need to be aligned to the same baseline
     :param (int,str) tab_replacement: tuple with tab character replace information. When
      (4, " ") will indicate a tab replacement of 4 spaces, defaults to 4 spaces by
-     tab character"""
+     tab character
+    :param str label_direction: string defining the label text orientation. There are 5
+     configurations possibles ``LTR``-Left-To-Right ``RTL``-Right-To-Left
+     ``TTB``-Top-To-Bottom ``UPR``-Upwards ``DWR``-Downwards. It defaults to ``LTR``"""
 
     # pylint: disable=unused-argument, too-many-instance-attributes, too-many-locals, too-many-arguments
     # pylint: disable=too-many-branches, no-self-use, too-many-statements
