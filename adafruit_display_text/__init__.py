@@ -160,6 +160,7 @@ class LabelBase(Group):
 
     Subclasses should implement ``_set_text``, ``_set_font``, and ``_set_line_spacing`` to
     have the correct behavior for that type of label.
+
     :param Font font: A font class that has ``get_bounding_box`` and ``get_glyph``.
       Must include a capital M for measuring character size.
     :param str text: Text to display
@@ -189,8 +190,7 @@ class LabelBase(Group):
      tab character
     :param str label_direction: string defining the label text orientation. There are 5
      configurations possibles ``LTR``-Left-To-Right ``RTL``-Right-To-Left
-     ``TTB``-Top-To-Bottom ``UPR``-Upwards ``DWR``-Downwards``DWR``-Downwards and
-     ``UPD``-Upside-Down only avalaible for bitmap_label. It defaults to ``LTR``"""
+     ``TTB``-Top-To-Bottom ``UPR``-Upwards ``DWR``-Downwards. It defaults to ``LTR``"""
 
     # pylint: disable=unused-argument,  too-many-instance-attributes, too-many-locals, too-many-arguments
     def __init__(
@@ -235,7 +235,7 @@ class LabelBase(Group):
 
         self._text = text
 
-        if label_direction not in ["LTR", "RTL", "UPR", "DWR", "TTB", "UPD"]:
+        if label_direction not in ["LTR", "RTL", "UPR", "DWR", "TTB"]:
             raise RuntimeError("Please provide a valid text direction")
         self._label_direction = label_direction
 
@@ -410,6 +410,6 @@ class LabelBase(Group):
     @label_direction.setter
     def label_direction(self, new_label_direction: str) -> None:
         """Set the text direction of the label"""
-        if new_label_direction not in ["LTR", "RTL", "UPR", "DWR", "TTB", "UPD"]:
+        if new_label_direction not in ["LTR", "RTL", "UPR", "DWR", "TTB"]:
             raise RuntimeError("Please provide a valid text direction")
         self._set_label_direction(new_label_direction)
