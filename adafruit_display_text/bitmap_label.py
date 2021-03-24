@@ -48,7 +48,7 @@ class Label(LabelBase):
     glyph (if its one line), or the (number of lines * linespacing + M)/2. That is,
     it will try to have it be center-left as close as possible.
     :param Font font: A font class that has ``get_bounding_box`` and ``get_glyph``.
-      Must include a capital M for measuring character size.
+     Must include a capital M for measuring character size.
     :param str text: Text to display
     :param int max_glyphs: Unnecessary parameter (provided only for direct compability
      with label.py)
