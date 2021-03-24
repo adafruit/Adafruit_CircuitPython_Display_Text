@@ -40,15 +40,18 @@ class Label(LabelBase):
     This method is memory-conserving relative to ``label.py``.
     The ``max_glyphs`` parameter is ignored and is present
     only for direct compatibility with label.py.
+
     For further reduction in memory usage, set ``save_text=False`` (text string will not
     be stored and ``line_spacing`` and ``font`` are immutable with ``save_text``
     set to ``False``).
+
     The origin point set by ``x`` and ``y``
     properties will be the left edge of the bounding box, and in the center of a M
     glyph (if its one line), or the (number of lines * linespacing + M)/2. That is,
     it will try to have it be center-left as close as possible.
+
     :param Font font: A font class that has ``get_bounding_box`` and ``get_glyph``.
-     Must include a capital M for measuring character size.
+      Must include a capital M for measuring character size.
     :param str text: Text to display
     :param int max_glyphs: Unnecessary parameter (provided only for direct compability
      with label.py)
@@ -76,7 +79,7 @@ class Label(LabelBase):
      tab character
     :param str label_direction: string defining the label text orientation. There are 5
      configurations possibles ``LTR``-Left-To-Right ``RTL``-Right-To-Left
-     ``UPR``-Upwards ``DWR``-Downwards and ``UPD``-Upside-Down. It defaults to ``LTR``"""
+     ``UPD``-Upside Down ``UPR``-Upwards ``DWR``-Downwards. It defaults to ``LTR``"""
 
     # pylint: disable=unused-argument, too-many-instance-attributes, too-many-locals, too-many-arguments
     # pylint: disable=too-many-branches, no-self-use, too-many-statements
