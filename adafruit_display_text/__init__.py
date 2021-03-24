@@ -189,8 +189,8 @@ class LabelBase(Group):
      tab character
     :param str label_direction: string defining the label text orientation. There are 5
      configurations possibles ``LTR``-Left-To-Right ``RTL``-Right-To-Left
-     ``TTB``-Top-To-Bottom ``UPR``-Upwards ``DWR``-Downwards and ``UPD``-Upside-Down
-     (bitmap_label only). It defaults to ``LTR``"""
+     ``TTB``-Top-To-Bottom ``UPR``-Upwards ``DWR``-Downwards``DWR``-Downwards and
+     ``UPD``-Upside-Down only avalaible for bitmap_label. It defaults to ``LTR``"""
 
     # pylint: disable=unused-argument,  too-many-instance-attributes, too-many-locals, too-many-arguments
     def __init__(
@@ -384,7 +384,6 @@ class LabelBase(Group):
         first two numbers are offset from the x, y origin of this group"""
         return tuple(self._bounding_box)
 
-    # pylint: disable=no-member
     @property
     def line_spacing(self) -> float:
         """The amount of space between lines of text, in multiples of the font's
