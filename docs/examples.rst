@@ -25,11 +25,92 @@ Example to compare Label and Bitmap_Label characteristics
     :caption: examples/display_text_label_vs_bitmap_label_comparison.py
     :linenos:
 
-Label vs Bitmap_label Comparison
---------------------------------
+Background color example
+------------------------
 
-Example to compare Label and Bitmap_Label characteristics
+Show the text backgrounds features
 
-.. literalinclude:: ../examples/display_text_label_vs_bitmap_label_comparison.py
-    :caption: examples/display_text_label_vs_bitmap_label_comparison.py
+.. literalinclude:: ../examples/display_text_background_color.py
+    :caption: examples/display_text_background_color.py
+    :linenos:
+
+Text padding example
+--------------------
+
+Show the text padding features
+
+.. literalinclude:: ../examples/display_text_background_color_padding.py
+    :caption: examples/display_text_background_color.py
+    :linenos:
+
+Anchored Position
+-----------------
+
+Anchored position use illustration
+
+.. literalinclude:: ../examples/display_text_anchored_position.py
+    :caption: examples/display_text_anchored_position.py
+    :linenos:
+
+Textarea Boundingbox
+--------------------
+
+Boundingbox demonstration
+
+.. literalinclude:: ../examples/display_text_textarea_boundingbox.py
+    :caption: examples/display_text_textarea_boundingbox.py
+    :linenos:
+
+Align Baseline example
+----------------------
+
+Demonstrate how to align different labels to a common horizontal line
+
+.. literalinclude:: ../examples/display_text_label_align_baseline_comparison.py
+    :caption: examples/display_text_label_align_baseline_comparison.py
+    :linenos:
+
+Magtag example
+--------------
+
+Uses the MAGTAG to display some text
+
+.. literalinclude:: ../examples/display_text_magtag.py
+    :caption: examples/display_text_magtag.py
+    :linenos:
+
+MatrixPortal example
+--------------------
+
+Uses the MatrixPortal to display some text
+
+.. literalinclude:: ../examples/display_text_matrixportal.py
+    :caption: examples/display_text_matrixportal.py
+    :linenos:
+
+PyPortal example
+----------------
+
+Uses the Pyportal to display some text
+
+.. literalinclude:: ../examples/display_text_pyportal.py
+    :caption: examples/display_text_pyportal.py
+    :linenos:
+
+Wraptest example
+----------------
+
+Illustrates the wraptest feature
+
+.. literalinclude:: ../examples/display_text_wraptest.py
+    :caption: examples/display_text_wraptest.py
+    :linenos:
+
+Wrap Pixel Test
+---------------
+
+Wrap Pixel Test
+
+.. literalinclude:: ../examples/display_text_wrap_pixels_test.py
+    :caption: examples/display_text_wrap_pixels_test.py
     :linenos:
