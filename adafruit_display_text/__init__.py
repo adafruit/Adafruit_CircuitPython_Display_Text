@@ -32,7 +32,6 @@ def wrap_text_to_pixels(
     :return: A list of the lines resulting from wrapping the
         input text at ``max_width`` pixels size
     :rtype: List[str]
-
     """
     # pylint: disable=too-many-locals, too-many-branches
     if font is None:
@@ -180,7 +179,6 @@ class LabelBase(Group):
              │                   @@___|                                     │
     (0.0,1.0)╰──────────────────────────────────────────────────────────────┘(1.0,1.0)
 
-
     :param Font font: A font class that has ``get_bounding_box`` and ``get_glyph``.
       Must include a capital M for measuring character size.
     :param str text: Text to display
@@ -221,7 +219,8 @@ class LabelBase(Group):
     :param str label_direction: string defining the label text orientation. There are 5
      configurations possibles ``LTR``-Left-To-Right ``RTL``-Right-To-Left
      ``TTB``-Top-To-Bottom ``UPR``-Upwards ``DWR``-Downwards and ``UPD``-Upside-Down
-     (bitmap_label only). It defaults to ``LTR``"""
+     (bitmap_label only). It defaults to ``LTR``
+     """
 
     # pylint: disable=unused-argument,  too-many-instance-attributes, too-many-locals, too-many-arguments
     def __init__(
