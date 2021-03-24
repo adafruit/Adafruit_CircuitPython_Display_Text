@@ -79,7 +79,7 @@ class Label(LabelBase):
      tab character
     :param str label_direction: string defining the label text orientation. There are 5
      configurations possibles ``LTR``-Left-To-Right ``RTL``-Right-To-Left
-     ``UPR``-Upwards ``DWR``-Downwards. It defaults to ``LTR``"""
+     ``UPR``-Upwards ``DWR``-Downwards and ``UPD``-Upside-Down. It defaults to ``LTR``"""
 
     # pylint: disable=unused-argument, too-many-instance-attributes, too-many-locals, too-many-arguments
     # pylint: disable=too-many-branches, no-self-use, too-many-statements
@@ -281,6 +281,9 @@ class Label(LabelBase):
                 self.tilegrid.flip_x = True
             if self._label_direction == "DWR":
                 self.tilegrid.transpose_xy = True
+                self.tilegrid.flip_y = True
+            if self._label_direction == "UPD":
+                self.tilegrid.flip_x = True
                 self.tilegrid.flip_y = True
 
             # Clear out any items in the local_group Group, in case this is an update to

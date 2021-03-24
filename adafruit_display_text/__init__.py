@@ -161,36 +161,67 @@ class LabelBase(Group):
     Subclasses should implement ``_set_text``, ``_set_font``, and ``_set_line_spacing`` to
     have the correct behavior for that type of label.
 
+    Anchor points are represented in the corners of the following graph
+
+    (0.0,0.0)┌──────────────────────────────────────────────────────────────┐ (1.0,0.0)
+             │                                          @@      |           │
+             │                                          @@      Ascent      │
+             │                                          @@      |           │
+             │------------------------------------------@@+-----|-----------│
+             │      %@   @%      @@@@@@@@%       %@@@@@@@@      |           │
+             │       %@ @%       @@%    %@       @%    %@@      |           │
+             │        %@%        @@      @%     %@      @@      |           │ Bounding BOX
+             │        %@%        @@      @$     $@      @@      |           │
+             │       %@ @%       @@$     @       @%    $@@      |           │
+             │      %@   @%      @@@@@@@%         %@@@@@@@      |           │
+             │-------------------@@+----------------------------------------│ Baseline
+             │                   @@   |                                     │
+             │                   @@   Descent                               │
+             │                   @@___|                                     │
+    (0.0,1.0)╰──────────────────────────────────────────────────────────────┘(1.0,1.0)
+
+
     :param Font font: A font class that has ``get_bounding_box`` and ``get_glyph``.
       Must include a capital M for measuring character size.
     :param str text: Text to display
     :param int max_glyphs: Unnecessary parameter (provided only for direct compability
      with :py:func:`~adafruit_display_text.label.Label`)
+
     :param int color: Color of all text in RGB hex
     :param int background_color: Color of the background, use `None` for transparent
+
     :param float line_spacing: Line spacing of text to display
+
     :param bool background_tight: Set `True` only if you want background box to tightly
      surround text. When set to 'True' Padding parameters will be ignored.
+
     :param int padding_top: Additional pixels added to background bounding box at top
     :param int padding_bottom: Additional pixels added to background bounding box at bottom
     :param int padding_left: Additional pixels added to background bounding box at left
     :param int padding_right: Additional pixels added to background bounding box at right
+
     :param (float,float) anchor_point: Point that anchored_position moves relative to.
      Tuple with decimal percentage of width and height.
      (E.g. (0,0) is top left, (1.0, 0.5): is middle right.)
     :param (int,int) anchored_position: Position relative to the anchor_point. Tuple
      containing x,y pixel coordinates.
+
     :param int scale: Integer value of the pixel scaling
+
     :param bool save_text: Set True to save the text string as a constant in the
      label structure.  Set False to reduce memory use.
+
     :param bool base_alignment: when True allows to align text label to the baseline.
      This is helpful when two or more labels need to be aligned to the same baseline
+
     :param (int,str) tab_replacement: tuple with tab character replace information. When
      (4, " ") will indicate a tab replacement of 4 spaces, defaults to 4 spaces by
      tab character
+
     :param str label_direction: string defining the label text orientation. There are 5
      configurations possibles ``LTR``-Left-To-Right ``RTL``-Right-To-Left
-     ``TTB``-Top-To-Bottom ``UPR``-Upwards ``DWR``-Downwards. It defaults to ``LTR``"""
+     ``TTB``-Top-To-Bottom ``UPR``-Upwards ``DWR``-Downwards and ``UPD``-Upside-Down
+     (bitmap_label only). It defaults to ``LTR``"""
 
     # pylint: disable=unused-argument,  too-many-instance-attributes, too-many-locals, too-many-arguments
     def __init__(
@@ -235,7 +266,7 @@ class LabelBase(Group):
 
         self._text = text
 
-        if label_direction not in ["LTR", "RTL", "UPR", "DWR", "TTB"]:
+        if label_direction not in ["LTR", "RTL", "UPR", "DWR", "TTB", "UPD"]:
             raise RuntimeError("Please provide a valid text direction")
         self._label_direction = label_direction
 
@@ -384,6 +415,7 @@ class LabelBase(Group):
         first two numbers are offset from the x, y origin of this group"""
         return tuple(self._bounding_box)
 
+    # pylint: disable=no-member
     @property
     def line_spacing(self) -> float:
         """The amount of space between lines of text, in multiples of the font's
@@ -410,6 +442,6 @@ class LabelBase(Group):
     @label_direction.setter
     def label_direction(self, new_label_direction: str) -> None:
         """Set the text direction of the label"""
-        if new_label_direction not in ["LTR", "RTL", "UPR", "DWR", "TTB"]:
+        if new_label_direction not in ["LTR", "RTL", "UPR", "DWR", "TTB", "UPD"]:
             raise RuntimeError("Please provide a valid text direction")
         self._set_label_direction(new_label_direction)
