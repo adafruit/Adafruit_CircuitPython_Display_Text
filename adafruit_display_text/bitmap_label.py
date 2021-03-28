@@ -108,6 +108,9 @@ class Label(LabelBase):
         self.background_color = kwargs.get("background_color", None)
         self._label_direction = kwargs.get("label_direction", "LTR")
 
+        if self._label_direction not in ["LTR", "RTL", "UPD", "UPR", "DWR"]:
+            raise RuntimeError("Please provide a valid text direction")
+
         if self._label_direction == "RTL":
             self._text = "".join(reversed(self._text))
 

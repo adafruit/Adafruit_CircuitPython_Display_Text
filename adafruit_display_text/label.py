@@ -127,6 +127,9 @@ class Label(LabelBase):
         self.base_alignment = kwargs.get("base_alignment", False)
         self._label_direction = kwargs.get("label_direction", "LTR")
 
+        if self._label_direction not in ["LTR", "RTL", "UPR", "DWR", "TTB"]:
+            raise RuntimeError("Please provide a valid text direction")
+
         if text is not None:
             self._update_text(str(text))
         if (kwargs.get("anchored_position", None) is not None) and (

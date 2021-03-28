@@ -235,8 +235,6 @@ class LabelBase(Group):
 
         self._text = text
 
-        if label_direction not in ["LTR", "RTL", "UPR", "DWR", "TTB"]:
-            raise RuntimeError("Please provide a valid text direction")
         self._label_direction = label_direction
 
         self.baseline = -1.0
