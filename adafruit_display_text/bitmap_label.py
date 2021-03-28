@@ -76,7 +76,10 @@ class Label(LabelBase):
      This is helpful when two or more labels need to be aligned to the same baseline
     :param (int,str) tab_replacement: tuple with tab character replace information. When
      (4, " ") will indicate a tab replacement of 4 spaces, defaults to 4 spaces by
-     tab character"""
+     tab character
+    :param str label_direction: string defining the label text orientation. There are 5
+     configurations possibles ``LTR``-Left-To-Right ``RTL``-Right-To-Left
+     ``UPD``-Upside Down ``UPR``-Upwards ``DWR``-Downwards. It defaults to ``LTR``"""
 
     # pylint: disable=unused-argument, too-many-instance-attributes, too-many-locals, too-many-arguments
     # pylint: disable=too-many-branches, no-self-use, too-many-statements
@@ -103,6 +106,13 @@ class Label(LabelBase):
 
         self.color = kwargs.get("color", 0xFFFFFF)
         self.background_color = kwargs.get("background_color", None)
+        self._label_direction = kwargs.get("label_direction", "LTR")
+
+        if self._label_direction not in ["LTR", "RTL", "UPD", "UPR", "DWR"]:
+            raise RuntimeError("Please provide a valid text direction")
+
+        if self._label_direction == "RTL":
+            self._text = "".join(reversed(self._text))
 
         self.base_alignment = kwargs.get("base_alignment", False)
 
@@ -124,6 +134,7 @@ class Label(LabelBase):
             scale=kwargs.get("scale", 1),
             base_alignment=kwargs.get("base_alignment", False),
             tab_replacement=kwargs.get("tab_replacement", (4, " ")),
+            label_direction=kwargs.get("label_direction", "LTR"),
         )
 
     def _reset_text(
@@ -144,6 +155,7 @@ class Label(LabelBase):
         scale: int = None,
         base_alignment: bool = None,
         tab_replacement: Tuple[int, str] = None,
+        label_direction: str = "LTR",
     ) -> None:
 
         # Store all the instance variables
@@ -175,6 +187,8 @@ class Label(LabelBase):
             self.base_alignment = base_alignment
         if tab_replacement is not None:
             self._tab_replacement = tab_replacement
+        if label_direction is not None:
+            self._label_direction = label_direction
 
         # if text is not provided as a parameter (text is None), use the previous value.
         if (text is None) and self._save_text:
@@ -182,6 +196,8 @@ class Label(LabelBase):
 
         if self._save_text:  # text string will be saved
             self._text = self._tab_text.join(text.split("\t"))
+            if self._label_direction == "RTL":
+                self._text = "".join(reversed(self._text))
         else:
             self._text = None  # save a None value since text string is not saved
 
@@ -262,6 +278,16 @@ class Label(LabelBase):
                 x=-self._padding_left + x_offset,
                 y=label_position_yoffset - y_offset - self._padding_top,
             )
+
+            if self._label_direction == "UPR":
+                self.tilegrid.transpose_xy = True
+                self.tilegrid.flip_x = True
+            if self._label_direction == "DWR":
+                self.tilegrid.transpose_xy = True
+                self.tilegrid.flip_y = True
+            if self._label_direction == "UPD":
+                self.tilegrid.flip_x = True
+                self.tilegrid.flip_y = True
 
             # Clear out any items in the local_group Group, in case this is an update to
             # the bitmap_label
