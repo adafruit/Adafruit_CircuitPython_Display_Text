@@ -37,7 +37,7 @@ Show the text backgrounds features
 Text padding example
 --------------------
 
-Show the text padding features
+Show the text padding features in all directions
 
 .. literalinclude:: ../examples/display_text_background_color_padding.py
     :caption: examples/display_text_background_color.py
