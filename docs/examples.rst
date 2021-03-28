@@ -24,12 +24,3 @@ Example to compare Label and Bitmap_Label characteristics
 .. literalinclude:: ../examples/display_text_label_vs_bitmap_label_comparison.py
     :caption: examples/display_text_label_vs_bitmap_label_comparison.py
     :linenos:
-
-Label vs Bitmap_label Comparison
---------------------------------
-
-Example to compare Label and Bitmap_Label characteristics
-
-.. literalinclude:: ../examples/display_text_label_vs_bitmap_label_comparison.py
-    :caption: examples/display_text_label_vs_bitmap_label_comparison.py
-    :linenos:
