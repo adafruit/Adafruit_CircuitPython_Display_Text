@@ -265,7 +265,7 @@ class Label(LabelBase):
             if self.base_alignment:
                 label_position_yoffset = 0
             else:
-                label_position_yoffset = self._get_ascent() // 2
+                label_position_yoffset = self._ascent // 2
 
             self.tilegrid = displayio.TileGrid(
                 self.bitmap,
@@ -325,7 +325,7 @@ class Label(LabelBase):
     def _text_bounding_box(
         self, text: str, font, line_spacing: float
     ) -> Tuple[int, int, int, int, int, int]:
-        ascender_max, descender_max = self._get_ascent_descent()
+        ascender_max, descender_max = self._ascent, self._descent
 
         lines = 1
 
@@ -337,7 +337,7 @@ class Label(LabelBase):
         right = x_start
         top = bottom = y_start
 
-        y_offset_tight = self._get_ascent() // 2
+        y_offset_tight = self._ascent // 2
 
         newline = False
 

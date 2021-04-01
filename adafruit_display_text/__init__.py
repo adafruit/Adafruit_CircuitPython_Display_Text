@@ -220,6 +220,7 @@ class LabelBase(Group):
         super().__init__(max_size=1, x=x, y=y, scale=1, **kwargs)
 
         self._font = font
+        self._ascent, self._descent = self._get_ascent_descent()
         self.palette = Palette(2)
         self._color = color
         self._background_color = background_color
