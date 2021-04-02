@@ -114,3 +114,12 @@ Wrap Pixel Test
 .. literalinclude:: ../examples/display_text_wrap_pixels_test.py
     :caption: examples/display_text_wrap_pixels_test.py
     :linenos:
+
+Library Features Example
+------------------------
+
+This examples shows the ``label`` and ``bitmap_label`` capabilities and features
+
+.. literalinclude:: ../examples/display_text_advance_example.py
+    :caption: examples/display_text_advance_example.py
+    :linenos:
