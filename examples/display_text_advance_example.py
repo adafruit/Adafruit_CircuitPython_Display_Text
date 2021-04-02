@@ -501,7 +501,7 @@ except TypeError:
         background_color=0x004499,
     )
     main_group.append(warning_text)
-    time.sleep(TIME_PAUSE))
+    time.sleep(TIME_PAUSE)
     display.show(main_group)
 
 main_group.pop()
