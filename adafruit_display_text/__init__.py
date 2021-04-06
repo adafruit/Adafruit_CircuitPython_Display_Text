@@ -245,7 +245,7 @@ class LabelBase(Group):
         if self.base_alignment:
             self._y_offset = 0
         else:
-            self._y_offset = self._get_ascent() // 2
+            self._y_offset = self._ascent // 2
 
     def _get_ascent_descent(self) -> Tuple[int, int]:
         """ Private function to calculate ascent and descent font values """
@@ -267,9 +267,6 @@ class LabelBase(Group):
                 ascender_max = max(ascender_max, this_glyph.height + this_glyph.dy)
                 descender_max = max(descender_max, -this_glyph.dy)
         return ascender_max, descender_max
-
-    def _get_ascent(self) -> int:
-        return self._get_ascent_descent()[0]
 
     @property
     def font(self) -> None:
