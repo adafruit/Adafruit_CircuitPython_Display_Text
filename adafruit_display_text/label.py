@@ -150,7 +150,7 @@ class Label(LabelBase):
             y_box_offset = self._bounding_box[1]
 
         else:  # draw a "loose" bounding box to include any ascenders/descenders.
-            ascent, descent = self._get_ascent_descent()
+            ascent, descent = self._ascent, self._descent
 
             if (
                 self._label_direction == "UPR"
@@ -225,7 +225,7 @@ class Label(LabelBase):
         self._background_color = new_color
 
         lines = self._text.rstrip("\n").count("\n") + 1
-        y_offset = self._get_ascent() // 2
+        y_offset = self._ascent // 2
 
         if not self._added_background_tilegrid:  # no bitmap is in the self Group
             # add bitmap if text is present and bitmap sizes > 0 pixels
@@ -279,7 +279,7 @@ class Label(LabelBase):
         if self.base_alignment:
             self._y_offset = 0
         else:
-            self._y_offset = self._get_ascent() // 2
+            self._y_offset = self._ascent // 2
 
         if self._label_direction == "RTL":
             left = top = bottom = 0
