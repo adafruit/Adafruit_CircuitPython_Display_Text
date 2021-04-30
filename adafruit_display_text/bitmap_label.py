@@ -19,7 +19,7 @@ Implementation Notes
 **Software and Dependencies:**
 
 * Adafruit CircuitPython firmware for the supported boards:
-  https://github.com/adafruit/circuitpython/releases
+  https://circuitpython.org/downloads
 
 """
 try:
@@ -53,7 +53,7 @@ class Label(LabelBase):
     :param Font font: A font class that has ``get_bounding_box`` and ``get_glyph``.
       Must include a capital M for measuring character size.
     :param str text: Text to display
-    :param int max_glyphs: Unnecessary parameter (provided only for direct compability
+    :param int max_glyphs: Unnecessary parameter (provided only for direct compatibility
      with label.py)
     :param int color: Color of all text in RGB hex
     :param int background_color: Color of the background, use `None` for transparent
