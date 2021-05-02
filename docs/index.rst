@@ -23,6 +23,10 @@ Table of Contents
 .. toctree::
     :caption: Tutorials
 
+    CircuitPython Display_Text Library <https://learn.adafruit.com/circuitpython-display_text-library>
+
+    Custom Fonts for CircuitPython Displays <https://learn.adafruit.com/custom-fonts-for-pyportal-circuitpython-display>
+
 .. toctree::
     :caption: Related Products
 
