@@ -299,12 +299,20 @@ class Label(LabelBase):
 
             # Update bounding_box values.  Note: To be consistent with label.py,
             # this is the bounding box for the text only, not including the background.
-            self._bounding_box = (
-                self.tilegrid.x,
-                self.tilegrid.y,
-                box_x,
-                tight_box_y,
-            )
+            if label_direction == "UPR" or self._label_direction == "DWR":
+                self._bounding_box = (
+                    self.tilegrid.x,
+                    self.tilegrid.y,
+                    tight_box_y,
+                    box_x,
+                )
+            else:
+                self._bounding_box = (
+                    self.tilegrid.x,
+                    self.tilegrid.y,
+                    box_x,
+                    tight_box_y,
+                )
 
         if (
             scale is not None
