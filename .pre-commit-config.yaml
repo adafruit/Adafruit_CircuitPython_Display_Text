@@ -28,6 +28,7 @@ repos:
     hooks:
     -   id: pylint_examples
         name: pylint (examples code)
+        require_serial: true
         description: Run pylint rules on "examples/*.py" files
         entry: /usr/bin/env bash -c
         args: ['([[ ! -d "examples" ]] || for example in $(find . -path "./examples/*.py"); do pylint --disable=missing-docstring,invalid-name $example; done)']

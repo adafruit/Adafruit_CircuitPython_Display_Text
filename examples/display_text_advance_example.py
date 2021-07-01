@@ -15,7 +15,7 @@ from adafruit_display_text import label, bitmap_label
 from adafruit_bitmap_font import bitmap_font
 
 display = board.DISPLAY
-main_group = displayio.Group(max_size=10)
+main_group = displayio.Group()
 MEDIUM_FONT = bitmap_font.load_font("fonts/LeagueSpartan-Bold-16.bdf")
 BIG_FONT = bitmap_font.load_font("fonts/LibreBodoniv2002-Bold-27.bdf")
 TIME_PAUSE = 2

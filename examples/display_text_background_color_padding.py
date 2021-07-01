@@ -81,7 +81,7 @@ text.append("MONSTERs ate pop quops")  # both ascenders and descenders
 text.append("MONSTER quops\nnewline quops")  # with newline
 
 display.auto_refresh = True
-myGroup = displayio.Group(max_size=6)
+myGroup = displayio.Group()
 display.show(myGroup)
 
 text_area = []

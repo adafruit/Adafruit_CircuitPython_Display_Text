@@ -161,7 +161,7 @@ bitmap_label_end = gc.mem_free()
 
 print("bitmap_label used: {} memory".format(bitmap_label_start - bitmap_label_end))
 
-bmap_group = displayio.Group(max_size=4)  # Create a group for displaying
+bmap_group = displayio.Group()  # Create a group for displaying
 bmap_group.append(bmap_label1)
 bmap_group.append(bmap_label2)
 
@@ -209,7 +209,7 @@ gc.collect()
 label_end = gc.mem_free()
 
 print("label used: {} memory".format(label_start - label_end))
-label_group = displayio.Group(max_size=4)  # Create a group for displaying
+label_group = displayio.Group()  # Create a group for displaying
 label_group.append(label1)
 label_group.append(label2)
 

@@ -217,7 +217,7 @@ class LabelBase(Group):
         label_direction: str = "LTR",
         **kwargs,
     ) -> None:
-        super().__init__(max_size=1, x=x, y=y, scale=1, **kwargs)
+        super().__init__(x=x, y=y, scale=1)
 
         self._font = font
         self._ascent, self._descent = self._get_ascent_descent()

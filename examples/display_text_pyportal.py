@@ -27,7 +27,7 @@ for b in range(100):
 
 demos = ["CircuitPython = Code + Community", "accents - üàêùéáçãÍóí", "others - αψ◌"]
 
-splash = displayio.Group(max_size=len(fonts) * len(demos))
+splash = displayio.Group()
 board.DISPLAY.show(splash)
 max_y = 0
 y = 2

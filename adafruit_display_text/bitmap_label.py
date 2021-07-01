@@ -91,7 +91,7 @@ class Label(LabelBase):
         super().__init__(font, **kwargs)
 
         self.local_group = displayio.Group(
-            max_size=1, scale=kwargs.get("scale", 1)
+            scale=kwargs.get("scale", 1)
         )  # local_group holds the tileGrid and sets the scaling
         self.append(
             self.local_group

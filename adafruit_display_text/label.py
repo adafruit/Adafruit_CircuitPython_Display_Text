@@ -81,18 +81,15 @@ class Label(LabelBase):
         text = kwargs.get("text", "")
 
         if not max_glyphs and not text:
-            raise RuntimeError("Please provide a max size, or initial text")
+            raise RuntimeError("Please provide a max_glyphs, or initial text")
         self._tab_replacement = kwargs.get("tab_replacement", (4, " "))
         self._tab_text = self._tab_replacement[1] * self._tab_replacement[0]
         text = self._tab_text.join(text.split("\t"))
         if not max_glyphs:
             max_glyphs = len(text)
-        # add one to max_size for the background bitmap tileGrid
 
         # local_group will set the scale
-        self.local_group = displayio.Group(
-            max_size=max_glyphs + 1, scale=kwargs.get("scale", 1)
-        )
+        self.local_group = displayio.Group(scale=kwargs.get("scale", 1))
         self.append(self.local_group)
 
         self.width = max_glyphs
