@@ -45,17 +45,17 @@ class Label(LabelBase):
     :param bool background_tight: Set `True` only if you want background box to tightly
      surround text. When set to 'True' Padding parameters will be ignored.
     :param int padding_top: Additional pixels added to background bounding box at top.
-     This parameter could be negative indicating additional pixels subtracted to background
-     bounding box.
+     This parameter could be negative indicating additional pixels subtracted from the
+     background bounding box.
     :param int padding_bottom: Additional pixels added to background bounding box at bottom.
-     This parameter could be negative indicating additional pixels subtracted to background
-     bounding box.
+     This parameter could be negative indicating additional pixels subtracted from the
+     background bounding box.
     :param int padding_left: Additional pixels added to background bounding box at left.
-     This parameter could be negative indicating additional pixels subtracted to background
-     bounding box.
+     This parameter could be negative indicating additional pixels subtracted from the
+     background bounding box.
     :param int padding_right: Additional pixels added to background bounding box at right.
-     This parameter could be negative indicating additional pixels subtracted to background
-     bounding box.
+     This parameter could be negative indicating additional pixels subtracted from the
+     background bounding box.
     :param (float,float) anchor_point: Point that anchored_position moves relative to.
      Tuple with decimal percentage of width and height.
      (E.g. (0,0) is top left, (1.0, 0.5): is middle right.)
