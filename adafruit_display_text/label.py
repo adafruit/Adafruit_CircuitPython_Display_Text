@@ -102,10 +102,6 @@ class Label(LabelBase):
         self.height = self._font.get_bounding_box()[1]
         self._bounding_box = None
 
-        self._background_tight = kwargs.get(
-            "background_tight", False
-        )  # sets padding status for text background box
-
         # Create the two-color text palette
         self.palette = displayio.Palette(2)
         self.palette[0] = 0

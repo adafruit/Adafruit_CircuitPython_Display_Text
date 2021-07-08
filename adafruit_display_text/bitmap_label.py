@@ -117,7 +117,6 @@ class Label(LabelBase):
             y=kwargs.get("y", 0),
             text=kwargs.get("text", ""),
             line_spacing=self._line_spacing,
-            background_tight=kwargs.get("background_tight", False),
             padding_top=kwargs.get("padding_top", 0),
             padding_bottom=kwargs.get("padding_bottom", 0),
             padding_left=kwargs.get("padding_left", 0),
@@ -138,7 +137,6 @@ class Label(LabelBase):
         y: int = None,
         text: str = None,
         line_spacing: float = None,
-        background_tight: bool = None,
         padding_top: int = None,
         padding_bottom: int = None,
         padding_left: int = None,
@@ -161,8 +159,6 @@ class Label(LabelBase):
             self.y = y
         if line_spacing is not None:
             self._line_spacing = line_spacing
-        if background_tight is not None:
-            self._background_tight = background_tight
         if padding_top is not None:
             self._padding_top = max(0, padding_top)
         if padding_bottom is not None:
