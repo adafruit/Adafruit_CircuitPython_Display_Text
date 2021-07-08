@@ -164,8 +164,6 @@ class LabelBase(Group):
     :param Font font: A font class that has ``get_bounding_box`` and ``get_glyph``.
       Must include a capital M for measuring character size.
     :param str text: Text to display
-    :param int max_glyphs: Unnecessary parameter (provided only for direct compability
-     with :py:func:`~adafruit_display_text.label.Label`)
     :param int color: Color of all text in RGB hex
     :param int background_color: Color of the background, use `None` for transparent
     :param float line_spacing: Line spacing of text to display
@@ -199,7 +197,6 @@ class LabelBase(Group):
         x: int = 0,
         y: int = 0,
         text: str = "",
-        max_glyphs: int = None,
         color: int = 0xFFFFFF,
         background_color: int = None,
         line_spacing: float = 1.25,

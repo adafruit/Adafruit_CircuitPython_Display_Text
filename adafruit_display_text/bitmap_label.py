@@ -38,8 +38,6 @@ class Label(LabelBase):
     """A label displaying a string of text that is stored in a bitmap.
     Note: This ``bitmap_label.py`` library utilizes a bitmap to display the text.
     This method is memory-conserving relative to ``label.py``.
-    The ``max_glyphs`` parameter is ignored and is present
-    only for direct compatibility with label.py.
 
     For further reduction in memory usage, set ``save_text=False`` (text string will not
     be stored and ``line_spacing`` and ``font`` are immutable with ``save_text``
@@ -53,8 +51,6 @@ class Label(LabelBase):
     :param Font font: A font class that has ``get_bounding_box`` and ``get_glyph``.
       Must include a capital M for measuring character size.
     :param str text: Text to display
-    :param int max_glyphs: Unnecessary parameter (provided only for direct compatibility
-     with label.py)
     :param int color: Color of all text in RGB hex
     :param int background_color: Color of the background, use `None` for transparent
     :param double line_spacing: Line spacing of text to display
@@ -83,8 +79,6 @@ class Label(LabelBase):
 
     # pylint: disable=unused-argument, too-many-instance-attributes, too-many-locals, too-many-arguments
     # pylint: disable=too-many-branches, no-self-use, too-many-statements
-    # Note: max_glyphs parameter is unnecessary, this is used for direct
-    # compatibility with label.py
 
     def __init__(self, font, **kwargs) -> None:
 
