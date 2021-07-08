@@ -96,8 +96,6 @@ class Label(LabelBase):
         self._font = font
         self._text = None
         self._anchor_point = kwargs.get("anchor_point", None)
-        self.x = kwargs.get("x", 0)
-        self.y = kwargs.get("y", 0)
 
         self.height = self._font.get_bounding_box()[1]
         self._bounding_box = None

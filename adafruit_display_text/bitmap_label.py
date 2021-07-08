@@ -113,8 +113,6 @@ class Label(LabelBase):
         # call the text updater with all the arguments.
         self._reset_text(
             font=font,
-            x=kwargs.get("x", 0),
-            y=kwargs.get("y", 0),
             text=kwargs.get("text", ""),
             line_spacing=self._line_spacing,
             padding_top=kwargs.get("padding_top", 0),
@@ -133,8 +131,6 @@ class Label(LabelBase):
     def _reset_text(
         self,
         font=None,
-        x: int = None,
-        y: int = None,
         text: str = None,
         line_spacing: float = None,
         padding_top: int = None,
@@ -153,10 +149,6 @@ class Label(LabelBase):
         # Store all the instance variables
         if font is not None:
             self._font = font
-        if x is not None:
-            self.x = x
-        if y is not None:
-            self.y = y
         if line_spacing is not None:
             self._line_spacing = line_spacing
         if padding_top is not None:
