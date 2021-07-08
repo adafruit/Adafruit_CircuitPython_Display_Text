@@ -217,6 +217,7 @@ class LabelBase(Group):
         super().__init__(x=x, y=y, scale=1)
 
         self._font = font
+        self._line_spacing = line_spacing
         self._ascent, self._descent = self._get_ascent_descent()
         self.palette = Palette(2)
         self._color = color

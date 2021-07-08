@@ -100,7 +100,6 @@ class Label(LabelBase):
         self.y = kwargs.get("y", 0)
 
         self.height = self._font.get_bounding_box()[1]
-        self._line_spacing = kwargs.get("line_spacing", 1.25)
         self._bounding_box = None
 
         self._background_tight = kwargs.get(

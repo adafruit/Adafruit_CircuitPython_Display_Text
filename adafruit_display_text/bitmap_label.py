@@ -53,7 +53,7 @@ class Label(LabelBase):
     :param str text: Text to display
     :param int color: Color of all text in RGB hex
     :param int background_color: Color of the background, use `None` for transparent
-    :param double line_spacing: Line spacing of text to display
+    :param float line_spacing: Line spacing of text to display
     :param boolean background_tight: Set `True` only if you want background box to tightly
      surround text. When set to 'True' Padding parameters will be ignored.
     :param int padding_top: Additional pixels added to background bounding box at top
@@ -116,7 +116,7 @@ class Label(LabelBase):
             x=kwargs.get("x", 0),
             y=kwargs.get("y", 0),
             text=kwargs.get("text", ""),
-            line_spacing=kwargs.get("line_spacing", 1.25),
+            line_spacing=self._line_spacing,
             background_tight=kwargs.get("background_tight", False),
             padding_top=kwargs.get("padding_top", 0),
             padding_bottom=kwargs.get("padding_bottom", 0),
@@ -228,7 +228,6 @@ class Label(LabelBase):
             ) = self._text_bounding_box(
                 self._text,
                 self._font,
-                self._line_spacing,
             )  # calculate the box size for a tight and loose backgrounds
 
             if self._background_tight:
@@ -251,7 +250,6 @@ class Label(LabelBase):
                 self.bitmap,
                 self._text,
                 self._font,
-                self._line_spacing,
                 self._padding_left - x_offset,
                 self._padding_top + y_offset,
             )
@@ -325,7 +323,7 @@ class Label(LabelBase):
         return return_value
 
     def _text_bounding_box(
-        self, text: str, font, line_spacing: float
+        self, text: str, font
     ) -> Tuple[int, int, int, int, int, int]:
         ascender_max, descender_max = self._ascent, self._descent
 
@@ -342,6 +340,7 @@ class Label(LabelBase):
         y_offset_tight = self._ascent // 2
 
         newline = False
+        line_spacing = self._line_spacing
 
         for char in text:
 
@@ -406,14 +405,13 @@ class Label(LabelBase):
         bitmap,
         text: str,
         font,
-        line_spacing: float,
         xposition: int,
         yposition: int,
         text_palette_index: int = 1,
         background_palette_index: int = 0,
         skip_index: int = 0,  # set to None to write all pixels, other wise skip this palette index
         # when copying glyph bitmaps (this is important for slanted text
-        # where rectangulary glyph boxes overlap)
+        # where rectangular glyph boxes overlap)
     ) -> Tuple[int, int, int, int]:
         # placeText - Writes text into a bitmap at the specified location.
         #
@@ -425,6 +423,7 @@ class Label(LabelBase):
         left = None
         right = x_start
         top = bottom = y_start
+        line_spacing = self._line_spacing
 
         for char in text:
 
