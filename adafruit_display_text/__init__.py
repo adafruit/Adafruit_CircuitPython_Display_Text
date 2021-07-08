@@ -274,8 +274,7 @@ class LabelBase(Group):
         return self._font
 
     def _set_font(self, new_font) -> None:
-        # subclasses should override this
-        pass
+        raise NotImplementedError("{} MUST override '_set_font'".format(type(self)))
 
     @font.setter
     def font(self, new_font) -> None:
@@ -362,8 +361,7 @@ class LabelBase(Group):
         self.anchored_position = self._anchored_position  # update the anchored_position
 
     def _set_text(self, new_text: str, scale: int) -> None:
-        # subclasses should override this
-        pass
+        raise NotImplementedError("{} MUST override '_set_text'".format(type(self)))
 
     @property
     def text(self) -> str:
@@ -387,8 +385,9 @@ class LabelBase(Group):
         return self._line_spacing
 
     def _set_line_spacing(self, new_line_spacing: float) -> None:
-        # subclass should override this.
-        pass
+        raise NotImplementedError(
+            "{} MUST override '_set_line_spacing'".format(type(self))
+        )
 
     @line_spacing.setter
     def line_spacing(self, new_line_spacing: float) -> None:
