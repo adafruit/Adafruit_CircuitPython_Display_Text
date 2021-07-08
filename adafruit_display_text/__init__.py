@@ -219,6 +219,10 @@ class LabelBase(Group):
         self._font = font
         self._line_spacing = line_spacing
         self._background_tight = background_tight
+        self._padding_top = padding_top
+        self._padding_bottom = padding_bottom
+        self._padding_left = padding_left
+        self._padding_right = padding_right
         self._ascent, self._descent = self._get_ascent_descent()
         self.palette = Palette(2)
         self._color = color

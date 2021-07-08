@@ -115,10 +115,6 @@ class Label(LabelBase):
             font=font,
             text=kwargs.get("text", ""),
             line_spacing=self._line_spacing,
-            padding_top=kwargs.get("padding_top", 0),
-            padding_bottom=kwargs.get("padding_bottom", 0),
-            padding_left=kwargs.get("padding_left", 0),
-            padding_right=kwargs.get("padding_right", 0),
             anchor_point=kwargs.get("anchor_point", None),
             anchored_position=kwargs.get("anchored_position", None),
             save_text=kwargs.get("save_text", True),
@@ -133,10 +129,6 @@ class Label(LabelBase):
         font=None,
         text: str = None,
         line_spacing: float = None,
-        padding_top: int = None,
-        padding_bottom: int = None,
-        padding_left: int = None,
-        padding_right: int = None,
         anchor_point: Tuple[float, float] = None,
         anchored_position: Tuple[int, int] = None,
         save_text: bool = None,
@@ -151,14 +143,6 @@ class Label(LabelBase):
             self._font = font
         if line_spacing is not None:
             self._line_spacing = line_spacing
-        if padding_top is not None:
-            self._padding_top = max(0, padding_top)
-        if padding_bottom is not None:
-            self._padding_bottom = max(0, padding_bottom)
-        if padding_left is not None:
-            self._padding_left = max(0, padding_left)
-        if padding_right is not None:
-            self._padding_right = max(0, padding_right)
         if anchor_point is not None:
             self._anchor_point = anchor_point
         if anchored_position is not None:

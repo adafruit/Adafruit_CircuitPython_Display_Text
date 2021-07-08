@@ -110,10 +110,6 @@ class Label(LabelBase):
         self._background_palette = displayio.Palette(1)
         self._added_background_tilegrid = False
 
-        self._padding_top = kwargs.get("padding_top", 0)
-        self._padding_bottom = kwargs.get("padding_bottom", 0)
-        self._padding_left = kwargs.get("padding_left", 0)
-        self._padding_right = kwargs.get("padding_right", 0)
         self.base_alignment = kwargs.get("base_alignment", False)
         self._label_direction = kwargs.get("label_direction", "LTR")
 
