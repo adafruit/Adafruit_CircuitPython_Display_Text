@@ -80,7 +80,7 @@ class Label(LabelBase):
     # pylint: disable=unused-argument, too-many-instance-attributes, too-many-locals, too-many-arguments
     # pylint: disable=too-many-branches, no-self-use, too-many-statements
 
-    def __init__(self, font, **kwargs) -> None:
+    def __init__(self, font, save_text=True, **kwargs) -> None:
 
         super().__init__(font, **kwargs)
 
@@ -94,6 +94,7 @@ class Label(LabelBase):
         self._tab_replacement = kwargs.get("tab_replacement", (4, " "))
         self._tab_text = self._tab_replacement[1] * self._tab_replacement[0]
         text = kwargs.get("text", "")
+        self._save_text = save_text
         self._text = self._tab_text.join(text.split("\t"))
 
         # Create the two-color palette
@@ -117,7 +118,6 @@ class Label(LabelBase):
             line_spacing=self._line_spacing,
             anchor_point=kwargs.get("anchor_point", None),
             anchored_position=kwargs.get("anchored_position", None),
-            save_text=kwargs.get("save_text", True),
             scale=kwargs.get("scale", 1),
             base_alignment=kwargs.get("base_alignment", False),
             tab_replacement=kwargs.get("tab_replacement", (4, " ")),
@@ -131,7 +131,6 @@ class Label(LabelBase):
         line_spacing: float = None,
         anchor_point: Tuple[float, float] = None,
         anchored_position: Tuple[int, int] = None,
-        save_text: bool = None,
         scale: int = None,
         base_alignment: bool = None,
         tab_replacement: Tuple[int, str] = None,
@@ -147,8 +146,6 @@ class Label(LabelBase):
             self._anchor_point = anchor_point
         if anchored_position is not None:
             self._anchored_position = anchored_position
-        if save_text is not None:
-            self._save_text = save_text
         if base_alignment is not None:
             self.base_alignment = base_alignment
         if tab_replacement is not None:

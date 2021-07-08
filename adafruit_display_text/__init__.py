@@ -179,8 +179,6 @@ class LabelBase(Group):
     :param (int,int) anchored_position: Position relative to the anchor_point. Tuple
      containing x,y pixel coordinates.
     :param int scale: Integer value of the pixel scaling
-    :param bool save_text: Set True to save the text string as a constant in the
-     label structure.  Set False to reduce memory use.
     :param bool base_alignment: when True allows to align text label to the baseline.
      This is helpful when two or more labels need to be aligned to the same baseline
     :param (int,str) tab_replacement: tuple with tab character replace information. When
@@ -207,7 +205,6 @@ class LabelBase(Group):
         padding_right: int = 0,
         anchor_point: Tuple[float, float] = None,
         anchored_position: Tuple[int, int] = None,
-        save_text: bool = True,  # can reduce memory use if save_text = False
         scale: int = 1,
         base_alignment: bool = False,
         tab_replacement: Tuple[int, str] = (4, " "),
