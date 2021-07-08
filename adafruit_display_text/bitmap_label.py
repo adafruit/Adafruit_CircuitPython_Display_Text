@@ -91,11 +91,9 @@ class Label(LabelBase):
             self.local_group
         )  # the local_group will always stay in the self Group
 
-        self._tab_replacement = kwargs.get("tab_replacement", (4, " "))
-        self._tab_text = self._tab_replacement[1] * self._tab_replacement[0]
         text = kwargs.get("text", "")
         self._save_text = save_text
-        self._text = self._tab_text.join(text.split("\t"))
+        self._text = self._replace_tabs(text)
 
         # Create the two-color palette
 
@@ -120,7 +118,6 @@ class Label(LabelBase):
             anchored_position=kwargs.get("anchored_position", None),
             scale=kwargs.get("scale", 1),
             base_alignment=kwargs.get("base_alignment", False),
-            tab_replacement=kwargs.get("tab_replacement", (4, " ")),
             label_direction=kwargs.get("label_direction", "LTR"),
         )
 
@@ -133,7 +130,6 @@ class Label(LabelBase):
         anchored_position: Tuple[int, int] = None,
         scale: int = None,
         base_alignment: bool = None,
-        tab_replacement: Tuple[int, str] = None,
         label_direction: str = "LTR",
     ) -> None:
 
@@ -148,8 +144,6 @@ class Label(LabelBase):
             self._anchored_position = anchored_position
         if base_alignment is not None:
             self.base_alignment = base_alignment
-        if tab_replacement is not None:
-            self._tab_replacement = tab_replacement
         if label_direction is not None:
             self._label_direction = label_direction
 
@@ -158,7 +152,7 @@ class Label(LabelBase):
             text = self._text
 
         if self._save_text:  # text string will be saved
-            self._text = self._tab_text.join(text.split("\t"))
+            self._text = self._replace_tabs(text)
             if self._label_direction == "RTL":
                 self._text = "".join(reversed(self._text))
         else:
@@ -553,8 +547,7 @@ class Label(LabelBase):
             raise RuntimeError("font is immutable when save_text is False")
 
     def _set_text(self, new_text: str, scale: int) -> None:
-        new_text = self._tab_text.join(new_text.split("\t"))
-        self._reset_text(text=new_text, scale=self.scale)
+        self._reset_text(text=self._replace_tabs(new_text), scale=self.scale)
 
     def _set_background_color(self, new_color):
         self._background_color = new_color

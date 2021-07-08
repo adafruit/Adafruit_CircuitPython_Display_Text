@@ -241,6 +241,8 @@ class LabelBase(Group):
         self.baseline = -1.0
 
         self.base_alignment = base_alignment
+        self._tab_replacement = tab_replacement
+        self._tab_text = self._tab_replacement[1] * self._tab_replacement[0]
 
         if self.base_alignment:
             self._y_offset = 0
@@ -408,3 +410,6 @@ class LabelBase(Group):
         if new_label_direction not in ["LTR", "RTL", "UPR", "DWR", "TTB"]:
             raise RuntimeError("Please provide a valid text direction")
         self._set_label_direction(new_label_direction)
+
+    def _replace_tabs(self, text):
+        return self._tab_text.join(text.split("\t"))

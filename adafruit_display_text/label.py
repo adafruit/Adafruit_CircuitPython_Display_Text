@@ -82,9 +82,7 @@ class Label(LabelBase):
 
         if not max_glyphs and not text:
             raise RuntimeError("Please provide a max_glyphs, or initial text")
-        self._tab_replacement = kwargs.get("tab_replacement", (4, " "))
-        self._tab_text = self._tab_replacement[1] * self._tab_replacement[0]
-        text = self._tab_text.join(text.split("\t"))
+        text = self._replace_tabs(text)
         if not max_glyphs:
             max_glyphs = len(text)
 
@@ -431,10 +429,9 @@ class Label(LabelBase):
             self._update_background_color(self._background_color)
 
     def _reset_text(self, new_text: str) -> None:
-        new_text = self._tab_text.join(new_text.split("\t"))
         try:
             current_anchored_position = self.anchored_position
-            self._update_text(str(new_text))
+            self._update_text(str(self._replace_tabs(new_text)))
             self.anchored_position = current_anchored_position
         except RuntimeError as run_error:
             raise RuntimeError("Text length exceeds max_glyphs") from run_error
