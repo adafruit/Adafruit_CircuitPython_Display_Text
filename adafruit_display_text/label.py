@@ -37,6 +37,8 @@ from adafruit_display_text import LabelBase
 
 
 class Label(LabelBase):
+    # pylint: disable=too-many-instance-attributes
+
     """A label displaying a string of text. The origin point set by ``x`` and ``y``
     properties will be the left edge of the bounding box, and in the center of a M
     glyph (if its one line), or the (number of lines * linespacing + M)/2. That is,
@@ -76,9 +78,6 @@ class Label(LabelBase):
     :param str label_direction: string defining the label text orientation. There are 5
      configurations possibles ``LTR``-Left-To-Right ``RTL``-Right-To-Left
      ``TTB``-Top-To-Bottom ``UPR``-Upwards ``DWR``-Downwards. It defaults to ``LTR``"""
-
-    # pylint: disable=too-many-instance-attributes, too-many-locals
-    # This has a lot of getters/setters, maybe it needs cleanup.
 
     def __init__(self, font, **kwargs) -> None:
         self._background_palette = Palette(1)
@@ -226,10 +225,9 @@ class Label(LabelBase):
                 self._local_group.pop(0)
                 self._added_background_tilegrid = False
 
-    # pylint: disable = too-many-branches, too-many-statements
-    def _update_text(
-        self, new_text: str
-    ) -> None:  # pylint: disable=too-many-locals ,too-many-branches, too-many-statements
+    def _update_text(self, new_text: str) -> None:
+        # pylint: disable=too-many-branches,too-many-statements
+
         x = 0
         y = 0
         if self._added_background_tilegrid:
@@ -379,8 +377,10 @@ class Label(LabelBase):
 
         while len(self._local_group) > tilegrid_count:  # i:
             self._local_group.pop()
-        # pylint: disable=invalid-unary-operand-type
+
         if self._label_direction == "RTL":
+            # pylint: disable=invalid-unary-operand-type
+            # type-checkers think left can be None
             self._bounding_box = (-left, top, left - right, bottom - top)
         if self._label_direction == "TTB":
             self._bounding_box = (left, top, right - left, bottom - top)

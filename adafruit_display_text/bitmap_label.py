@@ -80,9 +80,6 @@ class Label(LabelBase):
      configurations possibles ``LTR``-Left-To-Right ``RTL``-Right-To-Left
      ``UPD``-Upside Down ``UPR``-Upwards ``DWR``-Downwards. It defaults to ``LTR``"""
 
-    # pylint: disable=unused-argument, too-many-instance-attributes, too-many-locals, too-many-arguments
-    # pylint: disable=too-many-branches, no-self-use, too-many-statements
-
     def __init__(self, font, save_text=True, **kwargs) -> None:
 
         super().__init__(font, **kwargs)
@@ -109,6 +106,7 @@ class Label(LabelBase):
         line_spacing: float = None,
         scale: int = None,
     ) -> None:
+        # pylint: disable=too-many-branches, too-many-statements
 
         # Store all the instance variables
         if font is not None:
@@ -256,6 +254,8 @@ class Label(LabelBase):
     def _text_bounding_box(
         self, text: str, font
     ) -> Tuple[int, int, int, int, int, int]:
+        # pylint: disable=too-many-locals
+
         ascender_max, descender_max = self._ascent, self._descent
 
         lines = 1
@@ -330,7 +330,6 @@ class Label(LabelBase):
             final_y_offset_loose,
         )
 
-    # pylint: disable=too-many-nested-blocks
     def _place_text(
         self,
         bitmap,
@@ -342,6 +341,8 @@ class Label(LabelBase):
         # when copying glyph bitmaps (this is important for slanted text
         # where rectangular glyph boxes overlap)
     ) -> Tuple[int, int, int, int]:
+        # pylint: disable=too-many-arguments, too-many-locals
+
         # placeText - Writes text into a bitmap at the specified location.
         #
         # Note: scale is pushed up to Group level
@@ -441,6 +442,7 @@ class Label(LabelBase):
         skip_index: int = None,  # palette index that will not be copied
         # (for example: the background color of a glyph)
     ) -> None:
+        # pylint: disable=no-self-use, too-many-arguments
 
         if hasattr(bitmap, "blit"):  # if bitmap has a built-in blit function, call it
             # this function should perform its own input checks

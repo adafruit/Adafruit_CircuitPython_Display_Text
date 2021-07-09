@@ -17,6 +17,8 @@ from displayio import Group, Palette
 def wrap_text_to_pixels(
     string: str, max_width: int, font=None, indent0: str = "", indent1: str = ""
 ) -> List[str]:
+    # pylint: disable=too-many-branches, too-many-locals
+
     """wrap_text_to_pixels function
     A helper that will return a list of lines with word-break wrapping.
     Leading and trailing whitespace in your string will be removed. If
@@ -34,7 +36,6 @@ def wrap_text_to_pixels(
     :rtype: List[str]
 
     """
-    # pylint: disable=too-many-locals, too-many-branches
     if font is None:
 
         def measure(text):
@@ -153,6 +154,8 @@ def wrap_text_to_lines(string: str, max_chars: int) -> List[str]:
 
 
 class LabelBase(Group):
+    # pylint: disable=too-many-instance-attributes
+
     """Superclass that all other types of labels will extend. This contains
     all of the properties and functions that work the same way in all labels.
 
@@ -187,7 +190,6 @@ class LabelBase(Group):
     :param str label_direction: string defining the label text orientation. See the
      subclass documentation for the possible values."""
 
-    # pylint: disable=unused-argument,  too-many-instance-attributes, too-many-locals, too-many-arguments
     def __init__(
         self,
         font,
@@ -208,8 +210,10 @@ class LabelBase(Group):
         base_alignment: bool = False,
         tab_replacement: Tuple[int, str] = (4, " "),
         label_direction: str = "LTR",
-        **kwargs,
+        **kwargs,  # pylint: disable=unused-argument
     ) -> None:
+        # pylint: disable=too-many-arguments, too-many-locals
+
         super().__init__(x=x, y=y, scale=1)
 
         self._font = font
