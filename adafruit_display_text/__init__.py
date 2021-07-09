@@ -184,9 +184,8 @@ class LabelBase(Group):
     :param (int,str) tab_replacement: tuple with tab character replace information. When
      (4, " ") will indicate a tab replacement of 4 spaces, defaults to 4 spaces by
      tab character
-    :param str label_direction: string defining the label text orientation. There are 5
-     configurations possibles ``LTR``-Left-To-Right ``RTL``-Right-To-Left
-     ``TTB``-Top-To-Bottom ``UPR``-Upwards ``DWR``-Downwards. It defaults to ``LTR``"""
+    :param str label_direction: string defining the label text orientation. See the
+     subclass documentation for the possible values."""
 
     # pylint: disable=unused-argument,  too-many-instance-attributes, too-many-locals, too-many-arguments
     def __init__(
@@ -401,13 +400,19 @@ class LabelBase(Group):
         return self._label_direction
 
     def _set_label_direction(self, new_label_direction: str) -> None:
-        # subclass should override this.
-        pass
+        raise NotImplementedError(
+            "{} MUST override '_set_label_direction'".format(type(self))
+        )
+
+    def _get_valid_label_directions(self) -> Tuple[str, ...]:
+        raise NotImplementedError(
+            "{} MUST override '_get_valid_label_direction'".format(type(self))
+        )
 
     @label_direction.setter
     def label_direction(self, new_label_direction: str) -> None:
         """Set the text direction of the label"""
-        if new_label_direction not in ["LTR", "RTL", "UPR", "DWR", "TTB"]:
+        if new_label_direction not in self._get_valid_label_directions():
             raise RuntimeError("Please provide a valid text direction")
         self._set_label_direction(new_label_direction)
 

@@ -22,10 +22,16 @@ Implementation Notes
 
 """
 
-import displayio
-
 __version__ = "0.0.0-auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_Display_Text.git"
+
+
+try:
+    from typing import Tuple
+except ImportError:
+    pass
+
+import displayio
 
 from adafruit_display_text import LabelBase
 
@@ -109,10 +115,6 @@ class Label(LabelBase):
         self._added_background_tilegrid = False
 
         self.base_alignment = kwargs.get("base_alignment", False)
-        self._label_direction = kwargs.get("label_direction", "LTR")
-
-        if self._label_direction not in ["LTR", "RTL", "UPR", "DWR", "TTB"]:
-            raise RuntimeError("Please provide a valid text direction")
 
         if text is not None:
             self._update_text(str(text))
@@ -136,11 +138,7 @@ class Label(LabelBase):
         else:  # draw a "loose" bounding box to include any ascenders/descenders.
             ascent, descent = self._ascent, self._descent
 
-            if (
-                self._label_direction == "UPR"
-                or self._label_direction == "DWR"
-                or self._label_direction == "TTB"
-            ):
+            if self._label_direction in ("UPR", "DWR", "TTB"):
                 box_height = (
                     self._bounding_box[3] + self._padding_top + self._padding_bottom
                 )
@@ -284,7 +282,7 @@ class Label(LabelBase):
             if not glyph:
                 continue
 
-            if self._label_direction == "LTR" or self._label_direction == "RTL":
+            if self._label_direction in ("LTR", "RTL"):
                 bottom = max(bottom, y - glyph.dy + self._y_offset)
                 if y == 0:  # first line, find the Ascender height
                     top = min(top, -glyph.height - glyph.dy + self._y_offset)
@@ -309,7 +307,7 @@ class Label(LabelBase):
                             right = max(right, glyph.dx)
                     position_x = x - glyph.width
 
-            if self._label_direction == "TTB":
+            elif self._label_direction == "TTB":
                 if x == 0:
                     if left is None:
                         left = glyph.dx
@@ -325,7 +323,7 @@ class Label(LabelBase):
                 position_y = y + glyph.dy
                 position_x = x - glyph.width // 2 + self._y_offset
 
-            if self._label_direction == "UPR":
+            elif self._label_direction == "UPR":
                 if x == 0:
                     if bottom is None:
                         bottom = -glyph.dx
@@ -338,7 +336,7 @@ class Label(LabelBase):
                 position_y = y - glyph.width - glyph.dx
                 position_x = x - glyph.height - glyph.dy + self._y_offset
 
-            if self._label_direction == "DWR":
+            elif self._label_direction == "DWR":
                 if y == 0:
                     if top is None:
                         top = -glyph.dx
@@ -457,5 +455,7 @@ class Label(LabelBase):
 
     def _set_label_direction(self, new_label_direction: str) -> None:
         self._label_direction = new_label_direction
-        old_text = self._text
-        self._update_text(str(old_text))
+        self._update_text(str(self._text))
+
+    def _get_valid_label_directions(self) -> Tuple[str, ...]:
+        return "LTR", "RTL", "UPR", "DWR", "TTB"

@@ -22,14 +22,17 @@ Implementation Notes
   https://circuitpython.org/downloads
 
 """
+
+__version__ = "0.0.0-auto.0"
+__repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_Display_Text.git"
+
+
 try:
     from typing import Tuple
 except ImportError:
     pass
-import displayio
 
-__version__ = "0.0.0-auto.0"
-__repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_Display_Text.git"
+import displayio
 
 from adafruit_display_text import LabelBase
 
@@ -96,13 +99,8 @@ class Label(LabelBase):
         self._text = self._replace_tabs(text)
 
         # Create the two-color palette
-
         self.color = kwargs.get("color", 0xFFFFFF)
         self.background_color = kwargs.get("background_color", None)
-        self._label_direction = kwargs.get("label_direction", "LTR")
-
-        if self._label_direction not in ["LTR", "RTL", "UPD", "UPR", "DWR"]:
-            raise RuntimeError("Please provide a valid text direction")
 
         if self._label_direction == "RTL":
             self._text = "".join(reversed(self._text))
@@ -118,7 +116,6 @@ class Label(LabelBase):
             anchored_position=kwargs.get("anchored_position", None),
             scale=kwargs.get("scale", 1),
             base_alignment=kwargs.get("base_alignment", False),
-            label_direction=kwargs.get("label_direction", "LTR"),
         )
 
     def _reset_text(
@@ -130,7 +127,6 @@ class Label(LabelBase):
         anchored_position: Tuple[int, int] = None,
         scale: int = None,
         base_alignment: bool = None,
-        label_direction: str = "LTR",
     ) -> None:
 
         # Store all the instance variables
@@ -144,8 +140,6 @@ class Label(LabelBase):
             self._anchored_position = anchored_position
         if base_alignment is not None:
             self.base_alignment = base_alignment
-        if label_direction is not None:
-            self._label_direction = label_direction
 
         # if text is not provided as a parameter (text is None), use the previous value.
         if (text is None) and self._save_text:
@@ -254,7 +248,7 @@ class Label(LabelBase):
 
             # Update bounding_box values.  Note: To be consistent with label.py,
             # this is the bounding box for the text only, not including the background.
-            if label_direction == "UPR" or self._label_direction == "DWR":
+            if self._label_direction in ("UPR", "DWR"):
                 self._bounding_box = (
                     self.tilegrid.x,
                     self.tilegrid.y,
@@ -557,3 +551,10 @@ class Label(LabelBase):
         else:
             self.palette[0] = 0
             self.palette.make_transparent(0)
+
+    def _set_label_direction(self, new_label_direction: str) -> None:
+        self._label_direction = new_label_direction
+        self._reset_text(text=str(self._text))  # Force a recalculation
+
+    def _get_valid_label_directions(self) -> Tuple[str, ...]:
+        return "LTR", "RTL", "UPD", "UPR", "DWR"
