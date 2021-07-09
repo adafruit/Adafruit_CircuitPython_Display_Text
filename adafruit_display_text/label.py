@@ -103,7 +103,6 @@ class Label(LabelBase):
         self.width = max_glyphs
         self._font = font
         self._text = None
-        self._anchor_point = kwargs.get("anchor_point", None)
 
         self.height = self._font.get_bounding_box()[1]
         self._bounding_box = None
@@ -113,11 +112,7 @@ class Label(LabelBase):
         self._palette.make_transparent(0)
 
         if text is not None:
-            self._update_text(str(text))
-        if (kwargs.get("anchored_position", None) is not None) and (
-            kwargs.get("anchor_point", None) is not None
-        ):
-            self.anchored_position = kwargs.get("anchored_position", None)
+            self._reset_text(str(text))
 
     def _create_background_box(self, lines: int, y_offset: int) -> None:
         """Private Class function to create a background_box

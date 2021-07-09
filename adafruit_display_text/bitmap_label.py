@@ -106,8 +106,6 @@ class Label(LabelBase):
             font=font,
             text=kwargs.get("text", ""),
             line_spacing=self._line_spacing,
-            anchor_point=kwargs.get("anchor_point", None),
-            anchored_position=kwargs.get("anchored_position", None),
             scale=kwargs.get("scale", 1),
         )
 
@@ -116,8 +114,6 @@ class Label(LabelBase):
         font=None,
         text: str = None,
         line_spacing: float = None,
-        anchor_point: Tuple[float, float] = None,
-        anchored_position: Tuple[int, int] = None,
         scale: int = None,
     ) -> None:
 
@@ -126,10 +122,6 @@ class Label(LabelBase):
             self._font = font
         if line_spacing is not None:
             self._line_spacing = line_spacing
-        if anchor_point is not None:
-            self._anchor_point = anchor_point
-        if anchored_position is not None:
-            self._anchored_position = anchored_position
 
         # if text is not provided as a parameter (text is None), use the previous value.
         if (text is None) and self._save_text:
@@ -258,10 +250,9 @@ class Label(LabelBase):
         ):  # Scale will be defined in local_group (Note: self should have scale=1)
             self.scale = scale  # call the setter
 
-        self.anchored_position = (
-            self._anchored_position
-        )  # set the anchored_position with setter after bitmap is created, sets the
+        # set the anchored_position with setter after bitmap is created, sets the
         # x,y positions of the label
+        self.anchored_position = self._anchored_position
 
     @staticmethod
     def _line_spacing_ypixels(font, line_spacing: float) -> int:

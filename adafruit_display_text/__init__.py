@@ -323,9 +323,9 @@ class LabelBase(Group):
             self._anchor_point = (new_anchor_point[0], -1.0)
         else:
             self._anchor_point = new_anchor_point
-        self.anchored_position = (
-            self._anchored_position
-        )  # update the anchored_position using setter
+
+        # update the anchored_position using setter
+        self.anchored_position = self._anchored_position
 
     @property
     def anchored_position(self) -> Tuple[int, int]:
@@ -336,7 +336,7 @@ class LabelBase(Group):
     @anchored_position.setter
     def anchored_position(self, new_position: Tuple[int, int]) -> None:
         self._anchored_position = new_position
-        # Set anchored_position
+        # Calculate (x,y) position
         if (self._anchor_point is not None) and (self._anchored_position is not None):
             self.x = int(
                 new_position[0]
