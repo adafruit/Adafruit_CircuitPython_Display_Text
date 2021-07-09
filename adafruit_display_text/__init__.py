@@ -37,15 +37,15 @@ def wrap_text_to_pixels(
     # pylint: disable=too-many-locals, too-many-branches
     if font is None:
 
-        def measure(string):
-            return len(string)
+        def measure(text):
+            return len(text)
 
     else:
         if hasattr(font, "load_glyphs"):
             font.load_glyphs(string)
 
-        def measure(string):
-            return sum(font.get_glyph(ord(c)).shift_x for c in string)
+        def measure(text):
+            return sum(font.get_glyph(ord(c)).shift_x for c in text)
 
     lines = []
     partial = [indent0]
@@ -237,9 +237,10 @@ class LabelBase(Group):
         self.background_color = background_color
 
         # local group will hold background and text
-        # the self group scale should always remain at 1, the self.local_group will
+        # the self group scale should always remain at 1, the self._local_group will
         # be used to set the scale of the label
-        self.local_group = None
+        self._local_group = Group(scale=scale)
+        self.append(self._local_group)
 
         self.baseline = -1.0
 
@@ -250,7 +251,7 @@ class LabelBase(Group):
 
     def _get_ascent_descent(self) -> Tuple[int, int]:
         """ Private function to calculate ascent and descent font values """
-        if hasattr(self.font, "ascent"):
+        if hasattr(self.font, "ascent") and hasattr(self.font, "descent"):
             return self.font.ascent, self.font.descent
 
         # check a few glyphs for maximum ascender and descender height
@@ -355,11 +356,11 @@ class LabelBase(Group):
     @property
     def scale(self) -> int:
         """Set the scaling of the label, in integer values"""
-        return self.local_group.scale
+        return self._local_group.scale
 
     @scale.setter
     def scale(self, new_scale: int) -> None:
-        self.local_group.scale = new_scale
+        self._local_group.scale = new_scale
         self.anchored_position = self._anchored_position  # update the anchored_position
 
     def _set_text(self, new_text: str, scale: int) -> None:

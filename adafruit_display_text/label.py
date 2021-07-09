@@ -31,7 +31,7 @@ try:
 except ImportError:
     pass
 
-import displayio
+from displayio import Bitmap, Palette, TileGrid
 
 from adafruit_display_text import LabelBase
 
@@ -81,16 +81,12 @@ class Label(LabelBase):
     # This has a lot of getters/setters, maybe it needs cleanup.
 
     def __init__(self, font, **kwargs) -> None:
-        self._background_palette = displayio.Palette(1)
+        self._background_palette = Palette(1)
         self._added_background_tilegrid = False
 
         super().__init__(font, **kwargs)
 
         text = self._replace_tabs(self._text)
-
-        # local_group will set the scale
-        self.local_group = displayio.Group(scale=kwargs.get("scale", 1))
-        self.append(self.local_group)
 
         self.width = len(text)
         self._font = font
@@ -106,7 +102,7 @@ class Label(LabelBase):
         if text is not None:
             self._reset_text(str(text))
 
-    def _create_background_box(self, lines: int, y_offset: int) -> None:
+    def _create_background_box(self, lines: int, y_offset: int) -> TileGrid:
         """Private Class function to create a background_box
         :param lines: int number of lines
         :param y_offset: int y pixel bottom coordinate for the background_box"""
@@ -165,8 +161,8 @@ class Label(LabelBase):
             movx = left + x_box_offset
             movy = y_box_offset
 
-        background_bitmap = displayio.Bitmap(box_width, box_height, 1)
-        tile_grid = displayio.TileGrid(
+        background_bitmap = Bitmap(box_width, box_height, 1)
+        tile_grid = TileGrid(
             background_bitmap,
             pixel_shader=self._background_palette,
             x=movx,
@@ -182,7 +178,7 @@ class Label(LabelBase):
         if new_color is None:
             self._background_palette.make_transparent(0)
             if self._added_background_tilegrid:
-                self.local_group.pop(0)
+                self._local_group.pop(0)
                 self._added_background_tilegrid = False
         else:
             self._background_palette.make_opaque(0)
@@ -207,15 +203,9 @@ class Label(LabelBase):
                     self._bounding_box[3] + self._padding_top + self._padding_bottom > 0
                 )
             ):
-                # This can be simplified in CP v6.0, when group.append(0) bug is corrected
-                if len(self.local_group) > 0:
-                    self.local_group.insert(
-                        0, self._create_background_box(lines, y_offset)
-                    )
-                else:
-                    self.local_group.append(
-                        self._create_background_box(lines, y_offset)
-                    )
+                self._local_group.insert(
+                    0, self._create_background_box(lines, y_offset)
+                )
                 self._added_background_tilegrid = True
 
         else:  # a bitmap is present in the self Group
@@ -229,9 +219,11 @@ class Label(LabelBase):
                     self._bounding_box[3] + self._padding_top + self._padding_bottom > 0
                 )
             ):
-                self.local_group[0] = self._create_background_box(lines, self._y_offset)
+                self._local_group[0] = self._create_background_box(
+                    lines, self._y_offset
+                )
             else:  # delete the existing bitmap
-                self.local_group.pop(0)
+                self._local_group.pop(0)
                 self._added_background_tilegrid = False
 
     # pylint: disable = too-many-branches, too-many-statements
@@ -268,6 +260,8 @@ class Label(LabelBase):
             glyph = self._font.get_glyph(ord(character))
             if not glyph:
                 continue
+
+            position_x, position_y = 0, 0
 
             if self._label_direction in ("LTR", "RTL"):
                 bottom = max(bottom, y - glyph.dy + self._y_offset)
@@ -337,26 +331,15 @@ class Label(LabelBase):
                 position_x = x + glyph.dy - self._y_offset
 
             if glyph.width > 0 and glyph.height > 0:
-                try:
-                    # pylint: disable=unexpected-keyword-arg
-                    face = displayio.TileGrid(
-                        glyph.bitmap,
-                        pixel_shader=self._palette,
-                        default_tile=glyph.tile_index,
-                        tile_width=glyph.width,
-                        tile_height=glyph.height,
-                        position=(position_x, position_y),
-                    )
-                except TypeError:
-                    face = displayio.TileGrid(
-                        glyph.bitmap,
-                        pixel_shader=self._palette,
-                        default_tile=glyph.tile_index,
-                        tile_width=glyph.width,
-                        tile_height=glyph.height,
-                        x=position_x,
-                        y=position_y,
-                    )
+                face = TileGrid(
+                    glyph.bitmap,
+                    pixel_shader=self._palette,
+                    default_tile=glyph.tile_index,
+                    tile_width=glyph.width,
+                    tile_height=glyph.height,
+                    x=position_x,
+                    y=position_y,
+                )
 
                 if self._label_direction == "UPR":
                     face.transpose_xy = True
@@ -365,10 +348,10 @@ class Label(LabelBase):
                     face.transpose_xy = True
                     face.flip_y = True
 
-                if tilegrid_count < len(self.local_group):
-                    self.local_group[tilegrid_count] = face
+                if tilegrid_count < len(self._local_group):
+                    self._local_group[tilegrid_count] = face
                 else:
-                    self.local_group.append(face)
+                    self._local_group.append(face)
                 tilegrid_count += 1
 
             if self._label_direction == "RTL":
@@ -394,8 +377,8 @@ class Label(LabelBase):
         if self._label_direction == "TTB" and top is None:
             top = 0
 
-        while len(self.local_group) > tilegrid_count:  # i:
-            self.local_group.pop()
+        while len(self._local_group) > tilegrid_count:  # i:
+            self._local_group.pop()
         # pylint: disable=invalid-unary-operand-type
         if self._label_direction == "RTL":
             self._bounding_box = (-left, top, left - right, bottom - top)

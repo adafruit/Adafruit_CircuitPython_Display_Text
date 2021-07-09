@@ -87,13 +87,6 @@ class Label(LabelBase):
 
         super().__init__(font, **kwargs)
 
-        self.local_group = displayio.Group(
-            scale=kwargs.get("scale", 1)
-        )  # local_group holds the tileGrid and sets the scaling
-        self.append(
-            self.local_group
-        )  # the local_group will always stay in the self Group
-
         text = kwargs.get("text", "")
         self._save_text = save_text
         self._text = self._replace_tabs(text)
@@ -145,10 +138,10 @@ class Label(LabelBase):
                 0,  # zero width with text == ""
                 0,  # zero height with text == ""
             )
-            # Clear out any items in the self.local_group Group, in case this is an
+            # Clear out any items in the self._local_group Group, in case this is an
             # update to the bitmap_label
-            for _ in self.local_group:
-                self.local_group.pop(0)
+            for _ in self._local_group:
+                self._local_group.pop(0)
 
         else:  # The text string is not empty, so create the Bitmap and TileGrid and
             # append to the self Group
@@ -222,9 +215,9 @@ class Label(LabelBase):
 
             # Clear out any items in the local_group Group, in case this is an update to
             # the bitmap_label
-            for _ in self.local_group:
-                self.local_group.pop(0)
-            self.local_group.append(
+            for _ in self._local_group:
+                self._local_group.pop(0)
+            self._local_group.append(
                 self.tilegrid
             )  # add the bitmap's tilegrid to the group
 
@@ -345,8 +338,6 @@ class Label(LabelBase):
         font,
         xposition: int,
         yposition: int,
-        text_palette_index: int = 1,
-        background_palette_index: int = 0,
         skip_index: int = 0,  # set to None to write all pixels, other wise skip this palette index
         # when copying glyph bitmaps (this is important for slanted text
         # where rectangular glyph boxes overlap)
@@ -403,8 +394,8 @@ class Label(LabelBase):
                     # Clip glyph y-direction if outside the font ascent/descent metrics.
                     # Note: bitmap.blit will automatically clip the bottom of the glyph.
                     y_clip = 0
-                    if (y_blit_target) < 0:
-                        y_clip = -(y_blit_target)  # clip this amount from top of bitmap
+                    if y_blit_target < 0:
+                        y_clip = -y_blit_target  # clip this amount from top of bitmap
                         y_blit_target = 0  # draw the clipped bitmap at y=0
 
                         print(
@@ -434,7 +425,8 @@ class Label(LabelBase):
 
                     xposition = xposition + my_glyph.shift_x
 
-        return (left, top, right - left, bottom - top)  # bounding_box
+        # bounding_box
+        return left, top, right - left, bottom - top
 
     def _blit(
         self,
