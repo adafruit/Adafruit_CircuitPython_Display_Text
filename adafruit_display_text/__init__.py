@@ -225,7 +225,7 @@ class LabelBase(Group):
         self._padding_right = padding_right
         self._anchor_point = anchor_point
         self._anchored_position = anchored_position
-        self.base_alignment = base_alignment
+        self._base_alignment = base_alignment
         self._label_direction = label_direction
         self._tab_replacement = tab_replacement
         self._tab_text = self._tab_replacement[1] * self._tab_replacement[0]
@@ -243,7 +243,7 @@ class LabelBase(Group):
 
         self.baseline = -1.0
 
-        if self.base_alignment:
+        if self._base_alignment:
             self._y_offset = 0
         else:
             self._y_offset = self._ascent // 2

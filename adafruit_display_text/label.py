@@ -112,8 +112,6 @@ class Label(LabelBase):
         self._palette[0] = 0
         self._palette.make_transparent(0)
 
-        self.base_alignment = kwargs.get("base_alignment", False)
-
         if text is not None:
             self._update_text(str(text))
         if (kwargs.get("anchored_position", None) is not None) and (
@@ -159,7 +157,7 @@ class Label(LabelBase):
                     + self._padding_bottom
                 )
 
-            if self.base_alignment:
+            if self._base_alignment:
                 y_box_offset = -ascent - self._padding_top
             else:
                 y_box_offset = -ascent + y_offset - self._padding_top
@@ -260,7 +258,7 @@ class Label(LabelBase):
         else:
             i = 0
         tilegrid_count = i
-        if self.base_alignment:
+        if self._base_alignment:
             self._y_offset = 0
         else:
             self._y_offset = self._ascent // 2

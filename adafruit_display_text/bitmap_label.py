@@ -101,8 +101,6 @@ class Label(LabelBase):
         if self._label_direction == "RTL":
             self._text = "".join(reversed(self._text))
 
-        self.base_alignment = kwargs.get("base_alignment", False)
-
         # call the text updater with all the arguments.
         self._reset_text(
             font=font,
@@ -111,7 +109,6 @@ class Label(LabelBase):
             anchor_point=kwargs.get("anchor_point", None),
             anchored_position=kwargs.get("anchored_position", None),
             scale=kwargs.get("scale", 1),
-            base_alignment=kwargs.get("base_alignment", False),
         )
 
     def _reset_text(
@@ -122,7 +119,6 @@ class Label(LabelBase):
         anchor_point: Tuple[float, float] = None,
         anchored_position: Tuple[int, int] = None,
         scale: int = None,
-        base_alignment: bool = None,
     ) -> None:
 
         # Store all the instance variables
@@ -134,8 +130,6 @@ class Label(LabelBase):
             self._anchor_point = anchor_point
         if anchored_position is not None:
             self._anchored_position = anchored_position
-        if base_alignment is not None:
-            self.base_alignment = base_alignment
 
         # if text is not provided as a parameter (text is None), use the previous value.
         if (text is None) and self._save_text:
@@ -207,7 +201,7 @@ class Label(LabelBase):
                 self._padding_top + y_offset,
             )
 
-            if self.base_alignment:
+            if self._base_alignment:
                 label_position_yoffset = 0
             else:
                 label_position_yoffset = self._ascent // 2
