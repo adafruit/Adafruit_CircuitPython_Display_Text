@@ -213,35 +213,35 @@ class LabelBase(Group):
         super().__init__(x=x, y=y, scale=1)
 
         self._font = font
+        self._text = text
+        self._palette = Palette(2)
+        self._color = 0xFFFFFF
+        self._background_color = None
         self._line_spacing = line_spacing
         self._background_tight = background_tight
         self._padding_top = padding_top
         self._padding_bottom = padding_bottom
         self._padding_left = padding_left
         self._padding_right = padding_right
-        self._ascent, self._descent = self._get_ascent_descent()
-        self.palette = Palette(2)
-        self._color = color
-        self._background_color = background_color
-
-        self._bounding_box = None
         self._anchor_point = anchor_point
         self._anchored_position = anchored_position
+        self.base_alignment = base_alignment
+        self._label_direction = label_direction
+        self._tab_replacement = tab_replacement
+        self._tab_text = self._tab_replacement[1] * self._tab_replacement[0]
+
+        self._ascent, self._descent = self._get_ascent_descent()
+        self._bounding_box = None
+
+        self.color = color
+        self.background_color = background_color
 
         # local group will hold background and text
         # the self group scale should always remain at 1, the self.local_group will
         # be used to set the scale of the label
         self.local_group = None
 
-        self._text = text
-
-        self._label_direction = label_direction
-
         self.baseline = -1.0
-
-        self.base_alignment = base_alignment
-        self._tab_replacement = tab_replacement
-        self._tab_text = self._tab_replacement[1] * self._tab_replacement[0]
 
         if self.base_alignment:
             self._y_offset = 0
@@ -290,11 +290,11 @@ class LabelBase(Group):
     def color(self, new_color: int):
         self._color = new_color
         if new_color is not None:
-            self.palette[1] = new_color
-            self.palette.make_opaque(1)
+            self._palette[1] = new_color
+            self._palette.make_opaque(1)
         else:
-            self.palette[1] = 0
-            self.palette.make_transparent(1)
+            self._palette[1] = 0
+            self._palette.make_transparent(1)
 
     @property
     def background_color(self) -> int:
@@ -302,8 +302,9 @@ class LabelBase(Group):
         return self._background_color
 
     def _set_background_color(self, new_color):
-        # subclasses should override this
-        pass
+        raise NotImplementedError(
+            "{} MUST override '_set_background_color'".format(type(self))
+        )
 
     @background_color.setter
     def background_color(self, new_color: int) -> None:

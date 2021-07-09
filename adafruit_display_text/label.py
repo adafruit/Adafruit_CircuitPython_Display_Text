@@ -47,6 +47,7 @@ class Label(LabelBase):
     :param str text: Text to display
     :param int max_glyphs: The largest quantity of glyphs we will display
     :param int color: Color of all text in RGB hex
+    :param int background_color: Color of the background, use `None` for transparent
     :param float line_spacing: Line spacing of text to display
     :param bool background_tight: Set `True` only if you want background box to tightly
      surround text. When set to 'True' Padding parameters will be ignored.
@@ -81,6 +82,9 @@ class Label(LabelBase):
     # This has a lot of getters/setters, maybe it needs cleanup.
 
     def __init__(self, font, **kwargs) -> None:
+        self._background_palette = displayio.Palette(1)
+        self._added_background_tilegrid = False
+
         super().__init__(font, **kwargs)
 
         max_glyphs = kwargs.get("max_glyphs", None)
@@ -105,14 +109,8 @@ class Label(LabelBase):
         self._bounding_box = None
 
         # Create the two-color text palette
-        self.palette = displayio.Palette(2)
-        self.palette[0] = 0
-        self.palette.make_transparent(0)
-        self.color = kwargs.get("color", 0xFFFFFF)
-
-        self._background_color = kwargs.get("background_color", None)
-        self._background_palette = displayio.Palette(1)
-        self._added_background_tilegrid = False
+        self._palette[0] = 0
+        self._palette.make_transparent(0)
 
         self.base_alignment = kwargs.get("base_alignment", False)
 
@@ -192,9 +190,9 @@ class Label(LabelBase):
 
         return tile_grid
 
-    def _update_background_color(self, new_color: int) -> None:
+    def _set_background_color(self, new_color: int) -> None:
         """Private class function that allows updating the font box background color
-        :param new_color: int color as an RGB hex number."""
+        :param int new_color: color as an RGB hex number."""
 
         if new_color is None:
             self._background_palette.make_transparent(0)
@@ -208,6 +206,10 @@ class Label(LabelBase):
 
         lines = self._text.rstrip("\n").count("\n") + 1
         y_offset = self._ascent // 2
+
+        if self._bounding_box is None:
+            # Still in initialization
+            return
 
         if not self._added_background_tilegrid:  # no bitmap is in the self Group
             # add bitmap if text is present and bitmap sizes > 0 pixels
@@ -354,7 +356,7 @@ class Label(LabelBase):
                     # pylint: disable=unexpected-keyword-arg
                     face = displayio.TileGrid(
                         glyph.bitmap,
-                        pixel_shader=self.palette,
+                        pixel_shader=self._palette,
                         default_tile=glyph.tile_index,
                         tile_width=glyph.width,
                         tile_height=glyph.height,
@@ -363,7 +365,7 @@ class Label(LabelBase):
                 except TypeError:
                     face = displayio.TileGrid(
                         glyph.bitmap,
-                        pixel_shader=self.palette,
+                        pixel_shader=self._palette,
                         default_tile=glyph.tile_index,
                         tile_width=glyph.width,
                         tile_height=glyph.height,
@@ -423,8 +425,8 @@ class Label(LabelBase):
 
         self._text = new_text
 
-        if self.background_color is not None:
-            self._update_background_color(self._background_color)
+        if self._background_color is not None:
+            self._set_background_color(self._background_color)
 
     def _reset_text(self, new_text: str) -> None:
         try:
@@ -449,9 +451,6 @@ class Label(LabelBase):
 
     def _set_text(self, new_text: str, scale: int) -> None:
         self._reset_text(new_text)
-
-    def _set_background_color(self, new_color: int) -> None:
-        self._update_background_color(new_color)
 
     def _set_label_direction(self, new_label_direction: str) -> None:
         self._label_direction = new_label_direction

@@ -98,10 +98,6 @@ class Label(LabelBase):
         self._save_text = save_text
         self._text = self._replace_tabs(text)
 
-        # Create the two-color palette
-        self.color = kwargs.get("color", 0xFFFFFF)
-        self.background_color = kwargs.get("background_color", None)
-
         if self._label_direction == "RTL":
             self._text = "".join(reversed(self._text))
 
@@ -200,7 +196,7 @@ class Label(LabelBase):
             box_y = box_y + self._padding_top + self._padding_bottom
 
             # Create the bitmap and TileGrid
-            self.bitmap = displayio.Bitmap(box_x, box_y, len(self.palette))
+            self.bitmap = displayio.Bitmap(box_x, box_y, len(self._palette))
 
             # Place the text into the Bitmap
             self._place_text(
@@ -218,7 +214,7 @@ class Label(LabelBase):
 
             self.tilegrid = displayio.TileGrid(
                 self.bitmap,
-                pixel_shader=self.palette,
+                pixel_shader=self._palette,
                 width=1,
                 height=1,
                 tile_width=box_x,
@@ -546,11 +542,11 @@ class Label(LabelBase):
     def _set_background_color(self, new_color):
         self._background_color = new_color
         if new_color is not None:
-            self.palette[0] = new_color
-            self.palette.make_opaque(0)
+            self._palette[0] = new_color
+            self._palette.make_opaque(0)
         else:
-            self.palette[0] = 0
-            self.palette.make_transparent(0)
+            self._palette[0] = 0
+            self._palette.make_transparent(0)
 
     def _set_label_direction(self, new_label_direction: str) -> None:
         self._label_direction = new_label_direction
