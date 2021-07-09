@@ -31,7 +31,7 @@ bitmap = displayio.Bitmap(display.width, 4, 2)
 vertica_line = displayio.TileGrid(bitmap, pixel_shader=palette, x=0, y=110)
 main_group.append(vertica_line)
 # Tests
-text_area = label.Label(terminalio.FONT, text="Circuit Python", max_glyphs=40)
+text_area = label.Label(terminalio.FONT, text="Circuit Python")
 main_group.append(text_area)
 display.show(main_group)
 time.sleep(TIME_PAUSE)
@@ -43,7 +43,7 @@ time.sleep(TIME_PAUSE)
 # Testing creating label with initial position
 text_area.text = "Testing initiating without text"
 try:
-    text_middle = label.Label(terminalio.FONT, max_glyphs=40)
+    text_middle = label.Label(terminalio.FONT)
 except SyntaxError:
     print("Fail setting-up label without text")
     warning_text = label.Label(
@@ -121,7 +121,6 @@ text_initial_specs = label.Label(
     BIG_FONT,
     text="aaaaq~",
     x=0,
-    max_glyphs=6,
     y=display.height // 2,
     color=0xFFFFFF,
     background_color=0x990099,
@@ -132,7 +131,6 @@ text_initial_specs = label.Label(
     BIG_FONT,
     text="aaaaq~",
     x=90,
-    max_glyphs=6,
     y=display.height // 2,
     color=0xFFFFFF,
     background_color=0x990099,
@@ -338,7 +336,7 @@ main_group.pop()
 # Testing creating label with initial position
 display.show(main_group)
 time.sleep(TIME_PAUSE)
-text_area = bitmap_label.Label(terminalio.FONT, text="Circuit Python", max_glyphs=40)
+text_area = bitmap_label.Label(terminalio.FONT, text="Circuit Python")
 main_group.append(text_area)
 display.show(main_group)
 time.sleep(TIME_PAUSE)
@@ -349,7 +347,7 @@ display.show(main_group)
 time.sleep(TIME_PAUSE)
 text_area.text = "Testing initiating without text"
 try:
-    text_middle = label.Label(terminalio.FONT, max_glyphs=40)
+    text_middle = label.Label(terminalio.FONT)
 except TypeError:
     print("Fail setting-up label without text")
     warning_text = label.Label(
@@ -426,7 +424,6 @@ text_initial_specs = bitmap_label.Label(
     BIG_FONT,
     text="aaaaq~",
     x=0,
-    max_glyphs=6,
     y=display.height // 2,
     color=0xFFFFFF,
     background_color=0x990099,
@@ -437,7 +434,6 @@ text_initial_specs = bitmap_label.Label(
     BIG_FONT,
     text="aaaaq~",
     x=90,
-    max_glyphs=6,
     y=display.height // 2,
     color=0xFFFFFF,
     background_color=0x990099,

@@ -45,7 +45,6 @@ class Label(LabelBase):
     :param Font font: A font class that has ``get_bounding_box`` and ``get_glyph``.
       Must include a capital M for measuring character size.
     :param str text: Text to display
-    :param int max_glyphs: The largest quantity of glyphs we will display
     :param int color: Color of all text in RGB hex
     :param int background_color: Color of the background, use `None` for transparent
     :param float line_spacing: Line spacing of text to display
@@ -87,20 +86,13 @@ class Label(LabelBase):
 
         super().__init__(font, **kwargs)
 
-        max_glyphs = kwargs.get("max_glyphs", None)
-        text = kwargs.get("text", "")
-
-        if not max_glyphs and not text:
-            raise RuntimeError("Please provide a max_glyphs, or initial text")
-        text = self._replace_tabs(text)
-        if not max_glyphs:
-            max_glyphs = len(text)
+        text = self._replace_tabs(self._text)
 
         # local_group will set the scale
         self.local_group = displayio.Group(scale=kwargs.get("scale", 1))
         self.append(self.local_group)
 
-        self.width = max_glyphs
+        self.width = len(text)
         self._font = font
         self._text = None
 
@@ -422,12 +414,9 @@ class Label(LabelBase):
             self._set_background_color(self._background_color)
 
     def _reset_text(self, new_text: str) -> None:
-        try:
-            current_anchored_position = self.anchored_position
-            self._update_text(str(self._replace_tabs(new_text)))
-            self.anchored_position = current_anchored_position
-        except RuntimeError as run_error:
-            raise RuntimeError("Text length exceeds max_glyphs") from run_error
+        current_anchored_position = self.anchored_position
+        self._update_text(str(self._replace_tabs(new_text)))
+        self.anchored_position = current_anchored_position
 
     def _set_font(self, new_font) -> None:
         old_text = self._text
