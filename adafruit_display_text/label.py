@@ -87,8 +87,8 @@ class Label(LabelBase):
 
         text = self._replace_tabs(self._text)
 
-        self.width = len(text)
-        self.height = self._font.get_bounding_box()[1]
+        self._width = len(text)
+        self._height = self._font.get_bounding_box()[1]
 
         # Create the two-color text palette
         self._palette[0] = 0
@@ -119,7 +119,7 @@ class Label(LabelBase):
                 x_box_offset = -self._padding_bottom
                 box_width = (
                     (ascent + descent)
-                    + int((lines - 1) * self.width * self._line_spacing)
+                    + int((lines - 1) * self._width * self._line_spacing)
                     + self._padding_left
                     + self._padding_right
                 )
@@ -130,7 +130,7 @@ class Label(LabelBase):
                 x_box_offset = -self._padding_left
                 box_height = (
                     (ascent + descent)
-                    + int((lines - 1) * self.height * self._line_spacing)
+                    + int((lines - 1) * self._height * self._line_spacing)
                     + self._padding_top
                     + self._padding_bottom
                 )
@@ -248,7 +248,7 @@ class Label(LabelBase):
 
         for character in new_text:
             if character == "\n":
-                y += int(self.height * self._line_spacing)
+                y += int(self._height * self._line_spacing)
                 x = 0
                 continue
             glyph = self._font.get_glyph(ord(character))
@@ -402,7 +402,7 @@ class Label(LabelBase):
         current_anchored_position = self.anchored_position
         self._text = ""
         self._font = new_font
-        self.height = self._font.get_bounding_box()[1]
+        self._height = self._font.get_bounding_box()[1]
         self._update_text(str(old_text))
         self.anchored_position = current_anchored_position
 
