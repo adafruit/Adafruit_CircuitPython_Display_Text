@@ -190,7 +190,7 @@ class Label(LabelBase):
             else:
                 label_position_yoffset = self._ascent // 2
 
-            self.tilegrid = displayio.TileGrid(
+            self._tilegrid = displayio.TileGrid(
                 self._bitmap,
                 pixel_shader=self._palette,
                 width=1,
@@ -203,36 +203,36 @@ class Label(LabelBase):
             )
 
             if self._label_direction == "UPR":
-                self.tilegrid.transpose_xy = True
-                self.tilegrid.flip_x = True
+                self._tilegrid.transpose_xy = True
+                self._tilegrid.flip_x = True
             if self._label_direction == "DWR":
-                self.tilegrid.transpose_xy = True
-                self.tilegrid.flip_y = True
+                self._tilegrid.transpose_xy = True
+                self._tilegrid.flip_y = True
             if self._label_direction == "UPD":
-                self.tilegrid.flip_x = True
-                self.tilegrid.flip_y = True
+                self._tilegrid.flip_x = True
+                self._tilegrid.flip_y = True
 
             # Clear out any items in the local_group Group, in case this is an update to
             # the bitmap_label
             for _ in self._local_group:
                 self._local_group.pop(0)
             self._local_group.append(
-                self.tilegrid
+                self._tilegrid
             )  # add the bitmap's tilegrid to the group
 
             # Update bounding_box values.  Note: To be consistent with label.py,
             # this is the bounding box for the text only, not including the background.
             if self._label_direction in ("UPR", "DWR"):
                 self._bounding_box = (
-                    self.tilegrid.x,
-                    self.tilegrid.y,
+                    self._tilegrid.x,
+                    self._tilegrid.y,
                     tight_box_y,
                     box_x,
                 )
             else:
                 self._bounding_box = (
-                    self.tilegrid.x,
-                    self.tilegrid.y,
+                    self._tilegrid.x,
+                    self._tilegrid.y,
                     box_x,
                     tight_box_y,
                 )
