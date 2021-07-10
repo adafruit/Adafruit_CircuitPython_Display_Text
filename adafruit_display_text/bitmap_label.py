@@ -57,7 +57,7 @@ class Label(LabelBase):
     :param int color: Color of all text in RGB hex
     :param int background_color: Color of the background, use `None` for transparent
     :param float line_spacing: Line spacing of text to display
-    :param boolean background_tight: Set `True` only if you want background box to tightly
+    :param bool background_tight: Set `True` only if you want background box to tightly
      surround text. When set to 'True' Padding parameters will be ignored.
     :param int padding_top: Additional pixels added to background bounding box at top
     :param int padding_bottom: Additional pixels added to background bounding box at bottom
