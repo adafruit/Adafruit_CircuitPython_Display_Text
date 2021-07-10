@@ -88,11 +88,7 @@ class Label(LabelBase):
         text = self._replace_tabs(self._text)
 
         self.width = len(text)
-        self._font = font
-        self._text = None
-
         self.height = self._font.get_bounding_box()[1]
-        self._bounding_box = None
 
         # Create the two-color text palette
         self._palette[0] = 0
