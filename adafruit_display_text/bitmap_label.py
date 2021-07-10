@@ -82,6 +82,8 @@ class Label(LabelBase):
 
     def __init__(self, font, save_text=True, **kwargs) -> None:
 
+        self._bitmap = None
+
         super().__init__(font, **kwargs)
 
         self._save_text = save_text
@@ -172,11 +174,11 @@ class Label(LabelBase):
             box_y = box_y + self._padding_top + self._padding_bottom
 
             # Create the bitmap and TileGrid
-            self.bitmap = displayio.Bitmap(box_x, box_y, len(self._palette))
+            self._bitmap = displayio.Bitmap(box_x, box_y, len(self._palette))
 
             # Place the text into the Bitmap
             self._place_text(
-                self.bitmap,
+                self._bitmap,
                 self._text,
                 self._font,
                 self._padding_left - x_offset,
@@ -189,7 +191,7 @@ class Label(LabelBase):
                 label_position_yoffset = self._ascent // 2
 
             self.tilegrid = displayio.TileGrid(
-                self.bitmap,
+                self._bitmap,
                 pixel_shader=self._palette,
                 width=1,
                 height=1,
