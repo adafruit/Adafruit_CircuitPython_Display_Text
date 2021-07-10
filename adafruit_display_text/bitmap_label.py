@@ -84,9 +84,8 @@ class Label(LabelBase):
 
         super().__init__(font, **kwargs)
 
-        text = kwargs.get("text", "")
         self._save_text = save_text
-        self._text = self._replace_tabs(text)
+        self._text = self._replace_tabs(self._text)
 
         if self._label_direction == "RTL":
             self._text = "".join(reversed(self._text))
@@ -94,9 +93,9 @@ class Label(LabelBase):
         # call the text updater with all the arguments.
         self._reset_text(
             font=font,
-            text=kwargs.get("text", ""),
+            text=self._text,
             line_spacing=self._line_spacing,
-            scale=kwargs.get("scale", 1),
+            scale=self.scale,
         )
 
     def _reset_text(
