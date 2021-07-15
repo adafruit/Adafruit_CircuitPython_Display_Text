@@ -14,10 +14,13 @@ import displayio
 from adafruit_bitmap_font import bitmap_font
 from adafruit_display_text.label import Label
 
+FONT_DIR = "/fonts/"
 fonts = list(
-    filter(lambda x: x.endswith("bdf") and not x.startswith("."), os.listdir("/"))
+    filter(lambda x: x.endswith("bdf") and not x.startswith("."), os.listdir(FONT_DIR))
 )
-fonts = [bitmap_font.load_font(x) for x in fonts]
+fonts = [bitmap_font.load_font(FONT_DIR + x) for x in fonts]
+if len(fonts) == 0:
+    print("No fonts found in '{}'".format(FONT_DIR))
 
 print("fade up")
 # Fade up the backlight
@@ -30,12 +33,17 @@ demos = ["CircuitPython = Code + Community", "accents - üàêùéáçãÍóí",
 splash = displayio.Group()
 board.DISPLAY.show(splash)
 max_y = 0
-y = 2
+y = 0
 for demo_text in demos:
     for font in fonts:
+        if y >= board.DISPLAY.height:
+            y = 0
+            while len(splash):
+                splash.pop()
         print("Font load {}".format(font.name))
-        area = Label(font, text=demo_text)
-        area.y = y
+        area = Label(
+            font, text=demo_text, anchor_point=(0, 0), anchored_position=(0, y)
+        )
         splash.append(area)
 
         y += area.height
@@ -46,8 +54,8 @@ for demo_text in demos:
         except AttributeError:
             board.DISPLAY.wait_for_frame()
 
-# Wait for 10 minutes (600 seconds)
-time.sleep(600)
+# Wait for 1 minute (60 seconds)
+time.sleep(60)
 
 # Fade down the backlight
 for b in range(100, -1, -1):
