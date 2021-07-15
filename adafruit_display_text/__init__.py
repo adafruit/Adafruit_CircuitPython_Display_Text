@@ -386,6 +386,16 @@ class LabelBase(Group):
         return tuple(self._bounding_box)
 
     @property
+    def height(self) -> int:
+        """The height of the label determined from the bounding box."""
+        return self._bounding_box[3] - self._bounding_box[1]
+
+    @property
+    def width(self) -> int:
+        """The width of the label determined from the bounding box."""
+        return self._bounding_box[2] - self._bounding_box[0]
+
+    @property
     def line_spacing(self) -> float:
         """The amount of space between lines of text, in multiples of the font's
         bounding-box height. (E.g. 1.0 is the bounding-box height)"""
