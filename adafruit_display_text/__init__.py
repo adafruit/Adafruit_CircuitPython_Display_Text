@@ -234,6 +234,9 @@ class LabelBase(Group):
         self._tab_replacement = tab_replacement
         self._tab_text = self._tab_replacement[1] * self._tab_replacement[0]
 
+        if "max_glyphs" in kwargs:
+            print("Please update your code: 'max_glyphs' is not needed anymore.")
+
         self._ascent, self._descent = self._get_ascent_descent()
         self._bounding_box = None
 
