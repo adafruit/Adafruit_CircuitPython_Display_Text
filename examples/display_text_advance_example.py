@@ -28,22 +28,25 @@ horizontal_line = displayio.TileGrid(bitmap, pixel_shader=palette, x=155, y=0)
 main_group.append(horizontal_line)
 
 bitmap = displayio.Bitmap(display.width, 4, 2)
-vertica_line = displayio.TileGrid(bitmap, pixel_shader=palette, x=0, y=110)
-main_group.append(vertica_line)
+vertical_line = displayio.TileGrid(bitmap, pixel_shader=palette, x=0, y=110)
+main_group.append(vertical_line)
+
 # Tests
-text_area = label.Label(terminalio.FONT, text="Circuit Python", max_glyphs=40)
+text_area = label.Label(terminalio.FONT, text="Circuit Python")
 main_group.append(text_area)
 display.show(main_group)
 time.sleep(TIME_PAUSE)
+
 # Testing position setter
 text_area.x = 10
 text_area.y = 10
 display.show(main_group)
 time.sleep(TIME_PAUSE)
+
 # Testing creating label with initial position
 text_area.text = "Testing initiating without text"
 try:
-    text_middle = label.Label(terminalio.FONT, max_glyphs=40)
+    text_middle = label.Label(terminalio.FONT)
 except SyntaxError:
     print("Fail setting-up label without text")
     warning_text = label.Label(
@@ -64,17 +67,20 @@ text_middle = label.Label(
 main_group.append(text_middle)
 display.show(main_group)
 time.sleep(TIME_PAUSE)
+
 # Testing Text Setter
 text_area.text = "Testing Changing Text"
 text_middle.text = "Python"
 display.show(main_group)
 time.sleep(TIME_PAUSE)
+
 # Testing a and y getter and setter
 text_area.text = "Testing Changing Position"
 text_middle.x = text_middle.x - 50
 text_middle.y = text_middle.y - 50
 display.show(main_group)
 time.sleep(TIME_PAUSE)
+
 # Testing font Getter and setter
 text_area.text = "Testing Changing FONT"
 if isinstance(text_middle.font, fontio.BuiltinFont):
@@ -84,6 +90,7 @@ time.sleep(TIME_PAUSE)
 
 # Once this working we create another label with all the initial specs
 main_group.pop()
+
 # Testing Color
 text_area.text = "Testing Color"
 text_initial_specs = label.Label(
@@ -95,10 +102,12 @@ text_initial_specs = label.Label(
 main_group.append(text_initial_specs)
 display.show(main_group)
 time.sleep(TIME_PAUSE)
+
 text_initial_specs.color = 0x004400
 display.show(main_group)
 time.sleep(TIME_PAUSE)
 main_group.pop()
+
 # Testing Background Color
 text_area.text = "Testing Background Color"
 text_initial_specs = label.Label(
@@ -111,17 +120,18 @@ text_initial_specs = label.Label(
 main_group.append(text_initial_specs)
 display.show(main_group)
 time.sleep(TIME_PAUSE)
+
 text_initial_specs.background_color = 0x990099
 display.show(main_group)
 time.sleep(TIME_PAUSE)
 main_group.pop()
+
 # Testing Background Color
 text_area.text = "Testing Background Tight"
 text_initial_specs = label.Label(
     BIG_FONT,
     text="aaaaq~",
     x=0,
-    max_glyphs=6,
     y=display.height // 2,
     color=0xFFFFFF,
     background_color=0x990099,
@@ -132,7 +142,6 @@ text_initial_specs = label.Label(
     BIG_FONT,
     text="aaaaq~",
     x=90,
-    max_glyphs=6,
     y=display.height // 2,
     color=0xFFFFFF,
     background_color=0x990099,
@@ -179,7 +188,8 @@ text_initial_specs = label.Label(
 )
 main_group.append(text_initial_specs)
 display.show(main_group)
-time.sleep(1)
+time.sleep(TIME_PAUSE)
+
 try:
     text_initial_specs.anchored_position = (100, 100)
     text_initial_specs.anchor_point = (0.5, 0.5)
@@ -219,6 +229,7 @@ text_initial_specs = label.Label(
 main_group.append(text_initial_specs)
 display.show(main_group)
 time.sleep(TIME_PAUSE)
+
 text_initial_specs.scale = 2
 display.show(main_group)
 time.sleep(TIME_PAUSE)
@@ -272,6 +283,7 @@ main_group.append(text_initial_specs)
 display.show(main_group)
 time.sleep(TIME_PAUSE)
 main_group.pop()
+
 text_area.text = "Testing Direction-DWR"
 text_initial_specs = label.Label(
     MEDIUM_FONT,
@@ -292,6 +304,7 @@ main_group.append(text_initial_specs)
 display.show(main_group)
 time.sleep(TIME_PAUSE)
 main_group.pop()
+
 text_area.text = "Testing Direction-TTB"
 text_initial_specs = label.Label(
     MEDIUM_FONT,
@@ -312,6 +325,7 @@ main_group.append(text_initial_specs)
 display.show(main_group)
 time.sleep(TIME_PAUSE)
 main_group.pop()
+
 text_area.text = "Testing Direction-RTL"
 text_initial_specs = label.Label(
     MEDIUM_FONT,
@@ -338,7 +352,7 @@ main_group.pop()
 # Testing creating label with initial position
 display.show(main_group)
 time.sleep(TIME_PAUSE)
-text_area = bitmap_label.Label(terminalio.FONT, text="Circuit Python", max_glyphs=40)
+text_area = bitmap_label.Label(terminalio.FONT, text="Circuit Python")
 main_group.append(text_area)
 display.show(main_group)
 time.sleep(TIME_PAUSE)
@@ -349,7 +363,7 @@ display.show(main_group)
 time.sleep(TIME_PAUSE)
 text_area.text = "Testing initiating without text"
 try:
-    text_middle = label.Label(terminalio.FONT, max_glyphs=40)
+    text_middle = label.Label(terminalio.FONT)
 except TypeError:
     print("Fail setting-up label without text")
     warning_text = label.Label(
@@ -369,26 +383,31 @@ text_middle = bitmap_label.Label(
 main_group.append(text_middle)
 display.show(main_group)
 time.sleep(TIME_PAUSE)
+
 # Testing Text Setter
 text_area.text = "Testing Changing Text"
 text_middle.text = "Python"
 display.show(main_group)
 time.sleep(TIME_PAUSE)
+
 # Testing a and y getter and setter
 text_area.text = "Testing Changing Position"
 text_middle.x = text_middle.x - 50
 text_middle.y = text_middle.y - 50
 display.show(main_group)
 time.sleep(TIME_PAUSE)
+
 # Testing font Getter and setter
 text_area.text = "Testing Changing FONT"
 if isinstance(text_middle.font, fontio.BuiltinFont):
+    print("Font was BuiltinFont")
     text_middle.font = MEDIUM_FONT
 display.show(main_group)
 time.sleep(TIME_PAUSE)
 
 # Once this working we create another label with all the initial specs
 main_group.pop()
+
 # Testing Color
 text_area.text = "Testing Color"
 text_initial_specs = bitmap_label.Label(
@@ -400,10 +419,12 @@ text_initial_specs = bitmap_label.Label(
 main_group.append(text_initial_specs)
 display.show(main_group)
 time.sleep(TIME_PAUSE)
+
 text_initial_specs.color = 0x004400
 display.show(main_group)
 time.sleep(TIME_PAUSE)
 main_group.pop()
+
 # Testing Background Color
 text_area.text = "Testing Background Color"
 text_initial_specs = bitmap_label.Label(
@@ -416,17 +437,18 @@ text_initial_specs = bitmap_label.Label(
 main_group.append(text_initial_specs)
 display.show(main_group)
 time.sleep(TIME_PAUSE)
+
 text_initial_specs.background_color = 0x990099
 display.show(main_group)
 time.sleep(TIME_PAUSE)
 main_group.pop()
+
 # Testing Background Color
 text_area.text = "Testing Background Tight"
 text_initial_specs = bitmap_label.Label(
     BIG_FONT,
     text="aaaaq~",
     x=0,
-    max_glyphs=6,
     y=display.height // 2,
     color=0xFFFFFF,
     background_color=0x990099,
@@ -437,7 +459,6 @@ text_initial_specs = bitmap_label.Label(
     BIG_FONT,
     text="aaaaq~",
     x=90,
-    max_glyphs=6,
     y=display.height // 2,
     color=0xFFFFFF,
     background_color=0x990099,
@@ -484,7 +505,8 @@ text_initial_specs = bitmap_label.Label(
 )
 main_group.append(text_initial_specs)
 display.show(main_group)
-time.sleep(1)
+time.sleep(TIME_PAUSE)
+
 try:
     text_initial_specs.anchored_position = (100, 100)
     text_initial_specs.anchor_point = (0.5, 0.5)
@@ -524,6 +546,7 @@ text_initial_specs = bitmap_label.Label(
 main_group.append(text_initial_specs)
 display.show(main_group)
 time.sleep(TIME_PAUSE)
+
 text_initial_specs.scale = 2
 display.show(main_group)
 time.sleep(TIME_PAUSE)
@@ -577,6 +600,7 @@ main_group.append(text_initial_specs)
 display.show(main_group)
 time.sleep(TIME_PAUSE)
 main_group.pop()
+
 text_area.text = "Testing Direction-DWR"
 text_initial_specs = bitmap_label.Label(
     MEDIUM_FONT,
@@ -597,6 +621,7 @@ main_group.append(text_initial_specs)
 display.show(main_group)
 time.sleep(TIME_PAUSE)
 main_group.pop()
+
 text_area.text = "Testing Direction-UPD"
 text_initial_specs = bitmap_label.Label(
     MEDIUM_FONT,
@@ -617,6 +642,7 @@ main_group.append(text_initial_specs)
 display.show(main_group)
 time.sleep(TIME_PAUSE)
 main_group.pop()
+
 text_area.text = "Testing Direction-RTL"
 text_initial_specs = bitmap_label.Label(
     MEDIUM_FONT,
@@ -637,3 +663,6 @@ main_group.append(text_initial_specs)
 display.show(main_group)
 time.sleep(TIME_PAUSE)
 main_group.pop()
+
+text_area.text = "Finished"
+print("Tests finished")

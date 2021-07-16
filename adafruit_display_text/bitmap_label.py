@@ -22,14 +22,17 @@ Implementation Notes
   https://circuitpython.org/downloads
 
 """
+
+__version__ = "0.0.0-auto.0"
+__repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_Display_Text.git"
+
+
 try:
     from typing import Tuple
 except ImportError:
     pass
-import displayio
 
-__version__ = "0.0.0-auto.0"
-__repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_Display_Text.git"
+import displayio
 
 from adafruit_display_text import LabelBase
 
@@ -38,8 +41,6 @@ class Label(LabelBase):
     """A label displaying a string of text that is stored in a bitmap.
     Note: This ``bitmap_label.py`` library utilizes a bitmap to display the text.
     This method is memory-conserving relative to ``label.py``.
-    The ``max_glyphs`` parameter is ignored and is present
-    only for direct compatibility with label.py.
 
     For further reduction in memory usage, set ``save_text=False`` (text string will not
     be stored and ``line_spacing`` and ``font`` are immutable with ``save_text``
@@ -53,12 +54,10 @@ class Label(LabelBase):
     :param Font font: A font class that has ``get_bounding_box`` and ``get_glyph``.
       Must include a capital M for measuring character size.
     :param str text: Text to display
-    :param int max_glyphs: Unnecessary parameter (provided only for direct compatibility
-     with label.py)
     :param int color: Color of all text in RGB hex
     :param int background_color: Color of the background, use `None` for transparent
-    :param double line_spacing: Line spacing of text to display
-    :param boolean background_tight: Set `True` only if you want background box to tightly
+    :param float line_spacing: Line spacing of text to display
+    :param bool background_tight: Set `True` only if you want background box to tightly
      surround text. When set to 'True' Padding parameters will be ignored.
     :param int padding_top: Additional pixels added to background bounding box at top
     :param int padding_bottom: Additional pixels added to background bounding box at bottom
@@ -81,121 +80,47 @@ class Label(LabelBase):
      configurations possibles ``LTR``-Left-To-Right ``RTL``-Right-To-Left
      ``UPD``-Upside Down ``UPR``-Upwards ``DWR``-Downwards. It defaults to ``LTR``"""
 
-    # pylint: disable=unused-argument, too-many-instance-attributes, too-many-locals, too-many-arguments
-    # pylint: disable=too-many-branches, no-self-use, too-many-statements
-    # Note: max_glyphs parameter is unnecessary, this is used for direct
-    # compatibility with label.py
+    def __init__(self, font, save_text=True, **kwargs) -> None:
 
-    def __init__(self, font, **kwargs) -> None:
+        self._bitmap = None
 
         super().__init__(font, **kwargs)
 
-        self.local_group = displayio.Group(
-            scale=kwargs.get("scale", 1)
-        )  # local_group holds the tileGrid and sets the scaling
-        self.append(
-            self.local_group
-        )  # the local_group will always stay in the self Group
-
-        self._tab_replacement = kwargs.get("tab_replacement", (4, " "))
-        self._tab_text = self._tab_replacement[1] * self._tab_replacement[0]
-        text = kwargs.get("text", "")
-        self._text = self._tab_text.join(text.split("\t"))
-
-        # Create the two-color palette
-
-        self.color = kwargs.get("color", 0xFFFFFF)
-        self.background_color = kwargs.get("background_color", None)
-        self._label_direction = kwargs.get("label_direction", "LTR")
-
-        if self._label_direction not in ["LTR", "RTL", "UPD", "UPR", "DWR"]:
-            raise RuntimeError("Please provide a valid text direction")
+        self._save_text = save_text
+        self._text = self._replace_tabs(self._text)
 
         if self._label_direction == "RTL":
             self._text = "".join(reversed(self._text))
 
-        self.base_alignment = kwargs.get("base_alignment", False)
-
         # call the text updater with all the arguments.
         self._reset_text(
             font=font,
-            x=kwargs.get("x", 0),
-            y=kwargs.get("y", 0),
-            text=kwargs.get("text", ""),
-            line_spacing=kwargs.get("line_spacing", 1.25),
-            background_tight=kwargs.get("background_tight", False),
-            padding_top=kwargs.get("padding_top", 0),
-            padding_bottom=kwargs.get("padding_bottom", 0),
-            padding_left=kwargs.get("padding_left", 0),
-            padding_right=kwargs.get("padding_right", 0),
-            anchor_point=kwargs.get("anchor_point", None),
-            anchored_position=kwargs.get("anchored_position", None),
-            save_text=kwargs.get("save_text", True),
-            scale=kwargs.get("scale", 1),
-            base_alignment=kwargs.get("base_alignment", False),
-            tab_replacement=kwargs.get("tab_replacement", (4, " ")),
-            label_direction=kwargs.get("label_direction", "LTR"),
+            text=self._text,
+            line_spacing=self._line_spacing,
+            scale=self.scale,
         )
 
     def _reset_text(
         self,
         font=None,
-        x: int = None,
-        y: int = None,
         text: str = None,
         line_spacing: float = None,
-        background_tight: bool = None,
-        padding_top: int = None,
-        padding_bottom: int = None,
-        padding_left: int = None,
-        padding_right: int = None,
-        anchor_point: Tuple[float, float] = None,
-        anchored_position: Tuple[int, int] = None,
-        save_text: bool = None,
         scale: int = None,
-        base_alignment: bool = None,
-        tab_replacement: Tuple[int, str] = None,
-        label_direction: str = "LTR",
     ) -> None:
+        # pylint: disable=too-many-branches, too-many-statements
 
         # Store all the instance variables
         if font is not None:
             self._font = font
-        if x is not None:
-            self.x = x
-        if y is not None:
-            self.y = y
         if line_spacing is not None:
             self._line_spacing = line_spacing
-        if background_tight is not None:
-            self._background_tight = background_tight
-        if padding_top is not None:
-            self._padding_top = max(0, padding_top)
-        if padding_bottom is not None:
-            self._padding_bottom = max(0, padding_bottom)
-        if padding_left is not None:
-            self._padding_left = max(0, padding_left)
-        if padding_right is not None:
-            self._padding_right = max(0, padding_right)
-        if anchor_point is not None:
-            self._anchor_point = anchor_point
-        if anchored_position is not None:
-            self._anchored_position = anchored_position
-        if save_text is not None:
-            self._save_text = save_text
-        if base_alignment is not None:
-            self.base_alignment = base_alignment
-        if tab_replacement is not None:
-            self._tab_replacement = tab_replacement
-        if label_direction is not None:
-            self._label_direction = label_direction
 
         # if text is not provided as a parameter (text is None), use the previous value.
         if (text is None) and self._save_text:
             text = self._text
 
         if self._save_text:  # text string will be saved
-            self._text = self._tab_text.join(text.split("\t"))
+            self._text = self._replace_tabs(text)
             if self._label_direction == "RTL":
                 self._text = "".join(reversed(self._text))
         else:
@@ -212,10 +137,10 @@ class Label(LabelBase):
                 0,  # zero width with text == ""
                 0,  # zero height with text == ""
             )
-            # Clear out any items in the self.local_group Group, in case this is an
+            # Clear out any items in the self._local_group Group, in case this is an
             # update to the bitmap_label
-            for _ in self.local_group:
-                self.local_group.pop(0)
+            for _ in self._local_group:
+                self._local_group.pop(0)
 
         else:  # The text string is not empty, so create the Bitmap and TileGrid and
             # append to the self Group
@@ -234,7 +159,6 @@ class Label(LabelBase):
             ) = self._text_bounding_box(
                 self._text,
                 self._font,
-                self._line_spacing,
             )  # calculate the box size for a tight and loose backgrounds
 
             if self._background_tight:
@@ -250,26 +174,25 @@ class Label(LabelBase):
             box_y = box_y + self._padding_top + self._padding_bottom
 
             # Create the bitmap and TileGrid
-            self.bitmap = displayio.Bitmap(box_x, box_y, len(self.palette))
+            self._bitmap = displayio.Bitmap(box_x, box_y, len(self._palette))
 
             # Place the text into the Bitmap
             self._place_text(
-                self.bitmap,
+                self._bitmap,
                 self._text,
                 self._font,
-                self._line_spacing,
                 self._padding_left - x_offset,
                 self._padding_top + y_offset,
             )
 
-            if self.base_alignment:
+            if self._base_alignment:
                 label_position_yoffset = 0
             else:
                 label_position_yoffset = self._ascent // 2
 
-            self.tilegrid = displayio.TileGrid(
-                self.bitmap,
-                pixel_shader=self.palette,
+            self._tilegrid = displayio.TileGrid(
+                self._bitmap,
+                pixel_shader=self._palette,
                 width=1,
                 height=1,
                 tile_width=box_x,
@@ -280,36 +203,36 @@ class Label(LabelBase):
             )
 
             if self._label_direction == "UPR":
-                self.tilegrid.transpose_xy = True
-                self.tilegrid.flip_x = True
+                self._tilegrid.transpose_xy = True
+                self._tilegrid.flip_x = True
             if self._label_direction == "DWR":
-                self.tilegrid.transpose_xy = True
-                self.tilegrid.flip_y = True
+                self._tilegrid.transpose_xy = True
+                self._tilegrid.flip_y = True
             if self._label_direction == "UPD":
-                self.tilegrid.flip_x = True
-                self.tilegrid.flip_y = True
+                self._tilegrid.flip_x = True
+                self._tilegrid.flip_y = True
 
             # Clear out any items in the local_group Group, in case this is an update to
             # the bitmap_label
-            for _ in self.local_group:
-                self.local_group.pop(0)
-            self.local_group.append(
-                self.tilegrid
+            for _ in self._local_group:
+                self._local_group.pop(0)
+            self._local_group.append(
+                self._tilegrid
             )  # add the bitmap's tilegrid to the group
 
             # Update bounding_box values.  Note: To be consistent with label.py,
             # this is the bounding box for the text only, not including the background.
-            if label_direction == "UPR" or self._label_direction == "DWR":
+            if self._label_direction in ("UPR", "DWR"):
                 self._bounding_box = (
-                    self.tilegrid.x,
-                    self.tilegrid.y,
+                    self._tilegrid.x,
+                    self._tilegrid.y,
                     tight_box_y,
                     box_x,
                 )
             else:
                 self._bounding_box = (
-                    self.tilegrid.x,
-                    self.tilegrid.y,
+                    self._tilegrid.x,
+                    self._tilegrid.y,
                     box_x,
                     tight_box_y,
                 )
@@ -319,10 +242,9 @@ class Label(LabelBase):
         ):  # Scale will be defined in local_group (Note: self should have scale=1)
             self.scale = scale  # call the setter
 
-        self.anchored_position = (
-            self._anchored_position
-        )  # set the anchored_position with setter after bitmap is created, sets the
+        # set the anchored_position with setter after bitmap is created, sets the
         # x,y positions of the label
+        self.anchored_position = self._anchored_position
 
     @staticmethod
     def _line_spacing_ypixels(font, line_spacing: float) -> int:
@@ -331,8 +253,10 @@ class Label(LabelBase):
         return return_value
 
     def _text_bounding_box(
-        self, text: str, font, line_spacing: float
+        self, text: str, font
     ) -> Tuple[int, int, int, int, int, int]:
+        # pylint: disable=too-many-locals
+
         ascender_max, descender_max = self._ascent, self._descent
 
         lines = 1
@@ -348,6 +272,7 @@ class Label(LabelBase):
         y_offset_tight = self._ascent // 2
 
         newline = False
+        line_spacing = self._line_spacing
 
         for char in text:
 
@@ -406,21 +331,19 @@ class Label(LabelBase):
             final_y_offset_loose,
         )
 
-    # pylint: disable=too-many-nested-blocks
     def _place_text(
         self,
         bitmap,
         text: str,
         font,
-        line_spacing: float,
         xposition: int,
         yposition: int,
-        text_palette_index: int = 1,
-        background_palette_index: int = 0,
         skip_index: int = 0,  # set to None to write all pixels, other wise skip this palette index
         # when copying glyph bitmaps (this is important for slanted text
-        # where rectangulary glyph boxes overlap)
+        # where rectangular glyph boxes overlap)
     ) -> Tuple[int, int, int, int]:
+        # pylint: disable=too-many-arguments, too-many-locals
+
         # placeText - Writes text into a bitmap at the specified location.
         #
         # Note: scale is pushed up to Group level
@@ -431,6 +354,7 @@ class Label(LabelBase):
         left = None
         right = x_start
         top = bottom = y_start
+        line_spacing = self._line_spacing
 
         for char in text:
 
@@ -472,8 +396,8 @@ class Label(LabelBase):
                     # Clip glyph y-direction if outside the font ascent/descent metrics.
                     # Note: bitmap.blit will automatically clip the bottom of the glyph.
                     y_clip = 0
-                    if (y_blit_target) < 0:
-                        y_clip = -(y_blit_target)  # clip this amount from top of bitmap
+                    if y_blit_target < 0:
+                        y_clip = -y_blit_target  # clip this amount from top of bitmap
                         y_blit_target = 0  # draw the clipped bitmap at y=0
 
                         print(
@@ -503,7 +427,8 @@ class Label(LabelBase):
 
                     xposition = xposition + my_glyph.shift_x
 
-        return (left, top, right - left, bottom - top)  # bounding_box
+        # bounding_box
+        return left, top, right - left, bottom - top
 
     def _blit(
         self,
@@ -518,6 +443,7 @@ class Label(LabelBase):
         skip_index: int = None,  # palette index that will not be copied
         # (for example: the background color of a glyph)
     ) -> None:
+        # pylint: disable=no-self-use, too-many-arguments
 
         if hasattr(bitmap, "blit"):  # if bitmap has a built-in blit function, call it
             # this function should perform its own input checks
@@ -591,14 +517,20 @@ class Label(LabelBase):
             raise RuntimeError("font is immutable when save_text is False")
 
     def _set_text(self, new_text: str, scale: int) -> None:
-        new_text = self._tab_text.join(new_text.split("\t"))
-        self._reset_text(text=new_text, scale=self.scale)
+        self._reset_text(text=self._replace_tabs(new_text), scale=self.scale)
 
     def _set_background_color(self, new_color):
         self._background_color = new_color
         if new_color is not None:
-            self.palette[0] = new_color
-            self.palette.make_opaque(0)
+            self._palette[0] = new_color
+            self._palette.make_opaque(0)
         else:
-            self.palette[0] = 0
-            self.palette.make_transparent(0)
+            self._palette[0] = 0
+            self._palette.make_transparent(0)
+
+    def _set_label_direction(self, new_label_direction: str) -> None:
+        self._label_direction = new_label_direction
+        self._reset_text(text=str(self._text))  # Force a recalculation
+
+    def _get_valid_label_directions(self) -> Tuple[str, ...]:
+        return "LTR", "RTL", "UPD", "UPR", "DWR"
