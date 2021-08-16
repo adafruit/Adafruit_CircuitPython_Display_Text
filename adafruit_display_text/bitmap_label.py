@@ -534,3 +534,8 @@ class Label(LabelBase):
 
     def _get_valid_label_directions(self) -> Tuple[str, ...]:
         return "LTR", "RTL", "UPD", "UPR", "DWR"
+
+    @property
+    def bitmap(self):
+        """The Bitmap object that the text and background are drawn into."""
+        return self._bitmap
