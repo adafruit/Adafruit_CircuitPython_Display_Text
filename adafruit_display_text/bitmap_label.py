@@ -39,8 +39,8 @@ from adafruit_display_text import LabelBase
 
 class Label(LabelBase):
     """A label displaying a string of text that is stored in a bitmap.
-    Note: This ``bitmap_label.py`` library utilizes a bitmap to display the text.
-    This method is memory-conserving relative to ``label.py``.
+    Note: This ``bitmap_label.py`` library utilizes a :py:class:`~displayio.Bitmap`
+    to display the text. This method is memory-conserving relative to ``label.py``.
 
     For further reduction in memory usage, set ``save_text=False`` (text string will not
     be stored and ``line_spacing`` and ``font`` are immutable with ``save_text``
@@ -534,3 +534,12 @@ class Label(LabelBase):
 
     def _get_valid_label_directions(self) -> Tuple[str, ...]:
         return "LTR", "RTL", "UPD", "UPR", "DWR"
+
+    @property
+    def bitmap(self):
+        """
+        The Bitmap object that the text and background are drawn into.
+
+        :rtype: displayio.Bitmap
+        """
+        return self._bitmap
