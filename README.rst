@@ -46,6 +46,11 @@ For a board with a built-in display.
         pass
 
 
+Documentation
+=============
+
+API documentation for this library can be found on `Read the Docs <https://circuitpython.readthedocs.io/projects/display_text/en/latest/>`_.
+
 Contributing
 ============
 
