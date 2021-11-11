@@ -11,8 +11,8 @@ import board
 import displayio
 import terminalio
 import fontio
-from adafruit_display_text import label, bitmap_label
 from adafruit_bitmap_font import bitmap_font
+from adafruit_display_text import label, bitmap_label
 
 display = board.DISPLAY
 main_group = displayio.Group()
