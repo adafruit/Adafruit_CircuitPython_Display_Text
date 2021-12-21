@@ -28,7 +28,10 @@ __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_Display_Text.git"
 
 
 try:
-    from typing import Tuple
+    from typing import Union, Optional, Tuple
+    from fontio import BuiltinFont
+    from adafruit_bitmap_font.bdf import BDF
+    from adafruit_bitmap_font.pcf import PCF
 except ImportError:
     pass
 
@@ -51,8 +54,9 @@ class Label(LabelBase):
     glyph (if its one line), or the (number of lines * linespacing + M)/2. That is,
     it will try to have it be center-left as close as possible.
 
-    :param Font font: A font class that has ``get_bounding_box`` and ``get_glyph``.
+    :param font: A font class that has ``get_bounding_box`` and ``get_glyph``.
       Must include a capital M for measuring character size.
+    :type font: ~BuiltinFont, ~BDF, or ~PCF
     :param str text: Text to display
     :param int color: Color of all text in RGB hex
     :param int background_color: Color of the background, use `None` for transparent
@@ -80,7 +84,7 @@ class Label(LabelBase):
      configurations possibles ``LTR``-Left-To-Right ``RTL``-Right-To-Left
      ``UPD``-Upside Down ``UPR``-Upwards ``DWR``-Downwards. It defaults to ``LTR``"""
 
-    def __init__(self, font, save_text=True, **kwargs) -> None:
+    def __init__(self, font: Union[BuiltinFont, BDF, PCF], save_text: bool = True, **kwargs) -> None:
 
         self._bitmap = None
 
@@ -102,10 +106,10 @@ class Label(LabelBase):
 
     def _reset_text(
         self,
-        font=None,
-        text: str = None,
-        line_spacing: float = None,
-        scale: int = None,
+        font: Optional[Union[BuiltinFont, BDF, PCF]] = sNone,
+        text: Optional[str] = None,
+        line_spacing: Optional[float] = None,
+        scale: Optional[int] = None,
     ) -> None:
         # pylint: disable=too-many-branches, too-many-statements
 
@@ -247,13 +251,13 @@ class Label(LabelBase):
         self.anchored_position = self._anchored_position
 
     @staticmethod
-    def _line_spacing_ypixels(font, line_spacing: float) -> int:
+    def _line_spacing_ypixels(font: Union[BuiltinFont, BDF, PCF], line_spacing: float) -> int:
         # Note: Scaling is provided at the Group level
         return_value = int(line_spacing * font.get_bounding_box()[1])
         return return_value
 
     def _text_bounding_box(
-        self, text: str, font
+        self, text: str, font: Union[BuiltinFont, BDF, PCF]
     ) -> Tuple[int, int, int, int, int, int]:
         # pylint: disable=too-many-locals
 
@@ -333,9 +337,9 @@ class Label(LabelBase):
 
     def _place_text(
         self,
-        bitmap,
+        bitmap: displayio.Bitmap,
         text: str,
-        font,
+        font: Union[BuiltinFont, BDF, PCF],
         xposition: int,
         yposition: int,
         skip_index: int = 0,  # set to None to write all pixels, other wise skip this palette index
@@ -432,10 +436,10 @@ class Label(LabelBase):
 
     def _blit(
         self,
-        bitmap,  # target bitmap
+        bitmap: displayio.Bitmap,  # target bitmap
         x: int,  # target x upper left corner
         y: int,  # target y upper left corner
-        source_bitmap,  # source bitmap
+        source_bitmap: displayio.Bitmap,  # source bitmap
         x_1: int = 0,  # source x start
         y_1: int = 0,  # source y start
         x_2: int = None,  # source x end
@@ -509,7 +513,7 @@ class Label(LabelBase):
         else:
             raise RuntimeError("line_spacing is immutable when save_text is False")
 
-    def _set_font(self, new_font) -> None:
+    def _set_font(self, new_font: Union[BuiltinFont, BDF, PCF]) -> None:
         self._font = new_font
         if self._save_text:
             self._reset_text(font=new_font, scale=self.scale)
@@ -519,7 +523,7 @@ class Label(LabelBase):
     def _set_text(self, new_text: str, scale: int) -> None:
         self._reset_text(text=self._replace_tabs(new_text), scale=self.scale)
 
-    def _set_background_color(self, new_color):
+    def _set_background_color(self, new_color: Optional[int]):
         self._background_color = new_color
         if new_color is not None:
             self._palette[0] = new_color
@@ -536,7 +540,7 @@ class Label(LabelBase):
         return "LTR", "RTL", "UPD", "UPR", "DWR"
 
     @property
-    def bitmap(self):
+    def bitmap(self) -> displayio.Bitmap:
         """
         The Bitmap object that the text and background are drawn into.
 
