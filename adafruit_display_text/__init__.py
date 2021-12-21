@@ -18,7 +18,11 @@ from displayio import Group, Palette
 
 
 def wrap_text_to_pixels(
-    string: str, max_width: int, font: Optional[Union[BuiltinFont, BDF, PCF]] = None, indent0: str = "", indent1: str = ""
+    string: str,
+    max_width: int,
+    font: Optional[Union[BuiltinFont, BDF, PCF]] = None,
+    indent0: str = "",
+    indent1: str = "",
 ) -> List[str]:
     # pylint: disable=too-many-branches, too-many-locals
 

@@ -84,7 +84,9 @@ class Label(LabelBase):
      configurations possibles ``LTR``-Left-To-Right ``RTL``-Right-To-Left
      ``UPD``-Upside Down ``UPR``-Upwards ``DWR``-Downwards. It defaults to ``LTR``"""
 
-    def __init__(self, font: Union[BuiltinFont, BDF, PCF], save_text: bool = True, **kwargs) -> None:
+    def __init__(
+        self, font: Union[BuiltinFont, BDF, PCF], save_text: bool = True, **kwargs
+    ) -> None:
 
         self._bitmap = None
 
@@ -251,7 +253,9 @@ class Label(LabelBase):
         self.anchored_position = self._anchored_position
 
     @staticmethod
-    def _line_spacing_ypixels(font: Union[BuiltinFont, BDF, PCF], line_spacing: float) -> int:
+    def _line_spacing_ypixels(
+        font: Union[BuiltinFont, BDF, PCF], line_spacing: float
+    ) -> int:
         # Note: Scaling is provided at the Group level
         return_value = int(line_spacing * font.get_bounding_box()[1])
         return return_value
