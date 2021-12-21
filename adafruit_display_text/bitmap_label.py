@@ -108,7 +108,7 @@ class Label(LabelBase):
 
     def _reset_text(
         self,
-        font: Optional[Union[BuiltinFont, BDF, PCF]] = sNone,
+        font: Optional[Union[BuiltinFont, BDF, PCF]] = None,
         text: Optional[str] = None,
         line_spacing: Optional[float] = None,
         scale: Optional[int] = None,
