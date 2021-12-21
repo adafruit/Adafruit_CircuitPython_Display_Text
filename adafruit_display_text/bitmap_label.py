@@ -157,7 +157,7 @@ class Label(LabelBase):
                 loose_box_y,
                 loose_y_offset,
             ) = self._text_bounding_box(
-                self._text,
+                text,
                 self._font,
             )  # calculate the box size for a tight and loose backgrounds
 
@@ -179,7 +179,7 @@ class Label(LabelBase):
             # Place the text into the Bitmap
             self._place_text(
                 self._bitmap,
-                self._text,
+                text,
                 self._font,
                 self._padding_left - x_offset,
                 self._padding_top + y_offset,
