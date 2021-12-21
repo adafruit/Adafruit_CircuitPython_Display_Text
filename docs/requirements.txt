@@ -2,5 +2,4 @@
 #
 # SPDX-License-Identifier: Unlicense
 
-adafruit_bitmap_font
 sphinx>=4.0.0
