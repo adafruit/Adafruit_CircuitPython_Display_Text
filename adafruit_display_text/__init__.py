@@ -8,14 +8,21 @@
 """
 
 try:
-    from typing import List, Tuple
+    from typing import Optional, Union, List, Tuple
+    from fontio import BuiltinFont
+    from adafruit_bitmap_font.bdf import BDF
+    from adafruit_bitmap_font.pcf import PCF
 except ImportError:
     pass
 from displayio import Group, Palette
 
 
 def wrap_text_to_pixels(
-    string: str, max_width: int, font=None, indent0: str = "", indent1: str = ""
+    string: str,
+    max_width: int,
+    font: Optional[Union[BuiltinFont, BDF, PCF]] = None,
+    indent0: str = "",
+    indent1: str = "",
 ) -> List[str]:
     # pylint: disable=too-many-branches, too-many-locals
 
@@ -27,7 +34,8 @@ def wrap_text_to_pixels(
 
     :param str string: The text to be wrapped.
     :param int max_width: The maximum number of pixels on a line before wrapping.
-    :param Font font: The font to use for measuring the text.
+    :param font: The font to use for measuring the text.
+    :type font: ~BuiltinFont, ~BDF, or ~PCF
     :param str indent0: Additional character(s) to add to the first line.
     :param str indent1: Additional character(s) to add to all other lines.
 
@@ -164,8 +172,9 @@ class LabelBase(Group):
     Subclasses should implement ``_set_text``, ``_set_font``, and ``_set_line_spacing`` to
     have the correct behavior for that type of label.
 
-    :param Font font: A font class that has ``get_bounding_box`` and ``get_glyph``.
+    :param font: A font class that has ``get_bounding_box`` and ``get_glyph``.
       Must include a capital M for measuring character size.
+    :type font: ~BuiltinFont, ~BDF, or ~PCF
     :param str text: Text to display
     :param int color: Color of all text in RGB hex
     :param int background_color: Color of the background, use `None` for transparent
@@ -192,7 +201,7 @@ class LabelBase(Group):
 
     def __init__(
         self,
-        font,
+        font: Union[BuiltinFont, BDF, PCF],
         x: int = 0,
         y: int = 0,
         text: str = "",
@@ -278,15 +287,15 @@ class LabelBase(Group):
         return ascender_max, descender_max
 
     @property
-    def font(self) -> None:
+    def font(self) -> Union[BuiltinFont, BDF, PCF]:
         """Font to use for text display."""
         return self._font
 
-    def _set_font(self, new_font) -> None:
+    def _set_font(self, new_font: Union[BuiltinFont, BDF, PCF]) -> None:
         raise NotImplementedError("{} MUST override '_set_font'".format(type(self)))
 
     @font.setter
-    def font(self, new_font) -> None:
+    def font(self, new_font: Union[BuiltinFont, BDF, PCF]) -> None:
         self._set_font(new_font)
 
     @property
@@ -435,5 +444,5 @@ class LabelBase(Group):
             raise RuntimeError("Please provide a valid text direction")
         self._set_label_direction(new_label_direction)
 
-    def _replace_tabs(self, text):
+    def _replace_tabs(self, text: str) -> str:
         return self._tab_text.join(text.split("\t"))
