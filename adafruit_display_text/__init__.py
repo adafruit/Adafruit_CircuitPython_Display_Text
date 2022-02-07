@@ -72,8 +72,10 @@ def wrap_text_to_pixels(
                 for char in word:
                     if newline:
                         extraspace = 0
+                        leadchar = ""
                     else:
                         extraspace = swidth
+                        leadchar = " "
                     if (
                         measure("".join(partial))
                         + measure(cur_part)
@@ -83,12 +85,10 @@ def wrap_text_to_pixels(
                         > max_width
                     ):
                         if cur_part:
-                            if newline:
-                                word_parts.append("".join(partial) + cur_part + "-")
-                            else:
-                                word_parts.append(
-                                    "".join(partial) + " " + cur_part + "-"
-                                )
+                            word_parts.append(
+                                "".join(partial) + leadchar + cur_part + "-"
+                            )
+
                         else:
                             word_parts.append("".join(partial))
                         cur_part = char
