@@ -24,7 +24,7 @@ def wrap_text_to_pixels(
     indent0: str = "",
     indent1: str = "",
 ) -> List[str]:
-    # pylint: disable=too-many-branches, too-many-locals
+    # pylint: disable=too-many-branches, too-many-locals, too-many-nested-blocks, too-many-statements
 
     """wrap_text_to_pixels function
     A helper that will return a list of lines with word-break wrapping.
@@ -86,7 +86,9 @@ def wrap_text_to_pixels(
                             if newline:
                                 word_parts.append("".join(partial) + cur_part + "-")
                             else:
-                                word_parts.append("".join(partial) + " " + cur_part + "-")
+                                word_parts.append(
+                                    "".join(partial) + " " + cur_part + "-"
+                                )
                         else:
                             word_parts.append("".join(partial))
                         cur_part = char
