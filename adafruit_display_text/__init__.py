@@ -24,7 +24,7 @@ def wrap_text_to_pixels(
     indent0: str = "",
     indent1: str = "",
 ) -> List[str]:
-    # pylint: disable=too-many-branches, too-many-locals
+    # pylint: disable=too-many-branches, too-many-locals, too-many-nested-blocks, too-many-statements
 
     """wrap_text_to_pixels function
     A helper that will return a list of lines with word-break wrapping.
@@ -62,6 +62,7 @@ def wrap_text_to_pixels(
     swidth = measure(" ")
     firstword = True
     for line_in_input in string.split("\n"):
+        newline = True
         for index, word in enumerate(line_in_input.split(" ")):
             wwidth = measure(word)
             word_parts = []
@@ -69,16 +70,30 @@ def wrap_text_to_pixels(
 
             if wwidth > max_width:
                 for char in word:
+                    if newline:
+                        extraspace = 0
+                        leadchar = ""
+                    else:
+                        extraspace = swidth
+                        leadchar = " "
                     if (
                         measure("".join(partial))
                         + measure(cur_part)
                         + measure(char)
                         + measure("-")
+                        + extraspace
                         > max_width
                     ):
-                        word_parts.append("".join(partial) + cur_part + "-")
+                        if cur_part:
+                            word_parts.append(
+                                "".join(partial) + leadchar + cur_part + "-"
+                            )
+
+                        else:
+                            word_parts.append("".join(partial))
                         cur_part = char
                         partial = [indent1]
+                        newline = True
                     else:
                         cur_part += char
                 if cur_part:
@@ -103,6 +118,8 @@ def wrap_text_to_pixels(
                     lines.append("".join(partial))
                     partial = [indent1, word]
                     width = measure(indent1) + wwidth
+            if newline:
+                newline = False
 
         lines.append("".join(partial))
         partial = [indent1]
