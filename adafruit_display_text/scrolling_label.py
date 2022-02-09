@@ -38,7 +38,7 @@ class ScrollingLabel(bitmap_label.Label):
 
     :param font: The font to use for the label.
     :param max_characters: The number of characters that sets the  fixed-width. Default is 10.
-    :param full_text: The full text to show in the label. If this is longer than
+    :param text: The full text to show in the label. If this is longer than
      `max_characters` then the label will scroll to show everything.
     :param animate_time: The number of seconds in between scrolling animation
      frames. Default is 0.3 seconds.
