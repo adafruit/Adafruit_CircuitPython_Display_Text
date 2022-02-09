@@ -51,7 +51,7 @@ class ScrollingLabel(bitmap_label.Label):
         self,
         font,
         max_characters=10,
-        full_text="",
+        text="",
         animate_time=0.3,
         current_index=0,
         **kwargs
@@ -62,15 +62,10 @@ class ScrollingLabel(bitmap_label.Label):
         self._current_index = current_index
         self._last_animate_time = -1
         self.max_characters = max_characters
-        if "text" in kwargs:
-            raise ValueError(
-                "User code should not set the text argument on ScrollingText. "
-                "Use full_text instead."
-            )
 
-        if full_text[-1] != " ":
-            full_text = "{} ".format(full_text)
-        self._full_text = full_text
+        if text[-1] != " ":
+            text = "{} ".format(text)
+        self._full_text = text
 
         self.update()
 
