@@ -8,7 +8,7 @@ from adafruit_display_text.scrolling_label import ScrollingLabel
 
 text = "Hello world CircuitPython scrolling label"
 my_scrolling_label = ScrollingLabel(
-    terminalio.FONT, full_text=text, max_characters=20, animate_time=0.3
+    terminalio.FONT, text=text, max_characters=20, animate_time=0.3
 )
 my_scrolling_label.x = 10
 my_scrolling_label.y = 10
