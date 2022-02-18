@@ -35,6 +35,7 @@ setup(
     install_requires=[
         "Adafruit-Blinka",
         "adafruit-blinka-displayio",
+        "adafruit-circuitpython-bitmap-font",
     ],
     # Choose your license
     license="MIT",
