@@ -39,7 +39,7 @@ import displayio
 
 from adafruit_display_text import LabelBase
 
-
+# pylint: disable=too-many-instance-attributes
 class Label(LabelBase):
     """A label displaying a string of text that is stored in a bitmap.
     Note: This ``bitmap_label.py`` library utilizes a :py:class:`~displayio.Bitmap`
@@ -236,8 +236,8 @@ class Label(LabelBase):
 
             # Set TileGrid properties based on label_direction
             if self._label_direction != self._prev_label_direction:
-                tg = self._tilegrid
-                tg.transpose_xy, tg.flip_x, tg.flip_y = self._DIR_MAP[
+                tg1 = self._tilegrid
+                tg1.transpose_xy, tg1.flip_x, tg1.flip_y = self._DIR_MAP[
                     self._label_direction
                 ]
 
