@@ -106,9 +106,6 @@ class Label(LabelBase):
         self._save_text = save_text
         self._text = self._replace_tabs(self._text)
 
-        if self._label_direction == "RTL":
-            self._text = "".join(reversed(self._text))
-
         # call the text updater with all the arguments.
         self._reset_text(
             font=font,
@@ -138,8 +135,6 @@ class Label(LabelBase):
 
         if self._save_text:  # text string will be saved
             self._text = self._replace_tabs(text)
-            if self._label_direction == "RTL":
-                self._text = "".join(reversed(self._text))
         else:
             self._text = None  # save a None value since text string is not saved
 
@@ -205,7 +200,9 @@ class Label(LabelBase):
             # Place the text into the Bitmap
             self._place_text(
                 self._bitmap,
-                text,
+                text
+                if self._label_direction != "RTL"
+                else "".join(reversed(self._text)),
                 self._font,
                 self._padding_left - x_offset,
                 self._padding_top + y_offset,
