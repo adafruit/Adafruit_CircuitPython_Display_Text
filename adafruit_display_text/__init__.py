@@ -283,7 +283,7 @@ class LabelBase(Group):
             self._y_offset = self._ascent // 2
 
     def _get_ascent_descent(self) -> Tuple[int, int]:
-        """ Private function to calculate ascent and descent font values """
+        """Private function to calculate ascent and descent font values"""
         if hasattr(self.font, "ascent") and hasattr(self.font, "descent"):
             return self.font.ascent, self.font.descent
 
@@ -462,4 +462,4 @@ class LabelBase(Group):
         self._set_label_direction(new_label_direction)
 
     def _replace_tabs(self, text: str) -> str:
-        return self._tab_text.join(text.split("\t"))
+        return text if text.find("\t") < 0 else self._tab_text.join(text.split("\t"))

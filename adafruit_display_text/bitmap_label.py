@@ -39,7 +39,7 @@ import displayio
 
 from adafruit_display_text import LabelBase
 
-
+# pylint: disable=too-many-instance-attributes
 class Label(LabelBase):
     """A label displaying a string of text that is stored in a bitmap.
     Note: This ``bitmap_label.py`` library utilizes a :py:class:`~displayio.Bitmap`
@@ -84,19 +84,27 @@ class Label(LabelBase):
      configurations possibles ``LTR``-Left-To-Right ``RTL``-Right-To-Left
      ``UPD``-Upside Down ``UPR``-Upwards ``DWR``-Downwards. It defaults to ``LTR``"""
 
+    # This maps label_direction to TileGrid's transpose_xy, flip_x, flip_y
+    _DIR_MAP = {
+        "UPR": (True, True, False),
+        "DWR": (True, False, True),
+        "UPD": (False, True, True),
+        "LTR": (False, False, False),
+        "RTL": (False, False, False),
+    }
+
     def __init__(
         self, font: Union[BuiltinFont, BDF, PCF], save_text: bool = True, **kwargs
     ) -> None:
 
         self._bitmap = None
+        self._tilegrid = None
+        self._prev_label_direction = None
 
         super().__init__(font, **kwargs)
 
         self._save_text = save_text
         self._text = self._replace_tabs(self._text)
-
-        if self._label_direction == "RTL":
-            self._text = "".join(reversed(self._text))
 
         # call the text updater with all the arguments.
         self._reset_text(
@@ -113,7 +121,7 @@ class Label(LabelBase):
         line_spacing: Optional[float] = None,
         scale: Optional[int] = None,
     ) -> None:
-        # pylint: disable=too-many-branches, too-many-statements
+        # pylint: disable=too-many-branches, too-many-statements, too-many-locals
 
         # Store all the instance variables
         if font is not None:
@@ -127,8 +135,6 @@ class Label(LabelBase):
 
         if self._save_text:  # text string will be saved
             self._text = self._replace_tabs(text)
-            if self._label_direction == "RTL":
-                self._text = "".join(reversed(self._text))
         else:
             self._text = None  # save a None value since text string is not saved
 
@@ -179,13 +185,24 @@ class Label(LabelBase):
             box_x = box_x + self._padding_left + self._padding_right
             box_y = box_y + self._padding_top + self._padding_bottom
 
-            # Create the bitmap and TileGrid
-            self._bitmap = displayio.Bitmap(box_x, box_y, len(self._palette))
+            # Create the Bitmap unless it can be reused
+            new_bitmap = None
+            if (
+                self._bitmap is None
+                or self._bitmap.width != box_x
+                or self._bitmap.height != box_y
+            ):
+                new_bitmap = displayio.Bitmap(box_x, box_y, len(self._palette))
+                self._bitmap = new_bitmap
+            else:
+                self._bitmap.fill(0)
 
             # Place the text into the Bitmap
             self._place_text(
                 self._bitmap,
-                text,
+                text
+                if self._label_direction != "RTL"
+                else "".join(reversed(self._text)),
                 self._font,
                 self._padding_left - x_offset,
                 self._padding_top + y_offset,
@@ -196,35 +213,33 @@ class Label(LabelBase):
             else:
                 label_position_yoffset = self._ascent // 2
 
-            self._tilegrid = displayio.TileGrid(
-                self._bitmap,
-                pixel_shader=self._palette,
-                width=1,
-                height=1,
-                tile_width=box_x,
-                tile_height=box_y,
-                default_tile=0,
-                x=-self._padding_left + x_offset,
-                y=label_position_yoffset - y_offset - self._padding_top,
-            )
+            # Create the TileGrid if not created bitmap unchanged
+            if self._tilegrid is None or new_bitmap:
+                self._tilegrid = displayio.TileGrid(
+                    self._bitmap,
+                    pixel_shader=self._palette,
+                    width=1,
+                    height=1,
+                    tile_width=box_x,
+                    tile_height=box_y,
+                    default_tile=0,
+                    x=-self._padding_left + x_offset,
+                    y=label_position_yoffset - y_offset - self._padding_top,
+                )
+                # Clear out any items in the local_group Group, in case this is an update to
+                # the bitmap_label
+                for _ in self._local_group:
+                    self._local_group.pop(0)
+                self._local_group.append(
+                    self._tilegrid
+                )  # add the bitmap's tilegrid to the group
 
-            if self._label_direction == "UPR":
-                self._tilegrid.transpose_xy = True
-                self._tilegrid.flip_x = True
-            if self._label_direction == "DWR":
-                self._tilegrid.transpose_xy = True
-                self._tilegrid.flip_y = True
-            if self._label_direction == "UPD":
-                self._tilegrid.flip_x = True
-                self._tilegrid.flip_y = True
-
-            # Clear out any items in the local_group Group, in case this is an update to
-            # the bitmap_label
-            for _ in self._local_group:
-                self._local_group.pop(0)
-            self._local_group.append(
-                self._tilegrid
-            )  # add the bitmap's tilegrid to the group
+            # Set TileGrid properties based on label_direction
+            if self._label_direction != self._prev_label_direction:
+                tg1 = self._tilegrid
+                tg1.transpose_xy, tg1.flip_x, tg1.flip_y = self._DIR_MAP[
+                    self._label_direction
+                ]
 
             # Update bounding_box values.  Note: To be consistent with label.py,
             # this is the bounding box for the text only, not including the background.
@@ -537,6 +552,7 @@ class Label(LabelBase):
             self._palette.make_transparent(0)
 
     def _set_label_direction(self, new_label_direction: str) -> None:
+        self._prev_label_direction = self._label_direction
         self._label_direction = new_label_direction
         self._reset_text(text=str(self._text))  # Force a recalculation
 
