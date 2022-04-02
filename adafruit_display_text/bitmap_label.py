@@ -154,6 +154,10 @@ class Label(LabelBase):
             for _ in self._local_group:
                 self._local_group.pop(0)
 
+            # Free the bitmap and tilegrid since they are removed
+            self._bitmap = None
+            self._tilegrid = None
+
         else:  # The text string is not empty, so create the Bitmap and TileGrid and
             # append to the self Group
 
@@ -200,9 +204,7 @@ class Label(LabelBase):
             # Place the text into the Bitmap
             self._place_text(
                 self._bitmap,
-                text
-                if self._label_direction != "RTL"
-                else "".join(reversed(self._text)),
+                text if self._label_direction != "RTL" else "".join(reversed(text)),
                 self._font,
                 self._padding_left - x_offset,
                 self._padding_top + y_offset,
