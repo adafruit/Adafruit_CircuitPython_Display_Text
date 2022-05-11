@@ -27,7 +27,7 @@ __version__ = "0.0.0-auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_Display_Text.git"
 
 try:
-    from typing import Union, Optional, Tuple
+    from typing import Union, Optional
     from fontio import BuiltinFont
     from adafruit_bitmap_font.bdf import BDF
     from adafruit_bitmap_font.pcf import PCF
@@ -80,7 +80,8 @@ class ScrollingLabel(bitmap_label.Label):
         previews animation frame then move the characters over by 1 index.
         Must be called in the main loop of user code.
 
-        :param bool force: whether to ignore ``animation_time`` and force the update. Default is False.
+        :param bool force: whether to ignore ``animation_time`` and force the update.
+         Default is False.
         :return: None
         """
         _now = time.monotonic()
