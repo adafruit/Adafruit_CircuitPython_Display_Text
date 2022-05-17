@@ -27,10 +27,8 @@ __version__ = "0.0.0-auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_Display_Text.git"
 
 try:
-    from typing import Union, Optional
-    from fontio import BuiltinFont
-    from adafruit_bitmap_font.bdf import BDF
-    from adafruit_bitmap_font.pcf import PCF
+    from typing import Optional
+    from fontio import FontProtocol
 except ImportError:
     pass
 
@@ -43,7 +41,7 @@ class ScrollingLabel(bitmap_label.Label):
     in order to show the full text if it's larger than the fixed-width.
 
     :param font: The font to use for the label.
-    :type font: ~BuiltinFont, ~BDF, or ~PCF
+    :type: ~FontProtocol
     :param int max_characters: The number of characters that sets the fixed-width. Default is 10.
     :param str text: The full text to show in the label. If this is longer than
      ``max_characters`` then the label will scroll to show everything.
@@ -55,8 +53,8 @@ class ScrollingLabel(bitmap_label.Label):
     # pylint: disable=too-many-arguments
     def __init__(
         self,
-        font: Union[BuiltinFont, BDF, PCF],
-        max_characters: Optional[int] = 10,
+        font: FontProtocol,
+        max_characters: int = 10,
         text: Optional[str] = "",
         animate_time: Optional[float] = 0.3,
         current_index: Optional[int] = 0,
@@ -135,7 +133,7 @@ class ScrollingLabel(bitmap_label.Label):
         """The full text to be shown. If it's longer than ``max_characters`` then
         scrolling will occur as needed.
 
-        :return string: The full text of this label.
+        :return str: The full text of this label.
         """
         return self._full_text
 
