@@ -73,7 +73,7 @@ class ScrollingLabel(bitmap_label.Label):
 
         self.update()
 
-    def update(self, force: Optional[bool] = False) -> None:
+    def update(self, force: bool = False) -> None:
         """Attempt to update the display. If ``animate_time`` has elapsed since
         previews animation frame then move the characters over by 1 index.
         Must be called in the main loop of user code.
@@ -122,7 +122,7 @@ class ScrollingLabel(bitmap_label.Label):
         return self._current_index
 
     @current_index.setter
-    def current_index(self, new_index: int):
+    def current_index(self, new_index: int) -> None:
         if new_index < len(self.full_text):
             self._current_index = new_index
         else:
@@ -138,7 +138,7 @@ class ScrollingLabel(bitmap_label.Label):
         return self._full_text
 
     @full_text.setter
-    def full_text(self, new_text: str):
+    def full_text(self, new_text: str) -> None:
         if new_text[-1] != " ":
             new_text = "{} ".format(new_text)
         self._full_text = new_text
