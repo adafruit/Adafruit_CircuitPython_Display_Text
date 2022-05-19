@@ -34,7 +34,7 @@ setup(
     author_email="circuitpython@adafruit.com",
     install_requires=[
         "Adafruit-Blinka",
-        "adafruit-blinka-displayio",
+        "adafruit-blinka-displayio>=0.10.2",
         "adafruit-circuitpython-bitmap-font",
     ],
     # Choose your license

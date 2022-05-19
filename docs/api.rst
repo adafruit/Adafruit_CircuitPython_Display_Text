@@ -13,3 +13,6 @@
 
 .. automodule:: adafruit_display_text.bitmap_label
    :members:
+
+.. automodule:: adafruit_display_text.scrolling_label
+   :members:
