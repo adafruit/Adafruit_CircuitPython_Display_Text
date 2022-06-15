@@ -26,6 +26,8 @@ Implementation Notes
 __version__ = "0.0.0-auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_Display_Text.git"
 
+import displayio
+from adafruit_display_text import LabelBase
 
 try:
     from typing import Optional, Tuple
@@ -33,9 +35,6 @@ try:
 except ImportError:
     pass
 
-import displayio
-
-from adafruit_display_text import LabelBase
 
 # pylint: disable=too-many-instance-attributes
 class Label(LabelBase):

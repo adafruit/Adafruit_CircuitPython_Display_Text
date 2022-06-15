@@ -7,12 +7,13 @@
 =======================
 """
 
+from displayio import Group, Palette
+
 try:
     from typing import Optional, List, Tuple
     from fontio import FontProtocol
 except ImportError:
     pass
-from displayio import Group, Palette
 
 
 def wrap_text_to_pixels(
