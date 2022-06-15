@@ -26,18 +26,15 @@ Implementation Notes
 __version__ = "0.0.0-auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_Display_Text.git"
 
+import displayio
+from adafruit_display_text import LabelBase
 
 try:
-    from typing import Union, Optional, Tuple
-    from fontio import BuiltinFont
-    from adafruit_bitmap_font.bdf import BDF
-    from adafruit_bitmap_font.pcf import PCF
+    from typing import Optional, Tuple
+    from fontio import FontProtocol
 except ImportError:
     pass
 
-import displayio
-
-from adafruit_display_text import LabelBase
 
 # pylint: disable=too-many-instance-attributes
 class Label(LabelBase):
@@ -56,7 +53,7 @@ class Label(LabelBase):
 
     :param font: A font class that has ``get_bounding_box`` and ``get_glyph``.
       Must include a capital M for measuring character size.
-    :type font: ~BuiltinFont, ~BDF, or ~PCF
+    :type font: ~FontProtocol
     :param str text: Text to display
     :param int color: Color of all text in RGB hex
     :param int background_color: Color of the background, use `None` for transparent
@@ -93,9 +90,7 @@ class Label(LabelBase):
         "RTL": (False, False, False),
     }
 
-    def __init__(
-        self, font: Union[BuiltinFont, BDF, PCF], save_text: bool = True, **kwargs
-    ) -> None:
+    def __init__(self, font: FontProtocol, save_text: bool = True, **kwargs) -> None:
 
         self._bitmap = None
         self._tilegrid = None
@@ -116,7 +111,7 @@ class Label(LabelBase):
 
     def _reset_text(
         self,
-        font: Optional[Union[BuiltinFont, BDF, PCF]] = None,
+        font: Optional[FontProtocol] = None,
         text: Optional[str] = None,
         line_spacing: Optional[float] = None,
         scale: Optional[int] = None,
@@ -270,15 +265,13 @@ class Label(LabelBase):
         self.anchored_position = self._anchored_position
 
     @staticmethod
-    def _line_spacing_ypixels(
-        font: Union[BuiltinFont, BDF, PCF], line_spacing: float
-    ) -> int:
+    def _line_spacing_ypixels(font: FontProtocol, line_spacing: float) -> int:
         # Note: Scaling is provided at the Group level
         return_value = int(line_spacing * font.get_bounding_box()[1])
         return return_value
 
     def _text_bounding_box(
-        self, text: str, font: Union[BuiltinFont, BDF, PCF]
+        self, text: str, font: FontProtocol
     ) -> Tuple[int, int, int, int, int, int]:
         # pylint: disable=too-many-locals
 
@@ -360,7 +353,7 @@ class Label(LabelBase):
         self,
         bitmap: displayio.Bitmap,
         text: str,
-        font: Union[BuiltinFont, BDF, PCF],
+        font: FontProtocol,
         xposition: int,
         yposition: int,
         skip_index: int = 0,  # set to None to write all pixels, other wise skip this palette index
@@ -534,7 +527,7 @@ class Label(LabelBase):
         else:
             raise RuntimeError("line_spacing is immutable when save_text is False")
 
-    def _set_font(self, new_font: Union[BuiltinFont, BDF, PCF]) -> None:
+    def _set_font(self, new_font: FontProtocol) -> None:
         self._font = new_font
         if self._save_text:
             self._reset_text(font=new_font, scale=self.scale)

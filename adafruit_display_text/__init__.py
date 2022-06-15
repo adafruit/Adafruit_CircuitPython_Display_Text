@@ -7,20 +7,22 @@
 =======================
 """
 
+__version__ = "0.0.0-auto.0"
+__repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_Display_Text.git"
+
+from displayio import Group, Palette
+
 try:
-    from typing import Optional, Union, List, Tuple
-    from fontio import BuiltinFont
-    from adafruit_bitmap_font.bdf import BDF
-    from adafruit_bitmap_font.pcf import PCF
+    from typing import Optional, List, Tuple
+    from fontio import FontProtocol
 except ImportError:
     pass
-from displayio import Group, Palette
 
 
 def wrap_text_to_pixels(
     string: str,
     max_width: int,
-    font: Optional[Union[BuiltinFont, BDF, PCF]] = None,
+    font: Optional[FontProtocol] = None,
     indent0: str = "",
     indent1: str = "",
 ) -> List[str]:
@@ -35,7 +37,7 @@ def wrap_text_to_pixels(
     :param str string: The text to be wrapped.
     :param int max_width: The maximum number of pixels on a line before wrapping.
     :param font: The font to use for measuring the text.
-    :type font: ~BuiltinFont, ~BDF, or ~PCF
+    :type font: ~FontProtocol
     :param str indent0: Additional character(s) to add to the first line.
     :param str indent1: Additional character(s) to add to all other lines.
 
@@ -191,7 +193,7 @@ class LabelBase(Group):
 
     :param font: A font class that has ``get_bounding_box`` and ``get_glyph``.
       Must include a capital M for measuring character size.
-    :type font: ~BuiltinFont, ~BDF, or ~PCF
+    :type font: ~FontProtocol
     :param str text: Text to display
     :param int color: Color of all text in RGB hex
     :param int background_color: Color of the background, use `None` for transparent
@@ -218,7 +220,7 @@ class LabelBase(Group):
 
     def __init__(
         self,
-        font: Union[BuiltinFont, BDF, PCF],
+        font: FontProtocol,
         x: int = 0,
         y: int = 0,
         text: str = "",
@@ -304,15 +306,15 @@ class LabelBase(Group):
         return ascender_max, descender_max
 
     @property
-    def font(self) -> Union[BuiltinFont, BDF, PCF]:
+    def font(self) -> FontProtocol:
         """Font to use for text display."""
         return self._font
 
-    def _set_font(self, new_font: Union[BuiltinFont, BDF, PCF]) -> None:
+    def _set_font(self, new_font: FontProtocol) -> None:
         raise NotImplementedError("{} MUST override '_set_font'".format(type(self)))
 
     @font.setter
-    def font(self, new_font: Union[BuiltinFont, BDF, PCF]) -> None:
+    def font(self, new_font: FontProtocol) -> None:
         self._set_font(new_font)
 
     @property
