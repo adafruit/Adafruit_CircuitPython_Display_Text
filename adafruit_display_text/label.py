@@ -27,10 +27,8 @@ __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_Display_Text.git"
 
 
 try:
-    from typing import Union, Optional, Tuple
-    from fontio import BuiltinFont
-    from adafruit_bitmap_font.bdf import BDF
-    from adafruit_bitmap_font.pcf import PCF
+    from typing import Optional, Tuple
+    from fontio import FontProtocol
 except ImportError:
     pass
 
@@ -49,7 +47,7 @@ class Label(LabelBase):
 
     :param font: A font class that has ``get_bounding_box`` and ``get_glyph``.
       Must include a capital M for measuring character size.
-    :type font: ~BuiltinFont, ~BDF, or ~PCF
+    :type font: ~FontProtocol
     :param str text: Text to display
     :param int color: Color of all text in RGB hex
     :param int background_color: Color of the background, use `None` for transparent
@@ -83,7 +81,7 @@ class Label(LabelBase):
      configurations possibles ``LTR``-Left-To-Right ``RTL``-Right-To-Left
      ``TTB``-Top-To-Bottom ``UPR``-Upwards ``DWR``-Downwards. It defaults to ``LTR``"""
 
-    def __init__(self, font: Union[BuiltinFont, BDF, PCF], **kwargs) -> None:
+    def __init__(self, font: FontProtocol, **kwargs) -> None:
         self._background_palette = Palette(1)
         self._added_background_tilegrid = False
 
@@ -403,7 +401,7 @@ class Label(LabelBase):
         self._update_text(str(self._replace_tabs(new_text)))
         self.anchored_position = current_anchored_position
 
-    def _set_font(self, new_font: Union[BuiltinFont, BDF, PCF]) -> None:
+    def _set_font(self, new_font: FontProtocol) -> None:
         old_text = self._text
         current_anchored_position = self.anchored_position
         self._text = ""
