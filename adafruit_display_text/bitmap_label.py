@@ -547,9 +547,12 @@ class Label(LabelBase):
             self._palette.make_transparent(0)
 
     def _set_label_direction(self, new_label_direction: str) -> None:
-        self._prev_label_direction = self._label_direction
-        self._label_direction = new_label_direction
-        self._reset_text(text=str(self._text))  # Force a recalculation
+        # Only make changes if new direction is different
+        # to prevent errors in the _reset_text() direction checks
+        if self._label_direction != new_label_direction:
+            self._prev_label_direction = self._label_direction
+            self._label_direction = new_label_direction
+            self._reset_text(text=str(self._text))  # Force a recalculation
 
     def _get_valid_label_directions(self) -> Tuple[str, ...]:
         return "LTR", "RTL", "UPD", "UPR", "DWR"
