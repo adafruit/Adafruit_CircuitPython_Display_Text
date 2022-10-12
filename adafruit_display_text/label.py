@@ -48,8 +48,9 @@ class Label(LabelBase):
       Must include a capital M for measuring character size.
     :type font: ~FontProtocol
     :param str text: Text to display
-    :param int color: Color of all text in RGB hex
-    :param int background_color: Color of the background, use `None` for transparent
+    :param int|Tuple(int, int, int) color: Color of all text in HEX or RGB
+    :param int|Tuple(int, int, int) background_color: Color of the background, use `None`
+     for transparent
     :param float line_spacing: Line spacing of text to display
     :param bool background_tight: Set `True` only if you want background box to tightly
      surround text. When set to 'True' Padding parameters will be ignored.
@@ -65,15 +66,15 @@ class Label(LabelBase):
     :param int padding_right: Additional pixels added to background bounding box at right.
      This parameter could be negative indicating additional pixels subtracted from the
      background bounding box.
-    :param (float,float) anchor_point: Point that anchored_position moves relative to.
+    :param Tuple(float, float) anchor_point: Point that anchored_position moves relative to.
      Tuple with decimal percentage of width and height.
      (E.g. (0,0) is top left, (1.0, 0.5): is middle right.)
-    :param (int,int) anchored_position: Position relative to the anchor_point. Tuple
+    :param Tuple(int, int) anchored_position: Position relative to the anchor_point. Tuple
      containing x,y pixel coordinates.
     :param int scale: Integer value of the pixel scaling
     :param bool base_alignment: when True allows to align text label to the baseline.
      This is helpful when two or more labels need to be aligned to the same baseline
-    :param (int,str) tab_replacement: tuple with tab character replace information. When
+    :param Tuple(int, str) tab_replacement: tuple with tab character replace information. When
      (4, " ") will indicate a tab replacement of 4 spaces, defaults to 4 spaces by
      tab character
     :param str label_direction: string defining the label text orientation. There are 5
