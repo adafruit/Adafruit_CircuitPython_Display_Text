@@ -56,7 +56,7 @@ class Label(LabelBase):
     :type font: ~FontProtocol
     :param str text: Text to display
     :param int|Tuple(int, int, int) color: Color of all text in HEX or RGB
-    :param int|Tuple(int, int, int) background_color: Color of the background, use `None`
+    :param int|Tuple(int, int, int)|None background_color: Color of the background, use `None`
      for transparent
     :param float line_spacing: Line spacing of text to display
     :param bool background_tight: Set `True` only if you want background box to tightly
