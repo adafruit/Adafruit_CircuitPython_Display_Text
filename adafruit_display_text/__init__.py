@@ -56,7 +56,12 @@ def wrap_text_to_pixels(
             font.load_glyphs(string)
 
         def measure(text):
-            return sum(font.get_glyph(ord(c)).shift_x for c in text)
+            total_len = 0
+            for char in text:
+                this_glyph = font.get_glyph(ord(char))
+                if this_glyph:
+                    total_len += this_glyph.shift_x
+            return total_len
 
     lines = []
     partial = [indent0]
