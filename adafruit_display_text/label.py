@@ -271,7 +271,7 @@ class Label(LabelBase):
                     right = max(right, x + glyph.shift_x, x + glyph.width + glyph.dx)
                     if x == 0:
                         if left is None:
-                            left = glyph.dx
+                            left = 0
                         else:
                             left = min(left, glyph.dx)
                     position_x = x + glyph.dx
@@ -281,7 +281,7 @@ class Label(LabelBase):
                     )
                     if x == 0:
                         if right is None:
-                            right = glyph.dx
+                            right = 0
                         else:
                             right = max(right, glyph.dx)
                     position_x = x - glyph.width
@@ -289,7 +289,7 @@ class Label(LabelBase):
             elif self._label_direction == "TTB":
                 if x == 0:
                     if left is None:
-                        left = glyph.dx
+                        left = 0
                     else:
                         left = min(left, glyph.dx)
                 if y == 0:

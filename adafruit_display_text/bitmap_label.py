@@ -314,7 +314,7 @@ class Label(LabelBase):
                         lines += 1
                     if xposition == x_start:
                         if left is None:
-                            left = my_glyph.dx
+                            left = 0
                         else:
                             left = min(left, my_glyph.dx)
                     xright = xposition + my_glyph.width + my_glyph.dx
@@ -392,7 +392,7 @@ class Label(LabelBase):
                 else:
                     if xposition == x_start:
                         if left is None:
-                            left = my_glyph.dx
+                            left = 0
                         else:
                             left = min(left, my_glyph.dx)
 
