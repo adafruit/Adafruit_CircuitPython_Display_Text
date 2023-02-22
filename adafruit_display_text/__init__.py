@@ -221,7 +221,9 @@ class LabelBase(Group):
      (4, " ") will indicate a tab replacement of 4 spaces, defaults to 4 spaces by
      tab character
     :param str label_direction: string defining the label text orientation. See the
-     subclass documentation for the possible values."""
+     subclass documentation for the possible values.
+    :param bool verbose: print debugging information in some internal functions. Default to False
+    """
 
     def __init__(
         self,
@@ -243,6 +245,7 @@ class LabelBase(Group):
         base_alignment: bool = False,
         tab_replacement: Tuple[int, str] = (4, " "),
         label_direction: str = "LTR",
+        verbose: bool = False,
         **kwargs,  # pylint: disable=unused-argument
     ) -> None:
         # pylint: disable=too-many-arguments, too-many-locals
@@ -266,6 +269,7 @@ class LabelBase(Group):
         self._label_direction = label_direction
         self._tab_replacement = tab_replacement
         self._tab_text = self._tab_replacement[1] * self._tab_replacement[0]
+        self._verbose = verbose
 
         if "max_glyphs" in kwargs:
             print("Please update your code: 'max_glyphs' is not needed anymore.")

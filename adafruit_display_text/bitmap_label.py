@@ -80,7 +80,10 @@ class Label(LabelBase):
      tab character
     :param str label_direction: string defining the label text orientation. There are 5
      configurations possibles ``LTR``-Left-To-Right ``RTL``-Right-To-Left
-     ``UPD``-Upside Down ``UPR``-Upwards ``DWR``-Downwards. It defaults to ``LTR``"""
+     ``UPD``-Upside Down ``UPR``-Upwards ``DWR``-Downwards. It defaults to ``LTR``
+     :param bool verbose: print debugging information in some internal functions. Default to False
+
+    """
 
     # This maps label_direction to TileGrid's transpose_xy, flip_x, flip_y
     _DIR_MAP = {
@@ -350,6 +353,7 @@ class Label(LabelBase):
             final_y_offset_loose,
         )
 
+    # pylint: disable = too-many-branches
     def _place_text(
         self,
         bitmap: displayio.Bitmap,
@@ -418,19 +422,20 @@ class Label(LabelBase):
                     if y_blit_target < 0:
                         y_clip = -y_blit_target  # clip this amount from top of bitmap
                         y_blit_target = 0  # draw the clipped bitmap at y=0
-
-                        print(
-                            'Warning: Glyph clipped, exceeds Ascent property: "{}"'.format(
-                                char
+                        if self._verbose:
+                            print(
+                                'Warning: Glyph clipped, exceeds Ascent property: "{}"'.format(
+                                    char
+                                )
                             )
-                        )
 
                     if (y_blit_target + my_glyph.height) > bitmap.height:
-                        print(
-                            'Warning: Glyph clipped, exceeds descent property: "{}"'.format(
-                                char
+                        if self._verbose:
+                            print(
+                                'Warning: Glyph clipped, exceeds descent property: "{}"'.format(
+                                    char
+                                )
                             )
-                        )
 
                     self._blit(
                         bitmap,
