@@ -81,7 +81,7 @@ class Label(LabelBase):
     :param str label_direction: string defining the label text orientation. There are 5
      configurations possibles ``LTR``-Left-To-Right ``RTL``-Right-To-Left
      ``UPD``-Upside Down ``UPR``-Upwards ``DWR``-Downwards. It defaults to ``LTR``
-     :param bool verbose: print debugging information in some internal functions. Default to False
+    :param bool verbose: print debugging information in some internal functions. Default to False
 
     """
 
@@ -185,6 +185,7 @@ class Label(LabelBase):
                 y_offset = loose_y_offset
 
             # Calculate the background size including padding
+            tight_box_x = box_x
             box_x = box_x + self._padding_left + self._padding_right
             box_y = box_y + self._padding_top + self._padding_bottom
 
@@ -245,17 +246,23 @@ class Label(LabelBase):
             # Update bounding_box values.  Note: To be consistent with label.py,
             # this is the bounding box for the text only, not including the background.
             if self._label_direction in ("UPR", "DWR"):
+                if self._label_direction == "UPR":
+                    top = self._padding_right
+                    left = self._padding_top
+                if self._label_direction == "DWR":
+                    top = self._padding_left
+                    left = self._padding_bottom
                 self._bounding_box = (
-                    self._tilegrid.x,
-                    self._tilegrid.y,
+                    self._tilegrid.x + left,
+                    self._tilegrid.y + top,
                     tight_box_y,
-                    box_x,
+                    tight_box_x,
                 )
             else:
                 self._bounding_box = (
-                    self._tilegrid.x,
-                    self._tilegrid.y,
-                    box_x,
+                    self._tilegrid.x + self._padding_left,
+                    self._tilegrid.y + self._padding_top,
+                    tight_box_x,
                     tight_box_y,
                 )
 
