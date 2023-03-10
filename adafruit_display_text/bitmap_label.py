@@ -293,13 +293,13 @@ class Label(LabelBase):
 
         y_offset_tight = self._ascent // 2
 
-        newline = False
+        newlines = 0
         line_spacing = self._line_spacing
 
         for char in text:
 
             if char == "\n":  # newline
-                newline = True
+                newlines += 1
 
             else:
 
@@ -308,13 +308,13 @@ class Label(LabelBase):
                 if my_glyph is None:  # Error checking: no glyph found
                     print("Glyph not found: {}".format(repr(char)))
                 else:
-                    if newline:
-                        newline = False
+                    if newlines:
                         xposition = x_start  # reset to left column
-                        yposition = yposition + self._line_spacing_ypixels(
-                            font, line_spacing
-                        )  # Add a newline
-                        lines += 1
+                        yposition += (
+                            self._line_spacing_ypixels(font, line_spacing) * newlines
+                        )  # Add the newline(s)
+                        lines += newlines
+                        newlines = 0
                     if xposition == x_start:
                         if left is None:
                             left = 0
