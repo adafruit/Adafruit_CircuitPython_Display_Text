@@ -99,6 +99,7 @@ class Label(LabelBase):
         if text is not None:
             self._reset_text(str(text))
 
+    # pylint: disable=too-many-branches
     def _create_background_box(self, lines: int, y_offset: int) -> TileGrid:
         """Private Class function to create a background_box
         :param lines: int number of lines
@@ -114,16 +115,27 @@ class Label(LabelBase):
         else:  # draw a "loose" bounding box to include any ascenders/descenders.
             ascent, descent = self._ascent, self._descent
 
-            if self._label_direction in ("UPR", "DWR", "TTB"):
+            if self._label_direction in ("DWR", "UPR"):
                 box_height = (
-                    self._bounding_box[3] + self._padding_top + self._padding_bottom
+                    self._bounding_box[3] + self._padding_right + self._padding_left
                 )
-                x_box_offset = -self._padding_bottom
+                x_box_offset = -self._padding_left
                 box_width = (
                     (ascent + descent)
                     + int((lines - 1) * self._width * self._line_spacing)
-                    + self._padding_left
+                    + self._padding_top
+                    + self._padding_bottom
+                )
+            elif self._label_direction == "TTB":
+                box_height = (
+                    self._bounding_box[3] + self._padding_top + self._padding_bottom
+                )
+                x_box_offset = -self._padding_left
+                box_width = (
+                    (ascent + descent)
+                    + int((lines - 1) * self._height * self._line_spacing)
                     + self._padding_right
+                    + self._padding_left
                 )
             else:
                 box_width = (
@@ -137,23 +149,33 @@ class Label(LabelBase):
                     + self._padding_bottom
                 )
 
-            if self._base_alignment:
-                y_box_offset = -ascent - self._padding_top
+            if self._label_direction == "DWR":
+                padding_to_use = self._padding_bottom
+            elif self._label_direction == "TTB":
+                padding_to_use = self._padding_top
+                y_offset = 0
+                ascent = 0
             else:
-                y_box_offset = -ascent + y_offset - self._padding_top
+                padding_to_use = self._padding_top
+
+            if self._base_alignment:
+                y_box_offset = -ascent - padding_to_use
+            else:
+
+                y_box_offset = -ascent + y_offset - padding_to_use
 
         box_width = max(0, box_width)  # remove any negative values
         box_height = max(0, box_height)  # remove any negative values
 
         if self._label_direction == "UPR":
-            movx = left + x_box_offset
+            movx = y_box_offset
             movy = -box_height - x_box_offset
         elif self._label_direction == "DWR":
-            movx = left + x_box_offset
+            movx = y_box_offset
             movy = x_box_offset
         elif self._label_direction == "TTB":
-            movx = left + x_box_offset
-            movy = x_box_offset
+            movx = x_box_offset
+            movy = y_box_offset
         else:
             movx = left + x_box_offset
             movy = y_box_offset
@@ -168,6 +190,7 @@ class Label(LabelBase):
 
         return tile_grid
 
+    # pylint: enable=too-many-branches
     def _set_background_color(self, new_color: Optional[int]) -> None:
         """Private class function that allows updating the font box background color
 
