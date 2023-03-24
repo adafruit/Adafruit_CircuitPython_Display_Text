@@ -37,7 +37,7 @@ def wrap_text_to_pixels(
     :param str string: The text to be wrapped.
     :param int max_width: The maximum number of pixels on a line before wrapping.
     :param font: The font to use for measuring the text.
-    :type font: ~FontProtocol
+    :type font: ~fontio.FontProtocol
     :param str indent0: Additional character(s) to add to the first line.
     :param str indent1: Additional character(s) to add to all other lines.
 
@@ -198,7 +198,7 @@ class LabelBase(Group):
 
     :param font: A font class that has ``get_bounding_box`` and ``get_glyph``.
       Must include a capital M for measuring character size.
-    :type font: ~FontProtocol
+    :type font: ~fontio.FontProtocol
     :param str text: Text to display
     :param int color: Color of all text in RGB hex
     :param int background_color: Color of the background, use `None` for transparent
