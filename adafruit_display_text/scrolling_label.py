@@ -41,7 +41,7 @@ class ScrollingLabel(bitmap_label.Label):
     in order to show the full text if it's larger than the fixed-width.
 
     :param font: The font to use for the label.
-    :type: ~FontProtocol
+    :type: ~fontio.FontProtocol
     :param int max_characters: The number of characters that sets the fixed-width. Default is 10.
     :param str text: The full text to show in the label. If this is longer than
      ``max_characters`` then the label will scroll to show everything.

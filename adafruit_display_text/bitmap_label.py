@@ -53,7 +53,7 @@ class Label(LabelBase):
 
     :param font: A font class that has ``get_bounding_box`` and ``get_glyph``.
       Must include a capital M for measuring character size.
-    :type font: ~FontProtocol
+    :type font: ~fontio.FontProtocol
     :param str text: Text to display
     :param int|Tuple(int, int, int) color: Color of all text in HEX or RGB
     :param int|Tuple(int, int, int)|None background_color: Color of the background, use `None`
