@@ -161,7 +161,6 @@ class Label(LabelBase):
             if self._base_alignment:
                 y_box_offset = -ascent - padding_to_use
             else:
-
                 y_box_offset = -ascent + y_offset - padding_to_use
 
         box_width = max(0, box_width)  # remove any negative values

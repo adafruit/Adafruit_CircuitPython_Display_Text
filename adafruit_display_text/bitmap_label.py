@@ -95,7 +95,6 @@ class Label(LabelBase):
     }
 
     def __init__(self, font: FontProtocol, save_text: bool = True, **kwargs) -> None:
-
         self._bitmap = None
         self._tilegrid = None
         self._prev_label_direction = None
@@ -141,7 +140,6 @@ class Label(LabelBase):
         if (text == "") or (
             text is None
         ):  # If empty string, just create a zero-sized bounding box and that's it.
-
             self._bounding_box = (
                 0,
                 0,
@@ -304,12 +302,10 @@ class Label(LabelBase):
         line_spacing = self._line_spacing
 
         for char in text:
-
             if char == "\n":  # newline
                 newlines += 1
 
             else:
-
                 my_glyph = font.get_glyph(ord(char))
 
                 if my_glyph is None:  # Error checking: no glyph found
@@ -387,7 +383,6 @@ class Label(LabelBase):
         line_spacing = self._line_spacing
 
         for char in text:
-
             if char == "\n":  # newline
                 xposition = x_start  # reset to left column
                 yposition = yposition + self._line_spacing_ypixels(
@@ -395,7 +390,6 @@ class Label(LabelBase):
                 )  # Add a newline
 
             else:
-
                 my_glyph = font.get_glyph(ord(char))
 
                 if my_glyph is None:  # Error checking: no glyph found
@@ -490,7 +484,6 @@ class Label(LabelBase):
             )
 
         else:  # perform pixel by pixel copy of the bitmap
-
             # Perform input checks
 
             if x_2 is None:
@@ -516,7 +509,6 @@ class Label(LabelBase):
                     if (bitmap.width > x_placement >= 0) and (
                         bitmap.height > y_placement >= 0
                     ):  # ensure placement is within target bitmap
-
                         # get the palette index from the source bitmap
                         this_pixel_color = source_bitmap[
                             y_1

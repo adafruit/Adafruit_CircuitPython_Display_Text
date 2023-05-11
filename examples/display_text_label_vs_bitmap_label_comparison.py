@@ -99,7 +99,6 @@ preload_glyphs = (
 # preloading the glyphs will help speed up the rendering of text but will use more RAM
 
 if preload_glyphs and not use_builtinfont:
-
     # identify the glyphs to load into memory -> increases rendering speed
     glyphs = (
         b"0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ/-_,.:?!'\n "
