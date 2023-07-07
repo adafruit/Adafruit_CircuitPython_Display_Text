@@ -27,6 +27,7 @@ __version__ = "0.0.0+auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_Display_Text.git"
 
 import displayio
+import bitmaptools
 from adafruit_display_text import LabelBase
 
 try:
@@ -481,6 +482,18 @@ class Label(LabelBase):
                 x2=x_2,
                 y2=y_2,
                 skip_index=skip_index,
+            )
+        elif hasattr(bitmaptools, "blit"):
+            bitmaptools.blit(
+                bitmap,
+                source_bitmap,
+                x,
+                y,
+                x1=x_1,
+                y1=y_1,
+                x2=x_2,
+                y2=y_2,
+                skip_source_index=skip_index,
             )
 
         else:  # perform pixel by pixel copy of the bitmap
