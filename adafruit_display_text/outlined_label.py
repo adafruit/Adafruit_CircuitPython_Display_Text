@@ -26,20 +26,55 @@ __version__ = "0.0.0+auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_Display_Text.git"
 
 import bitmaptools
-import traceback
-from adafruit_display_text import bitmap_label
 from displayio import Palette, Bitmap
+from adafruit_display_text import bitmap_label
 
 try:
-    from typing import Optional, Tuple
+    from typing import Optional, Tuple, Union
     from fontio import FontProtocol
 except ImportError:
     pass
 
 
 class OutlinedLabel(bitmap_label.Label):
-    def __init__(self, font, outline_color=0x999999, outline_size=1, **kwargs):
-        super().__init__(font, **kwargs)
+    """
+    OutlinedLabel - A BitmapLabel subclass that includes arguments and properties for specifying
+    outline_size and outline_color to get drawn as a stroke around the text.
+
+    :param Union[Tuple, int] outline_color: The color of the outline stroke as RGB tuple, or hex.
+    :param int outline_size: The size in pixels of the outline stroke.
+
+    """
+
+    # pylint: disable=too-many-arguments
+    def __init__(
+        self,
+        font,
+        outline_color: Union[int, Tuple] = 0x999999,
+        outline_size: int = 1,
+        padding_top: Optional[int] = None,
+        padding_bottom: Optional[int] = None,
+        padding_left: Optional[int] = None,
+        padding_right: Optional[int] = None,
+        **kwargs
+    ):
+        if padding_top is None:
+            padding_top = outline_size + 0
+        if padding_bottom is None:
+            padding_bottom = outline_size + 2
+        if padding_left is None:
+            padding_left = outline_size + 0
+        if padding_right is None:
+            padding_right = outline_size + 0
+
+        super().__init__(
+            font,
+            padding_top=padding_top,
+            padding_bottom=padding_bottom,
+            padding_left=padding_left,
+            padding_right=padding_right,
+            **kwargs
+        )
 
         _background_color = self._palette[0]
         _foreground_color = self._palette[1]
@@ -65,31 +100,30 @@ class OutlinedLabel(bitmap_label.Label):
         )
 
     def _add_outline(self):
-        try:
-            # before = time.monotonic()
-
+        if hasattr(self, "_stamp_source"):
             for y in range(self.bitmap.height):
                 for x in range(self.bitmap.width):
                     if self.bitmap[x, y] == 1:
-                        # bitmap.blit(x-size,y-size, stamp_source, skip_self_index=target_color_index)
-                        bitmaptools.blit(
-                            self.bitmap,
-                            self._stamp_source,
-                            x - self._outline_size,
-                            y - self._outline_size,
-                            skip_dest_index=1,
-                        )
+                        try:
+                            bitmaptools.blit(
+                                self.bitmap,
+                                self._stamp_source,
+                                x - self._outline_size,
+                                y - self._outline_size,
+                                skip_dest_index=1,
+                            )
+                        except ValueError as value_error:
+                            raise ValueError(
+                                "Padding must be big enough to fit outline_size "
+                                "all the way around the text. "
+                                "Try using either larger padding sizes, or smaller outline_size."
+                            ) from value_error
+
                         # bitmaptools.blit(bitmap, stamp_source, x - size, y - size)
                         # for y_loc in range(-size, size+1):
                         #     for x_loc in range(-size, size+1):
                         #         if bitmap[x+x_loc, y+y_loc] != target_color_index:
                         #             bitmap[x + x_loc, y + y_loc] = outline_color_index
-        except ValueError as ve:
-            # print(traceback.print_exception(ve))
-            pass
-        except AttributeError as ae:
-            # print(traceback.print_exception(ae))
-            pass
 
     def _place_text(
         self,
@@ -112,6 +146,7 @@ class OutlinedLabel(bitmap_label.Label):
 
     @property
     def outline_color(self):
+        """Color of the outline to draw around the text."""
         return self._palette[2]
 
     @outline_color.setter
@@ -120,11 +155,18 @@ class OutlinedLabel(bitmap_label.Label):
 
     @property
     def outline_size(self):
+        """Stroke size of the outline to draw around the text."""
         return self._outline_size
 
     @outline_size.setter
     def outline_size(self, new_outline_size):
         self._outline_size = new_outline_size
+
+        self._padding_top = new_outline_size + 0
+        self._padding_bottom = new_outline_size + 2
+        self._padding_left = new_outline_size + 0
+        self._padding_right = new_outline_size + 0
+
         self._stamp_source = Bitmap(
             (new_outline_size * 2) + 1, (new_outline_size * 2) + 1, 3
         )
