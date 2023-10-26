@@ -441,7 +441,7 @@ class Label(LabelBase):
 
                     self._blit(
                         bitmap,
-                        xposition + my_glyph.dx,
+                        max(xposition + my_glyph.dx, 0),
                         y_blit_target,
                         my_glyph.bitmap,
                         x_1=glyph_offset_x,
