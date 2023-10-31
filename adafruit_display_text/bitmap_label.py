@@ -27,8 +27,13 @@ __version__ = "0.0.0+auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_Display_Text.git"
 
 import displayio
-import bitmaptools
 from adafruit_display_text import LabelBase
+
+try:
+    import bitmaptools
+except ImportError:
+    # We have a slower fallback for bitmaptools
+    pass
 
 try:
     from typing import Optional, Tuple
