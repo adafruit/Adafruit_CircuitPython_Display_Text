@@ -65,7 +65,7 @@ another_text.anchored_position = (display.width // 2, display.height // 2)
 main_group.append(another_text)
 
 # show the main group and refresh.
-display.show(main_group)
+display.root_group = main_group
 display.refresh()
 while True:
     pass

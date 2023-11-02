@@ -21,6 +21,6 @@ text = "Hello\nworld"
 text_area = label.Label(terminalio.FONT, text=text)
 text_area.x = 1
 text_area.y = 4
-display.show(text_area)
+display.root_group = text_area
 while True:
     pass

@@ -12,6 +12,6 @@ my_scrolling_label = ScrollingLabel(
 )
 my_scrolling_label.x = 10
 my_scrolling_label.y = 10
-board.DISPLAY.show(my_scrolling_label)
+board.DISPLAY.root_group = my_scrolling_label
 while True:
     my_scrolling_label.update()

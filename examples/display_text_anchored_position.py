@@ -60,7 +60,7 @@ text_group.append(text_area_bottom_middle)
 text_group.append(text_area_bottom_left)
 text_group.append(text_area_bottom_right)
 
-board.DISPLAY.show(text_group)
+board.DISPLAY.root_group = text_group
 
 while True:
     pass
