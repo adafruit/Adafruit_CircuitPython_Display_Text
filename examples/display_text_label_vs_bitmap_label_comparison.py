@@ -89,7 +89,7 @@ else:
     )
 
     # reset the display to show nothing.
-    display.show(None)
+    display.root_group = None
 
 print("Display is started")
 
@@ -219,6 +219,6 @@ main_group.append(bmap_group)
 
 display.auto_refresh = True
 
-display.show(main_group)
+display.root_group = main_group
 while True:
     pass

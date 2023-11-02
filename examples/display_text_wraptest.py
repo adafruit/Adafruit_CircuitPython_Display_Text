@@ -24,6 +24,6 @@ text = "\n".join(wrap_text_to_lines(text, 28))
 text_area = label.Label(terminalio.FONT, text=text)
 text_area.x = 10
 text_area.y = 10
-display.show(text_area)
+display.root_group = text_area
 while True:
     pass

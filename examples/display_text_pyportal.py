@@ -31,7 +31,7 @@ for b in range(100):
 demos = ["CircuitPython = Code + Community", "accents - üàêùéáçãÍóí", "others - αψ◌"]
 
 splash = displayio.Group()
-board.DISPLAY.show(splash)
+board.DISPLAY.root_group = splash
 max_y = 0
 y = 0
 for demo_text in demos:

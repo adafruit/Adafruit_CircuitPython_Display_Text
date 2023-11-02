@@ -67,7 +67,7 @@ else:
         native_frames_per_second=90,
     )
 
-display.show(None)
+display.root_group = None
 
 # font=terminalio.FONT # this is the Builtin fixed dimension font
 
@@ -82,7 +82,7 @@ text.append("MONSTER quops\nnewline quops")  # with newline
 
 display.auto_refresh = True
 myGroup = displayio.Group()
-display.show(myGroup)
+display.root_group = myGroup
 
 text_area = []
 myPadding = 4

@@ -34,13 +34,13 @@ main_group.append(vertical_line)
 # Tests
 text_area = label.Label(terminalio.FONT, text="Circuit Python")
 main_group.append(text_area)
-display.show(main_group)
+display.root_group = main_group
 time.sleep(TIME_PAUSE)
 
 # Testing position setter
 text_area.x = 10
 text_area.y = 10
-display.show(main_group)
+display.root_group = main_group
 time.sleep(TIME_PAUSE)
 
 # Testing creating label with initial position
@@ -57,7 +57,7 @@ except SyntaxError:
         background_color=0x004499,
     )
     main_group.append(warning_text)
-display.show(main_group)
+display.root_group = main_group
 time.sleep(TIME_PAUSE)
 
 text_area.text = "Testing Position"
@@ -65,27 +65,27 @@ text_middle = label.Label(
     terminalio.FONT, text="Circuit", x=display.width // 2, y=display.height // 2
 )
 main_group.append(text_middle)
-display.show(main_group)
+display.root_group = main_group
 time.sleep(TIME_PAUSE)
 
 # Testing Text Setter
 text_area.text = "Testing Changing Text"
 text_middle.text = "Python"
-display.show(main_group)
+display.root_group = main_group
 time.sleep(TIME_PAUSE)
 
 # Testing a and y getter and setter
 text_area.text = "Testing Changing Position"
 text_middle.x = text_middle.x - 50
 text_middle.y = text_middle.y - 50
-display.show(main_group)
+display.root_group = main_group
 time.sleep(TIME_PAUSE)
 
 # Testing font Getter and setter
 text_area.text = "Testing Changing FONT"
 if isinstance(text_middle.font, fontio.BuiltinFont):
     text_middle.font = MEDIUM_FONT
-display.show(main_group)
+display.root_group = main_group
 time.sleep(TIME_PAUSE)
 
 # Once this working we create another label with all the initial specs
@@ -100,11 +100,11 @@ text_initial_specs = label.Label(
     y=display.height // 2,
 )
 main_group.append(text_initial_specs)
-display.show(main_group)
+display.root_group = main_group
 time.sleep(TIME_PAUSE)
 
 text_initial_specs.color = 0x004400
-display.show(main_group)
+display.root_group = main_group
 time.sleep(TIME_PAUSE)
 main_group.pop()
 
@@ -118,11 +118,11 @@ text_initial_specs = label.Label(
     color=0xFFFFFF,
 )
 main_group.append(text_initial_specs)
-display.show(main_group)
+display.root_group = main_group
 time.sleep(TIME_PAUSE)
 
 text_initial_specs.background_color = 0x990099
-display.show(main_group)
+display.root_group = main_group
 time.sleep(TIME_PAUSE)
 main_group.pop()
 
@@ -148,7 +148,7 @@ text_initial_specs = label.Label(
     background_tight=False,
 )
 main_group.append(text_initial_specs)
-display.show(main_group)
+display.root_group = main_group
 time.sleep(TIME_PAUSE)
 main_group.pop()
 main_group.pop()
@@ -168,7 +168,7 @@ text_initial_specs = label.Label(
     padding_left=10,
 )
 main_group.append(text_initial_specs)
-display.show(main_group)
+display.root_group = main_group
 time.sleep(TIME_PAUSE)
 main_group.pop()
 
@@ -187,7 +187,7 @@ text_initial_specs = label.Label(
     padding_left=10,
 )
 main_group.append(text_initial_specs)
-display.show(main_group)
+display.root_group = main_group
 time.sleep(TIME_PAUSE)
 
 try:
@@ -206,7 +206,7 @@ except TypeError:
     )
     main_group.append(warning_text)
     time.sleep(TIME_PAUSE)
-    display.show(main_group)
+    display.root_group = main_group
 
 main_group.pop()
 
@@ -227,11 +227,11 @@ text_initial_specs = label.Label(
     anchor_point=(0.5, 0.5),
 )
 main_group.append(text_initial_specs)
-display.show(main_group)
+display.root_group = main_group
 time.sleep(TIME_PAUSE)
 
 text_initial_specs.scale = 2
-display.show(main_group)
+display.root_group = main_group
 time.sleep(TIME_PAUSE)
 main_group.pop()
 
@@ -257,7 +257,7 @@ text_initial_specs = label.Label(
     base_alignment=True,
 )
 main_group.append(text_initial_specs)
-display.show(main_group)
+display.root_group = main_group
 time.sleep(TIME_PAUSE)
 main_group.pop()
 main_group.pop()
@@ -280,7 +280,7 @@ text_initial_specs = label.Label(
     label_direction="UPR",
 )
 main_group.append(text_initial_specs)
-display.show(main_group)
+display.root_group = main_group
 time.sleep(TIME_PAUSE)
 main_group.pop()
 
@@ -301,7 +301,7 @@ text_initial_specs = label.Label(
     label_direction="DWR",
 )
 main_group.append(text_initial_specs)
-display.show(main_group)
+display.root_group = main_group
 time.sleep(TIME_PAUSE)
 main_group.pop()
 
@@ -322,7 +322,7 @@ text_initial_specs = label.Label(
     label_direction="TTB",
 )
 main_group.append(text_initial_specs)
-display.show(main_group)
+display.root_group = main_group
 time.sleep(TIME_PAUSE)
 main_group.pop()
 
@@ -343,23 +343,23 @@ text_initial_specs = label.Label(
     label_direction="RTL",
 )
 main_group.append(text_initial_specs)
-display.show(main_group)
+display.root_group = main_group
 time.sleep(TIME_PAUSE)
 main_group.pop()
 
 main_group.pop()
 
 # Testing creating label with initial position
-display.show(main_group)
+display.root_group = main_group
 time.sleep(TIME_PAUSE)
 text_area = bitmap_label.Label(terminalio.FONT, text="Circuit Python")
 main_group.append(text_area)
-display.show(main_group)
+display.root_group = main_group
 time.sleep(TIME_PAUSE)
 # Testing position setter
 text_area.x = 10
 text_area.y = 10
-display.show(main_group)
+display.root_group = main_group
 time.sleep(TIME_PAUSE)
 text_area.text = "Testing initiating without text"
 try:
@@ -381,20 +381,20 @@ text_middle = bitmap_label.Label(
     terminalio.FONT, text="Circuit", x=display.width // 2, y=display.height // 2
 )
 main_group.append(text_middle)
-display.show(main_group)
+display.root_group = main_group
 time.sleep(TIME_PAUSE)
 
 # Testing Text Setter
 text_area.text = "Testing Changing Text"
 text_middle.text = "Python"
-display.show(main_group)
+display.root_group = main_group
 time.sleep(TIME_PAUSE)
 
 # Testing a and y getter and setter
 text_area.text = "Testing Changing Position"
 text_middle.x = text_middle.x - 50
 text_middle.y = text_middle.y - 50
-display.show(main_group)
+display.root_group = main_group
 time.sleep(TIME_PAUSE)
 
 # Testing font Getter and setter
@@ -402,7 +402,7 @@ text_area.text = "Testing Changing FONT"
 if isinstance(text_middle.font, fontio.BuiltinFont):
     print("Font was BuiltinFont")
     text_middle.font = MEDIUM_FONT
-display.show(main_group)
+display.root_group = main_group
 time.sleep(TIME_PAUSE)
 
 # Once this working we create another label with all the initial specs
@@ -417,11 +417,11 @@ text_initial_specs = bitmap_label.Label(
     y=display.height // 2,
 )
 main_group.append(text_initial_specs)
-display.show(main_group)
+display.root_group = main_group
 time.sleep(TIME_PAUSE)
 
 text_initial_specs.color = 0x004400
-display.show(main_group)
+display.root_group = main_group
 time.sleep(TIME_PAUSE)
 main_group.pop()
 
@@ -435,11 +435,11 @@ text_initial_specs = bitmap_label.Label(
     color=0xFFFFFF,
 )
 main_group.append(text_initial_specs)
-display.show(main_group)
+display.root_group = main_group
 time.sleep(TIME_PAUSE)
 
 text_initial_specs.background_color = 0x990099
-display.show(main_group)
+display.root_group = main_group
 time.sleep(TIME_PAUSE)
 main_group.pop()
 
@@ -465,7 +465,7 @@ text_initial_specs = bitmap_label.Label(
     background_tight=False,
 )
 main_group.append(text_initial_specs)
-display.show(main_group)
+display.root_group = main_group
 time.sleep(TIME_PAUSE)
 main_group.pop()
 main_group.pop()
@@ -485,7 +485,7 @@ text_initial_specs = bitmap_label.Label(
     padding_left=10,
 )
 main_group.append(text_initial_specs)
-display.show(main_group)
+display.root_group = main_group
 time.sleep(TIME_PAUSE)
 main_group.pop()
 
@@ -504,7 +504,7 @@ text_initial_specs = bitmap_label.Label(
     padding_left=10,
 )
 main_group.append(text_initial_specs)
-display.show(main_group)
+display.root_group = main_group
 time.sleep(TIME_PAUSE)
 
 try:
@@ -523,7 +523,7 @@ except TypeError:
     )
     main_group.append(warning_text)
     time.sleep(TIME_PAUSE)
-    display.show(main_group)
+    display.root_group = main_group
 
 main_group.pop()
 
@@ -544,11 +544,11 @@ text_initial_specs = bitmap_label.Label(
     anchor_point=(0.5, 0.5),
 )
 main_group.append(text_initial_specs)
-display.show(main_group)
+display.root_group = main_group
 time.sleep(TIME_PAUSE)
 
 text_initial_specs.scale = 2
-display.show(main_group)
+display.root_group = main_group
 time.sleep(TIME_PAUSE)
 main_group.pop()
 
@@ -574,7 +574,7 @@ text_initial_specs = bitmap_label.Label(
     base_alignment=True,
 )
 main_group.append(text_initial_specs)
-display.show(main_group)
+display.root_group = main_group
 time.sleep(TIME_PAUSE)
 main_group.pop()
 main_group.pop()
@@ -597,7 +597,7 @@ text_initial_specs = bitmap_label.Label(
     label_direction="UPR",
 )
 main_group.append(text_initial_specs)
-display.show(main_group)
+display.root_group = main_group
 time.sleep(TIME_PAUSE)
 main_group.pop()
 
@@ -618,7 +618,7 @@ text_initial_specs = bitmap_label.Label(
     label_direction="DWR",
 )
 main_group.append(text_initial_specs)
-display.show(main_group)
+display.root_group = main_group
 time.sleep(TIME_PAUSE)
 main_group.pop()
 
@@ -639,7 +639,7 @@ text_initial_specs = bitmap_label.Label(
     label_direction="UPD",
 )
 main_group.append(text_initial_specs)
-display.show(main_group)
+display.root_group = main_group
 time.sleep(TIME_PAUSE)
 main_group.pop()
 
@@ -660,7 +660,7 @@ text_initial_specs = bitmap_label.Label(
     label_direction="RTL",
 )
 main_group.append(text_initial_specs)
-display.show(main_group)
+display.root_group = main_group
 time.sleep(TIME_PAUSE)
 main_group.pop()
 
