@@ -45,7 +45,7 @@ For a board with a built-in display.
     text_area = label.Label(terminalio.FONT, text=text)
     text_area.x = 10
     text_area.y = 10
-    board.DISPLAY.show(text_area)
+    board.DISPLAY.root_group = text_area
     while True:
         pass
 
