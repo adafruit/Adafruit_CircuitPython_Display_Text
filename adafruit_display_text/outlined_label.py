@@ -100,6 +100,11 @@ class OutlinedLabel(bitmap_label.Label):
         )
 
     def _add_outline(self):
+        """
+        Blit the outline into the labels Bitmap. We will stamp self._stamp_source for each
+        pixel of the foreground color but skip the foreground color when we blit.
+        :return: None
+        """
         if hasattr(self, "_stamp_source"):
             for y in range(self.bitmap.height):
                 for x in range(self.bitmap.width):
@@ -119,12 +124,6 @@ class OutlinedLabel(bitmap_label.Label):
                                 "Try using either larger padding sizes, or smaller outline_size."
                             ) from value_error
 
-                        # bitmaptools.blit(bitmap, stamp_source, x - size, y - size)
-                        # for y_loc in range(-size, size+1):
-                        #     for x_loc in range(-size, size+1):
-                        #         if bitmap[x+x_loc, y+y_loc] != target_color_index:
-                        #             bitmap[x + x_loc, y + y_loc] = outline_color_index
-
     def _place_text(
         self,
         bitmap: Bitmap,
@@ -136,6 +135,16 @@ class OutlinedLabel(bitmap_label.Label):
         # when copying glyph bitmaps (this is important for slanted text
         # where rectangular glyph boxes overlap)
     ) -> Tuple[int, int, int, int]:
+        """
+        Copy the glpyphs that represent the value of the string into the labels Bitmap.
+        :param bitmap: The bitmap to place text into
+        :param text: The text to render
+        :param font: The font to render the text in
+        :param xposition: x location of the starting point within the bitmap
+        :param yposition: y location of the starting point within the bitmap
+        :param skip_index: Color index to skip during rendering instead of covering up
+        :return Tuple bounding_box: tuple with x, y, width, height values of the bitmap
+        """
         parent_result = super()._place_text(
             bitmap, text, font, xposition, yposition, skip_index=skip_index
         )
