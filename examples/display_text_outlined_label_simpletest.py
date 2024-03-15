@@ -22,7 +22,7 @@ text_area = outlined_label.OutlinedLabel(
     padding_bottom=2,
     scale=3,
 )
-text_area.anchor_point = (0,0)
+text_area.anchor_point = (0, 0)
 text_area.anchored_position = (10, 10)
 board.DISPLAY.root_group = text_area
 while True:
