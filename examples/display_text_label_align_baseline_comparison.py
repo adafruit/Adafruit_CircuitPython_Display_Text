@@ -69,7 +69,7 @@ right_text_aligned = label.Label(
 )
 
 main_group.append(right_text_aligned)
-display.show(main_group)
+display.root_group = main_group
 
 while True:
     pass

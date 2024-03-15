@@ -18,7 +18,7 @@ text_area.y = 10
 
 print("background color is {:06x}".format(text_area.background_color))
 
-board.DISPLAY.show(text_area)
+board.DISPLAY.root_group = text_area
 
 time.sleep(2)
 text_area.background_color = 0xFF0000
