@@ -27,10 +27,12 @@ __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_Display_Text.git"
 
 
 from displayio import Bitmap, Palette, TileGrid
+
 from adafruit_display_text import LabelBase
 
 try:
     from typing import Optional, Tuple
+
     from fontio import FontProtocol
 except ImportError:
     pass

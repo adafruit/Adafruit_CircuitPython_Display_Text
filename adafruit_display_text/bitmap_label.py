@@ -27,6 +27,7 @@ __version__ = "0.0.0+auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_Display_Text.git"
 
 import displayio
+
 from adafruit_display_text import LabelBase
 
 try:
@@ -37,6 +38,7 @@ except ImportError:
 
 try:
     from typing import Optional, Tuple
+
     from fontio import FontProtocol
 except ImportError:
     pass
@@ -294,9 +296,9 @@ class Label(LabelBase):
 
         lines = 1
 
-        xposition = (
-            x_start
-        ) = yposition = y_start = 0  # starting x and y position (left margin)
+        xposition = x_start = yposition = y_start = (
+            0  # starting x and y position (left margin)
+        )
 
         left = None
         right = x_start

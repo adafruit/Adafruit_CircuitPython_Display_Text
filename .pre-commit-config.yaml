@@ -3,10 +3,6 @@
 # SPDX-License-Identifier: Unlicense
 
 repos:
-  - repo: https://github.com/python/black
-    rev: 23.3.0
-    hooks:
-      - id: black
   - repo: https://github.com/fsfe/reuse-tool
     rev: v1.1.2
     hooks:
@@ -17,26 +13,9 @@ repos:
       - id: check-yaml
       - id: end-of-file-fixer
       - id: trailing-whitespace
-  - repo: https://github.com/pycqa/pylint
-    rev: v2.17.4
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.3.2
     hooks:
-      - id: pylint
-        name: pylint (library code)
-        types: [python]
-        args:
-          - --disable=consider-using-f-string
-        exclude: "^(docs/|examples/|tests/|setup.py$)"
-      - id: pylint
-        name: pylint (example code)
-        description: Run pylint rules on "examples/*.py" files
-        types: [python]
-        files: "^examples/"
-        args:
-          - --disable=missing-docstring,invalid-name,consider-using-f-string,duplicate-code
-      - id: pylint
-        name: pylint (test code)
-        description: Run pylint rules on "tests/*.py" files
-        types: [python]
-        files: "^tests/"
-        args:
-          - --disable=missing-docstring,consider-using-f-string,duplicate-code
+      - id: ruff
+        args: [ "--select", "I", "--fix" ]
+      - id: ruff-format

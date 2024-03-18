@@ -27,10 +27,12 @@ __version__ = "0.0.0+auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_Display_Text.git"
 
 import time
+
 from adafruit_display_text import bitmap_label
 
 try:
     from typing import Optional
+
     from fontio import FontProtocol
 except ImportError:
     pass
@@ -58,7 +60,7 @@ class ScrollingLabel(bitmap_label.Label):
         text: Optional[str] = "",
         animate_time: Optional[float] = 0.3,
         current_index: Optional[int] = 0,
-        **kwargs
+        **kwargs,
     ) -> None:
         super().__init__(font, **kwargs)
         self.animate_time = animate_time
