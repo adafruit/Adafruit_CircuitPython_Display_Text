@@ -4,6 +4,7 @@
 """
 This examples shows the use of anchor_point and anchored_position.
 """
+
 import board
 import terminalio
 import displayio

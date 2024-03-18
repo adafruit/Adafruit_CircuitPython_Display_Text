@@ -294,9 +294,9 @@ class Label(LabelBase):
 
         lines = 1
 
-        xposition = (
-            x_start
-        ) = yposition = y_start = 0  # starting x and y position (left margin)
+        xposition = x_start = yposition = y_start = (
+            0  # starting x and y position (left margin)
+        )
 
         left = None
         right = x_start

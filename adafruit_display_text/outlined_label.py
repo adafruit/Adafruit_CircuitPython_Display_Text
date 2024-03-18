@@ -22,6 +22,7 @@ Implementation Notes
   https://circuitpython.org/downloads
 
 """
+
 __version__ = "0.0.0+auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_Display_Text.git"
 
@@ -56,7 +57,7 @@ class OutlinedLabel(bitmap_label.Label):
         padding_bottom: Optional[int] = None,
         padding_left: Optional[int] = None,
         padding_right: Optional[int] = None,
-        **kwargs
+        **kwargs,
     ):
         if padding_top is None:
             padding_top = outline_size + 0
@@ -73,7 +74,7 @@ class OutlinedLabel(bitmap_label.Label):
             padding_bottom=padding_bottom,
             padding_left=padding_left,
             padding_right=padding_right,
-            **kwargs
+            **kwargs,
         )
 
         _background_color = self._palette[0]

@@ -5,6 +5,7 @@
 Basic display_text.label example script
 adapted for use on MagTag.
 """
+
 import time
 import board
 import displayio

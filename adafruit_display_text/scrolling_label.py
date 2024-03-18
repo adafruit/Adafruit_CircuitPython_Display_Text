@@ -58,7 +58,7 @@ class ScrollingLabel(bitmap_label.Label):
         text: Optional[str] = "",
         animate_time: Optional[float] = 0.3,
         current_index: Optional[int] = 0,
-        **kwargs
+        **kwargs,
     ) -> None:
         super().__init__(font, **kwargs)
         self.animate_time = animate_time

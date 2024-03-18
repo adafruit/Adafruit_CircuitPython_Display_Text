@@ -7,6 +7,7 @@
 import os
 import sys
 import datetime
+import sphinx_rtd_theme
 
 sys.path.insert(0, os.path.abspath(".."))
 
@@ -101,7 +102,6 @@ napoleon_numpy_docstring = False
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-import sphinx_rtd_theme
 
 html_theme = "sphinx_rtd_theme"
 html_theme_path = [sphinx_rtd_theme.get_html_theme_path(), "."]

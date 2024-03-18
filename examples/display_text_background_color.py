@@ -4,6 +4,7 @@
 """
 This example shows the use color and background_color
 """
+
 import time
 import board
 import terminalio
