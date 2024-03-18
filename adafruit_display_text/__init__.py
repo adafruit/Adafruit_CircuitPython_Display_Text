@@ -13,7 +13,8 @@ __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_Display_Text.git"
 from displayio import Group, Palette
 
 try:
-    from typing import Optional, List, Tuple
+    from typing import List, Optional, Tuple
+
     from fontio import FontProtocol
 except ImportError:
     pass

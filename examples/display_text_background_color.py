@@ -6,8 +6,10 @@ This example shows the use color and background_color
 """
 
 import time
+
 import board
 import terminalio
+
 from adafruit_display_text import label
 
 text = " Color Background Hello world"

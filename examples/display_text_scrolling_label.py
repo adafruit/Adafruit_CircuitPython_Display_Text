@@ -3,8 +3,8 @@
 
 import board
 import terminalio
-from adafruit_display_text.scrolling_label import ScrollingLabel
 
+from adafruit_display_text.scrolling_label import ScrollingLabel
 
 text = "Hello world CircuitPython scrolling label"
 my_scrolling_label = ScrollingLabel(

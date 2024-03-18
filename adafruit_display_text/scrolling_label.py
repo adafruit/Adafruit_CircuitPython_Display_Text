@@ -27,10 +27,12 @@ __version__ = "0.0.0+auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_Display_Text.git"
 
 import time
+
 from adafruit_display_text import bitmap_label
 
 try:
     from typing import Optional
+
     from fontio import FontProtocol
 except ImportError:
     pass

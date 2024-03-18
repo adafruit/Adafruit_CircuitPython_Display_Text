@@ -6,13 +6,13 @@
 # pylint: disable=no-member
 
 import gc
+
 import board
 import displayio
 import terminalio
 from adafruit_bitmap_font import bitmap_font
 
-from adafruit_display_text import bitmap_label
-from adafruit_display_text import label
+from adafruit_display_text import bitmap_label, label
 
 # pylint: disable=no-member
 

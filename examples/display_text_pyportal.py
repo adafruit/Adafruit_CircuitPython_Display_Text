@@ -8,10 +8,11 @@ a terminal using a font on the PyPortal
 
 import os
 import time
+
 import board
 import displayio
-
 from adafruit_bitmap_font import bitmap_font
+
 from adafruit_display_text.label import Label
 
 FONT_DIR = "/fonts/"

@@ -6,12 +6,12 @@ This example shows the use color and background_color
 """
 
 import time
+
 import board
 import displayio
-
 from adafruit_bitmap_font import bitmap_font
-from adafruit_display_text import label
 
+from adafruit_display_text import label
 
 #  Setup the SPI display
 if "DISPLAY" in dir(board):

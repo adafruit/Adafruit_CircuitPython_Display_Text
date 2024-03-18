@@ -7,9 +7,11 @@ adapted for use on MagTag.
 """
 
 import time
+
 import board
 import displayio
 import terminalio
+
 from adafruit_display_text import label
 
 # use built in display (PyPortal, PyGamer, PyBadge, CLUE, etc.)
