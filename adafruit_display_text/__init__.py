@@ -428,12 +428,12 @@ class LabelBase(Group):
     @property
     def height(self) -> int:
         """The height of the label determined from the bounding box."""
-        return self._bounding_box[3] - self._bounding_box[1]
+        return self._bounding_box[3]
 
     @property
     def width(self) -> int:
         """The width of the label determined from the bounding box."""
-        return self._bounding_box[2] - self._bounding_box[0]
+        return self._bounding_box[2]
 
     @property
     def line_spacing(self) -> float:
