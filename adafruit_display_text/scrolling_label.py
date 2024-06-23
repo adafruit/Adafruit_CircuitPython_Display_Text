@@ -26,7 +26,7 @@ Implementation Notes
 __version__ = "0.0.0+auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_Display_Text.git"
 
-from supervisor import ticks_ms
+from adafruit_ticks import ticks_ms
 from adafruit_display_text import bitmap_label
 
 try:

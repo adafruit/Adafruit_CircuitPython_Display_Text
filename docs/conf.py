@@ -32,7 +32,6 @@ autodoc_mock_imports = [
     "adafruit_bitmap_font",
     "fontio",
     "bitmaptools",
-    "supervisor",
 ]
 
 
