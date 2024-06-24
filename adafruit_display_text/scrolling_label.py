@@ -26,7 +26,7 @@ Implementation Notes
 __version__ = "0.0.0+auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_Display_Text.git"
 
-from adafruit_ticks import ticks_ms
+import adafruit_ticks
 from adafruit_display_text import bitmap_label
 
 try:
@@ -81,10 +81,10 @@ class ScrollingLabel(bitmap_label.Label):
          Default is False.
         :return: None
         """
-        _now = ticks_ms()
-        if _now < self._last_animate_time:  # ticks_ms has rolled over
-            self._last_animate_time = _now
-        if force or self._last_animate_time + (self.animate_time * 1000) <= _now:
+        _now = adafruit_ticks.ticks_ms()
+        if force or adafruit_ticks.ticks_less(
+            self._last_animate_time + int(self.animate_time * 1000), _now
+        ):
             if len(self.full_text) <= self.max_characters:
                 super()._set_text(self.full_text, self.scale)
                 self._last_animate_time = _now
