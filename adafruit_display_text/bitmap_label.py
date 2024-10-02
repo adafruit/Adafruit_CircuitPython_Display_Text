@@ -183,6 +183,10 @@ class Label(LabelBase):
             if self._background_tight:
                 box_y = tight_box_y
                 y_offset = tight_y_offset
+                self._padding_left = 0
+                self._padding_right = 0
+                self._padding_top = 0
+                self._padding_bottom = 0
 
             else:  # calculate the box size for a loose background
                 box_y = loose_box_y
