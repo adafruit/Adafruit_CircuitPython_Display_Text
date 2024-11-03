@@ -66,7 +66,7 @@ class ScrollingLabel(bitmap_label.Label):
         self._last_animate_time = -1
         self.max_characters = max_characters
 
-        if text[-1] != " ":
+        if text and text[-1] != " ":
             text = "{} ".format(text)
         self._full_text = text
 
@@ -123,10 +123,10 @@ class ScrollingLabel(bitmap_label.Label):
 
     @current_index.setter
     def current_index(self, new_index: int) -> None:
-        if new_index < len(self.full_text):
-            self._current_index = new_index
-        else:
+        if self.full_text:
             self._current_index = new_index % len(self.full_text)
+        else:
+            self._current_index = 0
 
     @property
     def full_text(self) -> str:
@@ -139,11 +139,11 @@ class ScrollingLabel(bitmap_label.Label):
 
     @full_text.setter
     def full_text(self, new_text: str) -> None:
-        if new_text[-1] != " ":
+        if new_text and new_text[-1] != " ":
             new_text = "{} ".format(new_text)
         self._full_text = new_text
         self.current_index = 0
-        self.update()
+        self.update(True)
 
     @property
     def text(self):
