@@ -141,9 +141,10 @@ class ScrollingLabel(bitmap_label.Label):
     def full_text(self, new_text: str) -> None:
         if new_text and new_text[-1] != " ":
             new_text = "{} ".format(new_text)
-        self._full_text = new_text
-        self.current_index = 0
-        self.update(True)
+        if new_text != self._full_text:
+            self._full_text = new_text
+            self.current_index = 0
+            self.update(True)
 
     @property
     def text(self):
