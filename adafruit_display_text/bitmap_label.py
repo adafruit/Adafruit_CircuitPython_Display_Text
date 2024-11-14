@@ -292,15 +292,18 @@ class Label(LabelBase):
     def _text_bounding_box(
         self, text: str, font: FontProtocol
     ) -> Tuple[int, int, int, int, int, int]:
-        # pylint: disable=too-many-locals
+        # pylint: disable=too-many-locals,too-many-branches
 
-        ascender_max, descender_max = self._ascent, self._descent
+        bbox = font.get_bounding_box()
+        if len(bbox) == 4:
+            ascender_max, descender_max = bbox[1], -bbox[3]
+        else:
+            ascender_max, descender_max = self._ascent, self._descent
 
         lines = 1
 
-        xposition = (
-            x_start
-        ) = yposition = y_start = 0  # starting x and y position (left margin)
+        # starting x and y position (left margin)
+        xposition = x_start = yposition = y_start = 0
 
         left = None
         right = x_start
