@@ -246,7 +246,6 @@ class LabelBase(Group):
         tab_replacement: Tuple[int, str] = (4, " "),
         label_direction: str = "LTR",
         verbose: bool = False,
-        **kwargs,  # pylint: disable=unused-argument
     ) -> None:
         # pylint: disable=too-many-arguments, too-many-locals
 
@@ -270,9 +269,6 @@ class LabelBase(Group):
         self._tab_replacement = tab_replacement
         self._tab_text = self._tab_replacement[1] * self._tab_replacement[0]
         self._verbose = verbose
-
-        if "max_glyphs" in kwargs:
-            print("Please update your code: 'max_glyphs' is not needed anymore.")
 
         self._ascent, self._descent = self._get_ascent_descent()
         self._bounding_box = None
