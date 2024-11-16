@@ -39,7 +39,7 @@ except ImportError:
     pass
 
 
-# pylint: disable=too-many-instance-attributes
+# pylint: disable=too-many-instance-attributes, duplicate-code
 class TextBox(bitmap_label.Label):
     """
     TextBox has a constrained width and optionally height.
@@ -120,7 +120,7 @@ class TextBox(bitmap_label.Label):
         # when copying glyph bitmaps (this is important for slanted text
         # where rectangular glyph boxes overlap)
     ) -> Tuple[int, int, int, int]:
-        # pylint: disable=too-many-arguments, too-many-locals
+        # pylint: disable=too-many-arguments, too-many-locals, too-many-statements, too-many-branches
 
         # placeText - Writes text into a bitmap at the specified location.
         #
