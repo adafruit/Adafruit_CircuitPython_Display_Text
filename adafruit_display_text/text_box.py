@@ -54,7 +54,7 @@ class TextBox(bitmap_label.Label):
     :param width: The width of the TextBox in pixels.
     :param height: The height of the TextBox in pixels.
     :param align: How to align the text within the box,
-      valid values are `ALIGN_LEFT`, `ALIGN_CENTER`, `ALIGN_RIGHT`.
+      valid values are ``ALIGN_LEFT``, ``ALIGN_CENTER``, ``ALIGN_RIGHT``.
     """
 
     ALIGN_LEFT = const(0)

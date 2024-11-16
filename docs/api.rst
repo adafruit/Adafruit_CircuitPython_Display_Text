@@ -19,3 +19,6 @@
 
 .. automodule:: adafruit_display_text.outlined_label
    :members:
+
+.. automodule:: adafruit_display_text.text_box
+   :members:
