@@ -29,16 +29,8 @@ __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_Display_Text.git"
 import displayio
 from micropython import const
 
-from adafruit_display_text import wrap_text_to_pixels, LabelBase
+from adafruit_display_text import wrap_text_to_pixels
 from adafruit_display_text import bitmap_label
-
-
-
-try:
-    import bitmaptools
-except ImportError:
-    # We have a slower fallback for bitmaptools
-    pass
 
 try:
     from typing import Optional, Tuple
@@ -49,21 +41,31 @@ except ImportError:
 
 # pylint: disable=too-many-instance-attributes
 class TextBox(bitmap_label.Label):
+    """
+    TextBox has a constrained width and optionally height.
+    You set the desired size when it's initialized it
+    will automatically wrap text to fit it within the allotted
+    size.
+
+    Left, Right, and Center alignment of the text within the
+    box are supported.
+
+    :param font: The font to use for the TextBox.
+    :param width: The width of the TextBox in pixels.
+    :param height: The height of the TextBox in pixels.
+    :param align: How to align the text within the box,
+      valid values are `ALIGN_LEFT`, `ALIGN_CENTER`, `ALIGN_RIGHT`.
+    """
+
     ALIGN_LEFT = const(0)
     ALIGN_CENTER = const(1)
     ALIGN_RIGHT = const(2)
 
     DYNAMIC_HEIGHT = const(-1)
 
-    def __init__(self, font: FontProtocol, width: int, height: int, align=ALIGN_LEFT, **kwargs) -> None:
-        """
-
-        :param font:
-        :param width:
-        :param height:
-        :param align:
-        :param kwargs:
-        """
+    def __init__(
+        self, font: FontProtocol, width: int, height: int, align=ALIGN_LEFT, **kwargs
+    ) -> None:
         self._bitmap = None
         self._tilegrid = None
         self._prev_label_direction = None
@@ -75,12 +77,20 @@ class TextBox(bitmap_label.Label):
         else:
             self.dynamic_height = True
 
-        self.align = align
+        if align not in (TextBox.ALIGN_LEFT, TextBox.ALIGN_CENTER, TextBox.ALIGN_RIGHT):
+            raise ValueError(
+                "Align must be one of: ALIGN_LEFT, ALIGN_CENTER, ALIGN_RIGHT"
+            )
+        self._align = align
 
         self._padding_left = kwargs.get("padding_left", 0)
         self._padding_right = kwargs.get("padding_right", 0)
 
-        self.lines = wrap_text_to_pixels(kwargs.get("text", ""), self._width - self._padding_left - self._padding_right, font)
+        self.lines = wrap_text_to_pixels(
+            kwargs.get("text", ""),
+            self._width - self._padding_left - self._padding_right,
+            font,
+        )
 
         super(bitmap_label.Label, self).__init__(font, **kwargs)
 
@@ -127,22 +137,25 @@ class TextBox(bitmap_label.Label):
         if self.align == self.ALIGN_RIGHT:
             unused_space = self._width - cur_line_width
             x_start = original_xposition + unused_space - self._padding_right
-        xposition = x_start
+
+        xposition = x_start  # pylint: disable=used-before-assignment
 
         y_start = yposition
-        #print(f"start loc {x_start}, {y_start}")
+        # print(f"start loc {x_start}, {y_start}")
 
         left = None
         right = x_start
         top = bottom = y_start
         line_spacing = self._line_spacing
 
-        #print(f"cur_line width: {cur_line_width}")
+        # print(f"cur_line width: {cur_line_width}")
         for char in text:
             if char == "\n":  # newline
                 cur_line_index += 1
-                cur_line_width = self._text_bounding_box(self.lines[cur_line_index], self.font)[0]
-                #print(f"cur_line width: {cur_line_width}")
+                cur_line_width = self._text_bounding_box(
+                    self.lines[cur_line_index], self.font
+                )[0]
+                # print(f"cur_line width: {cur_line_width}")
                 if self.align == self.ALIGN_LEFT:
                     x_start = original_xposition  # starting x position (left margin)
                 if self.align == self.ALIGN_CENTER:
@@ -225,7 +238,7 @@ class TextBox(bitmap_label.Label):
 
         # bounding_box
         return left, top, right - left, bottom - top
-    
+
     def _reset_text(
         self,
         font: Optional[FontProtocol] = None,
@@ -314,7 +327,9 @@ class TextBox(bitmap_label.Label):
                 or self._bitmap.width != self._width
                 or self._bitmap.height != self._height
             ):
-                new_bitmap = displayio.Bitmap(self._width, self._height, len(self._palette))
+                new_bitmap = displayio.Bitmap(
+                    self._width, self._height, len(self._palette)
+                )
                 self._bitmap = new_bitmap
             else:
                 self._bitmap.fill(0)
@@ -397,10 +412,24 @@ class TextBox(bitmap_label.Label):
 
     @bitmap_label.Label.text.setter
     def text(self, text: str) -> None:
-        self.lines = wrap_text_to_pixels(text, self._width - self._padding_left - self._padding_right,
-                                         self.font)
+        self.lines = wrap_text_to_pixels(
+            text, self._width - self._padding_left - self._padding_right, self.font
+        )
         self._text = self._replace_tabs(text)
         self._original_text = self._text
         self._text = "\n".join(self.lines)
 
         self._set_text(self._text, self.scale)
+
+    @property
+    def align(self):
+        """Alignment of the text within the TextBox"""
+        return self._align
+
+    @align.setter
+    def align(self, align: int) -> None:
+        if align not in (TextBox.ALIGN_LEFT, TextBox.ALIGN_CENTER, TextBox.ALIGN_RIGHT):
+            raise ValueError(
+                "Align must be one of: ALIGN_LEFT, ALIGN_CENTER, ALIGN_RIGHT"
+            )
+        self._align = align
