@@ -1,15 +1,15 @@
-# SPDX-FileCopyrightText: 2020 Kevin Matocha
+# SPDX-FileCopyrightText: 2024 Tim Cocks for Adafruit Industries
 #
 # SPDX-License-Identifier: MIT
 
 """
-`adafruit_display_text.bitmap_label`
+`adafruit_display_text.text_box`
 ================================================================================
 
 Text graphics handling for CircuitPython, including text boxes
 
 
-* Author(s): Kevin Matocha
+* Author(s): Tim Cocks
 
 Implementation Notes
 --------------------
