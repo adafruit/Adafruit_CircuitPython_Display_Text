@@ -413,6 +413,8 @@ class LabelBase(Group):
 
     @text.setter  # Cannot set color or background color with text setter, use separate setter
     def text(self, new_text: str) -> None:
+        if new_text == self._text:
+            return
         self._set_text(new_text, self.scale)
 
     @property
