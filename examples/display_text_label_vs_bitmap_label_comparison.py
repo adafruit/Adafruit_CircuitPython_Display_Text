@@ -3,18 +3,14 @@
 
 # Sample for comparing label and bitmap_label positioning with Builtin or loaded BDF fonts
 
-# pylint: disable=no-member
-
 import gc
+
 import board
 import displayio
 import terminalio
 from adafruit_bitmap_font import bitmap_font
 
-from adafruit_display_text import bitmap_label
-from adafruit_display_text import label
-
-# pylint: disable=no-member
+from adafruit_display_text import bitmap_label, label
 
 
 ##########
@@ -93,16 +89,12 @@ else:
 
 print("Display is started")
 
-preload_glyphs = (
-    True  # set this to True if you want to preload the font glyphs into memory
-)
+preload_glyphs = True  # set this to True if you want to preload the font glyphs into memory
 # preloading the glyphs will help speed up the rendering of text but will use more RAM
 
 if preload_glyphs and not use_builtinfont:
     # identify the glyphs to load into memory -> increases rendering speed
-    glyphs = (
-        b"0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ/-_,.:?!'\n "
-    )
+    glyphs = b"0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ/-_,.:?!'\n "
 
     print("loading glyphs...")
     fontToUse.load_glyphs(glyphs)
@@ -157,7 +149,7 @@ bmap_label2 = bitmap_label.Label(
 gc.collect()
 bitmap_label_end = gc.mem_free()
 
-print("bitmap_label used: {} memory".format(bitmap_label_start - bitmap_label_end))
+print(f"bitmap_label used: {bitmap_label_start - bitmap_label_end} memory")
 
 bmap_group = displayio.Group()  # Create a group for displaying
 bmap_group.append(bmap_label1)
@@ -205,7 +197,7 @@ label2 = label.Label(
 gc.collect()
 label_end = gc.mem_free()
 
-print("label used: {} memory".format(label_start - label_end))
+print(f"label used: {label_start - label_end} memory")
 label_group = displayio.Group()  # Create a group for displaying
 label_group.append(label1)
 label_group.append(label2)

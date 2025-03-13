@@ -27,17 +27,18 @@ __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_Display_Text.git"
 
 
 from displayio import Bitmap, Palette, TileGrid
+
 from adafruit_display_text import LabelBase
 
 try:
     from typing import Optional, Tuple
+
     from fontio import FontProtocol
 except ImportError:
     pass
 
 
 class Label(LabelBase):
-    # pylint: disable=too-many-instance-attributes
 
     """A label displaying a string of text. The origin point set by ``x`` and ``y``
     properties will be the left edge of the bounding box, and in the center of a M
@@ -99,7 +100,6 @@ class Label(LabelBase):
         if text is not None:
             self._reset_text(str(text))
 
-    # pylint: disable=too-many-branches
     def _create_background_box(self, lines: int, y_offset: int) -> TileGrid:
         """Private Class function to create a background_box
         :param lines: int number of lines
@@ -115,10 +115,8 @@ class Label(LabelBase):
         else:  # draw a "loose" bounding box to include any ascenders/descenders.
             ascent, descent = self._ascent, self._descent
 
-            if self._label_direction in ("DWR", "UPR"):
-                box_height = (
-                    self._bounding_box[3] + self._padding_right + self._padding_left
-                )
+            if self._label_direction in {"DWR", "UPR"}:
+                box_height = self._bounding_box[3] + self._padding_right + self._padding_left
                 x_box_offset = -self._padding_left
                 box_width = (
                     (ascent + descent)
@@ -127,9 +125,7 @@ class Label(LabelBase):
                     + self._padding_bottom
                 )
             elif self._label_direction == "TTB":
-                box_height = (
-                    self._bounding_box[3] + self._padding_top + self._padding_bottom
-                )
+                box_height = self._bounding_box[3] + self._padding_top + self._padding_bottom
                 x_box_offset = -self._padding_left
                 box_width = (
                     (ascent + descent)
@@ -138,9 +134,7 @@ class Label(LabelBase):
                     + self._padding_left
                 )
             else:
-                box_width = (
-                    self._bounding_box[2] + self._padding_left + self._padding_right
-                )
+                box_width = self._bounding_box[2] + self._padding_left + self._padding_right
                 x_box_offset = -self._padding_left
                 box_height = (
                     (ascent + descent)
@@ -189,7 +183,6 @@ class Label(LabelBase):
 
         return tile_grid
 
-    # pylint: enable=too-many-branches
     def _set_background_color(self, new_color: Optional[int]) -> None:
         """Private class function that allows updating the font box background color
 
@@ -217,38 +210,23 @@ class Label(LabelBase):
             # add bitmap if text is present and bitmap sizes > 0 pixels
             if (
                 (len(self._text) > 0)
-                and (
-                    self._bounding_box[2] + self._padding_left + self._padding_right > 0
-                )
-                and (
-                    self._bounding_box[3] + self._padding_top + self._padding_bottom > 0
-                )
+                and (self._bounding_box[2] + self._padding_left + self._padding_right > 0)
+                and (self._bounding_box[3] + self._padding_top + self._padding_bottom > 0)
             ):
-                self._local_group.insert(
-                    0, self._create_background_box(lines, y_offset)
-                )
+                self._local_group.insert(0, self._create_background_box(lines, y_offset))
                 self._added_background_tilegrid = True
 
-        else:  # a bitmap is present in the self Group
-            # update bitmap if text is present and bitmap sizes > 0 pixels
-            if (
-                (len(self._text) > 0)
-                and (
-                    self._bounding_box[2] + self._padding_left + self._padding_right > 0
-                )
-                and (
-                    self._bounding_box[3] + self._padding_top + self._padding_bottom > 0
-                )
-            ):
-                self._local_group[0] = self._create_background_box(
-                    lines, self._y_offset
-                )
-            else:  # delete the existing bitmap
-                self._local_group.pop(0)
-                self._added_background_tilegrid = False
+        elif (
+            (len(self._text) > 0)
+            and (self._bounding_box[2] + self._padding_left + self._padding_right > 0)
+            and (self._bounding_box[3] + self._padding_top + self._padding_bottom > 0)
+        ):
+            self._local_group[0] = self._create_background_box(lines, self._y_offset)
+        else:  # delete the existing bitmap
+            self._local_group.pop(0)
+            self._added_background_tilegrid = False
 
     def _update_text(self, new_text: str) -> None:
-        # pylint: disable=too-many-branches,too-many-statements
 
         x = 0
         y = 0
@@ -283,7 +261,7 @@ class Label(LabelBase):
 
             position_x, position_y = 0, 0
 
-            if self._label_direction in ("LTR", "RTL"):
+            if self._label_direction in {"LTR", "RTL"}:
                 bottom = max(bottom, y - glyph.dy + self._y_offset)
                 if y == 0:  # first line, find the Ascender height
                     top = min(top, -glyph.height - glyph.dy + self._y_offset)
@@ -298,9 +276,7 @@ class Label(LabelBase):
                             left = min(left, glyph.dx)
                     position_x = x + glyph.dx
                 else:
-                    left = max(
-                        left, abs(x) + glyph.shift_x, abs(x) + glyph.width + glyph.dx
-                    )
+                    left = max(left, abs(x) + glyph.shift_x, abs(x) + glyph.width + glyph.dx)
                     if x == 0:
                         if right is None:
                             right = 0
@@ -318,9 +294,7 @@ class Label(LabelBase):
                     top = min(top, -glyph.dy)
 
                 bottom = max(bottom, y + glyph.height, y + glyph.height + glyph.dy)
-                right = max(
-                    right, x + glyph.width + glyph.dx, x + glyph.shift_x + glyph.dx
-                )
+                right = max(right, x + glyph.width + glyph.dx, x + glyph.shift_x + glyph.dx)
                 position_y = y + glyph.dy
                 position_x = x - glyph.width // 2 + self._y_offset
 
@@ -401,7 +375,6 @@ class Label(LabelBase):
             self._local_group.pop()
 
         if self._label_direction == "RTL":
-            # pylint: disable=invalid-unary-operand-type
             # type-checkers think left can be None
             self._bounding_box = (-left, top, left - right, bottom - top)
         if self._label_direction == "TTB":
