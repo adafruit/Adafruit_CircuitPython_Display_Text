@@ -3,8 +3,8 @@
 
 import board
 import terminalio
-from adafruit_display_text import bitmap_label
 
+from adafruit_display_text import bitmap_label
 
 text = "Hello world"
 text_area = bitmap_label.Label(terminalio.FONT, text=text)

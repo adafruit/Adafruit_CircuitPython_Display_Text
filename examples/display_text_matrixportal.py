@@ -10,8 +10,10 @@ adafruit_matrixportal - https://github.com/adafruit/Adafruit_CircuitPython_Matri
 
 Copy it from the current libraries bundle into the lib folder on your device.
 """
+
 import terminalio
 from adafruit_matrixportal.matrix import Matrix
+
 from adafruit_display_text import label
 
 matrix = Matrix()

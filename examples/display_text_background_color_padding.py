@@ -4,13 +4,14 @@
 """
 This example shows the use color and background_color
 """
+
 import time
+
 import board
 import displayio
-
 from adafruit_bitmap_font import bitmap_font
-from adafruit_display_text import label
 
+from adafruit_display_text import label
 
 #  Setup the SPI display
 if "DISPLAY" in dir(board):
@@ -110,7 +111,7 @@ for i, thisText in enumerate(text):
     text_area[i].anchored_position = (this_x, this_y)
     myGroup.append(text_area[i])
 
-print("background color is {}".format(text_area[0].background_color))
+print(f"background color is {text_area[0].background_color}")
 
 
 while True:
@@ -121,20 +122,20 @@ while True:
 
     for area in text_area:
         area.background_color = 0xFF0000
-    print("background color is {:06x}".format(text_area[0].background_color))
+    print(f"background color is {text_area[0].background_color:06x}")
     time.sleep(2)
     for area in text_area:
         area.background_color = 0x000088
-    print("background color is {:06x}".format(text_area[0].background_color))
+    print(f"background color is {text_area[0].background_color:06x}")
     time.sleep(2)
     for area in text_area:
         area.background_color = 0x00FF00
-    print("background color is {:06x}".format(text_area[0].background_color))
+    print(f"background color is {text_area[0].background_color:06x}")
     time.sleep(2)
     for area in text_area:
         area.background_color = 0xFF0000
-    print("background color is {:06x}".format(text_area[0].background_color))
+    print(f"background color is {text_area[0].background_color:06x}")
     time.sleep(2)
     for area in text_area:
         area.background_color = None
-    print("background color is {}".format(text_area[0].background_color))
+    print(f"background color is {text_area[0].background_color}")

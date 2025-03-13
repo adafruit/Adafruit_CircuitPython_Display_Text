@@ -8,19 +8,18 @@ a terminal using a font on the PyPortal
 
 import os
 import time
+
 import board
 import displayio
-
 from adafruit_bitmap_font import bitmap_font
+
 from adafruit_display_text.label import Label
 
 FONT_DIR = "/fonts/"
-fonts = list(
-    filter(lambda x: x.endswith("bdf") and not x.startswith("."), os.listdir(FONT_DIR))
-)
+fonts = list(filter(lambda x: x.endswith("bdf") and not x.startswith("."), os.listdir(FONT_DIR)))
 fonts = [bitmap_font.load_font(FONT_DIR + x) for x in fonts]
 if len(fonts) == 0:
-    print("No fonts found in '{}'".format(FONT_DIR))
+    print(f"No fonts found in '{FONT_DIR}'")
 
 print("fade up")
 # Fade up the backlight
@@ -40,10 +39,8 @@ for demo_text in demos:
             y = 0
             while len(splash):
                 splash.pop()
-        print("Font load {}".format(font.name))
-        area = Label(
-            font, text=demo_text, anchor_point=(0, 0), anchored_position=(0, y)
-        )
+        print(f"Font load {font.name}")
+        area = Label(font, text=demo_text, anchor_point=(0, 0), anchored_position=(0, y))
         splash.append(area)
 
         y += area.height

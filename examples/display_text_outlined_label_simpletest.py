@@ -3,6 +3,7 @@
 
 import board
 import terminalio
+
 from adafruit_display_text import outlined_label
 
 if board.DISPLAY.width <= 150:

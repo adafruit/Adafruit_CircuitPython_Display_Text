@@ -7,12 +7,14 @@ This is an advanced demonstration of the display_text library capabilities
 """
 
 import time
+
 import board
 import displayio
-import terminalio
 import fontio
+import terminalio
 from adafruit_bitmap_font import bitmap_font
-from adafruit_display_text import label, bitmap_label
+
+from adafruit_display_text import bitmap_label, label
 
 display = board.DISPLAY
 main_group = displayio.Group()
