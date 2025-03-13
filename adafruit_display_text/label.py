@@ -39,7 +39,6 @@ except ImportError:
 
 
 class Label(LabelBase):
-
     """A label displaying a string of text. The origin point set by ``x`` and ``y``
     properties will be the left edge of the bounding box, and in the center of a M
     glyph (if its one line), or the (number of lines * linespacing + M)/2. That is,
@@ -227,7 +226,6 @@ class Label(LabelBase):
             self._added_background_tilegrid = False
 
     def _update_text(self, new_text: str) -> None:
-
         x = 0
         y = 0
         if self._added_background_tilegrid:

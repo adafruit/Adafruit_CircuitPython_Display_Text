@@ -126,7 +126,6 @@ class Label(LabelBase):
         line_spacing: Optional[float] = None,
         scale: Optional[int] = None,
     ) -> None:
-
         # Store all the instance variables
         if font is not None:
             self._font = font
@@ -284,8 +283,6 @@ class Label(LabelBase):
     def _text_bounding_box(
         self, text: str, font: FontProtocol
     ) -> Tuple[int, int, int, int, int, int]:
-
-
         bbox = font.get_bounding_box()
         if len(bbox) == 4:
             ascender_max, descender_max = bbox[1], -bbox[3]
@@ -372,7 +369,6 @@ class Label(LabelBase):
         # when copying glyph bitmaps (this is important for slanted text
         # where rectangular glyph boxes overlap)
     ) -> Tuple[int, int, int, int]:
-
         # placeText - Writes text into a bitmap at the specified location.
         #
         # Note: scale is pushed up to Group level
@@ -463,7 +459,6 @@ class Label(LabelBase):
         skip_index: int = None,  # palette index that will not be copied
         # (for example: the background color of a glyph)
     ) -> None:
-
         if hasattr(bitmap, "blit"):  # if bitmap has a built-in blit function, call it
             # this function should perform its own input checks
             bitmap.blit(

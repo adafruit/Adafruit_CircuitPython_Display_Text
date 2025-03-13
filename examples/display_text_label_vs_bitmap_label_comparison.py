@@ -12,7 +12,6 @@ from adafruit_bitmap_font import bitmap_font
 
 from adafruit_display_text import bitmap_label, label
 
-
 ##########
 # Use this Boolean variables to select which font style to use
 ##########

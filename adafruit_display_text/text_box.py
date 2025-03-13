@@ -114,7 +114,6 @@ class TextBox(bitmap_label.Label):
         # when copying glyph bitmaps (this is important for slanted text
         # where rectangular glyph boxes overlap)
     ) -> Tuple[int, int, int, int]:
-
         # placeText - Writes text into a bitmap at the specified location.
         #
         # Note: scale is pushed up to Group level
@@ -226,7 +225,6 @@ class TextBox(bitmap_label.Label):
         line_spacing: Optional[float] = None,
         scale: Optional[int] = None,
     ) -> None:
-
         # Store all the instance variables
         if font is not None:
             self._font = font

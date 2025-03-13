@@ -27,7 +27,6 @@ def wrap_text_to_pixels(
     indent0: str = "",
     indent1: str = "",
 ) -> List[str]:
-
     """wrap_text_to_pixels function
     A helper that will return a list of lines with word-break wrapping.
     Leading and trailing whitespace in your string will be removed. If
@@ -183,7 +182,6 @@ def wrap_text_to_lines(string: str, max_chars: int) -> List[str]:
 
 
 class LabelBase(Group):
-
     """Superclass that all other types of labels will extend. This contains
     all of the properties and functions that work the same way in all labels.
 
@@ -243,7 +241,6 @@ class LabelBase(Group):
         label_direction: str = "LTR",
         verbose: bool = False,
     ) -> None:
-
         super().__init__(x=x, y=y, scale=1)
 
         self._font = font
