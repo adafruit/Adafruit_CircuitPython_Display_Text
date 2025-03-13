@@ -94,8 +94,6 @@ class TextBox(bitmap_label.Label):
 
         super(bitmap_label.Label, self).__init__(font, **kwargs)
 
-        print(f"before reset: {self._text}")
-
         self._text = "\n".join(self.lines)
         self._text = self._replace_tabs(self._text)
         self._original_text = self._text
@@ -107,7 +105,6 @@ class TextBox(bitmap_label.Label):
             line_spacing=self._line_spacing,
             scale=self.scale,
         )
-        print(f"after reset: {self._text}")
 
     def _place_text(
         self,
@@ -141,21 +138,18 @@ class TextBox(bitmap_label.Label):
         xposition = x_start  # pylint: disable=used-before-assignment
 
         y_start = yposition
-        # print(f"start loc {x_start}, {y_start}")
 
         left = None
         right = x_start
         top = bottom = y_start
         line_spacing = self._line_spacing
 
-        # print(f"cur_line width: {cur_line_width}")
         for char in text:
             if char == "\n":  # newline
                 cur_line_index += 1
                 cur_line_width = self._text_bounding_box(
                     self.lines[cur_line_index], self.font
                 )[0]
-                # print(f"cur_line width: {cur_line_width}")
                 if self.align == self.ALIGN_LEFT:
                     x_start = original_xposition  # starting x position (left margin)
                 if self.align == self.ALIGN_CENTER:
@@ -259,7 +253,6 @@ class TextBox(bitmap_label.Label):
             text = self._text
 
         self._text = self._replace_tabs(text)
-        print(f"inside reset_text text: {text}")
 
         # Check for empty string
         if (text == "") or (
@@ -317,7 +310,6 @@ class TextBox(bitmap_label.Label):
             box_y = box_y + self._padding_top + self._padding_bottom
 
             if self.dynamic_height:
-                print(f"dynamic height, box_y: {box_y}")
                 self._height = box_y
 
             # Create the Bitmap unless it can be reused
@@ -375,7 +367,6 @@ class TextBox(bitmap_label.Label):
                 tight_box_x,
                 tight_box_y,
             )
-            print(f"end of reset_text bounding box: {self._bounding_box}")
 
         if (
             scale is not None
