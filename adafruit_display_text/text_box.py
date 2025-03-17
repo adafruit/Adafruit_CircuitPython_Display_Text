@@ -29,17 +29,16 @@ __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_Display_Text.git"
 import displayio
 from micropython import const
 
-from adafruit_display_text import wrap_text_to_pixels
-from adafruit_display_text import bitmap_label
+from adafruit_display_text import bitmap_label, wrap_text_to_pixels
 
 try:
     from typing import Optional, Tuple
+
     from fontio import FontProtocol
 except ImportError:
     pass
 
 
-# pylint: disable=too-many-instance-attributes, duplicate-code
 class TextBox(bitmap_label.Label):
     """
     TextBox has a constrained width and optionally height.
@@ -77,10 +76,8 @@ class TextBox(bitmap_label.Label):
         else:
             self.dynamic_height = True
 
-        if align not in (TextBox.ALIGN_LEFT, TextBox.ALIGN_CENTER, TextBox.ALIGN_RIGHT):
-            raise ValueError(
-                "Align must be one of: ALIGN_LEFT, ALIGN_CENTER, ALIGN_RIGHT"
-            )
+        if align not in {TextBox.ALIGN_LEFT, TextBox.ALIGN_CENTER, TextBox.ALIGN_RIGHT}:
+            raise ValueError("Align must be one of: ALIGN_LEFT, ALIGN_CENTER, ALIGN_RIGHT")
         self._align = align
 
         self._padding_left = kwargs.get("padding_left", 0)
@@ -117,8 +114,6 @@ class TextBox(bitmap_label.Label):
         # when copying glyph bitmaps (this is important for slanted text
         # where rectangular glyph boxes overlap)
     ) -> Tuple[int, int, int, int]:
-        # pylint: disable=too-many-arguments, too-many-locals, too-many-statements, too-many-branches
-
         # placeText - Writes text into a bitmap at the specified location.
         #
         # Note: scale is pushed up to Group level
@@ -135,7 +130,7 @@ class TextBox(bitmap_label.Label):
             unused_space = self._width - cur_line_width
             x_start = original_xposition + unused_space - self._padding_right
 
-        xposition = x_start  # pylint: disable=used-before-assignment
+        xposition = x_start
 
         y_start = yposition
 
@@ -147,9 +142,7 @@ class TextBox(bitmap_label.Label):
         for char in text:
             if char == "\n":  # newline
                 cur_line_index += 1
-                cur_line_width = self._text_bounding_box(
-                    self.lines[cur_line_index], self.font
-                )[0]
+                cur_line_width = self._text_bounding_box(self.lines[cur_line_index], self.font)[0]
                 if self.align == self.ALIGN_LEFT:
                     x_start = original_xposition  # starting x position (left margin)
                 if self.align == self.ALIGN_CENTER:
@@ -168,7 +161,7 @@ class TextBox(bitmap_label.Label):
                 my_glyph = font.get_glyph(ord(char))
 
                 if my_glyph is None:  # Error checking: no glyph found
-                    print("Glyph not found: {}".format(repr(char)))
+                    print(f"Glyph not found: {repr(char)}")
                 else:
                     if xposition == x_start:
                         if left is None:
@@ -199,19 +192,11 @@ class TextBox(bitmap_label.Label):
                         y_clip = -y_blit_target  # clip this amount from top of bitmap
                         y_blit_target = 0  # draw the clipped bitmap at y=0
                         if self._verbose:
-                            print(
-                                'Warning: Glyph clipped, exceeds Ascent property: "{}"'.format(
-                                    char
-                                )
-                            )
+                            print(f'Warning: Glyph clipped, exceeds Ascent property: "{char}"')
 
                     if (y_blit_target + my_glyph.height) > bitmap.height:
                         if self._verbose:
-                            print(
-                                'Warning: Glyph clipped, exceeds descent property: "{}"'.format(
-                                    char
-                                )
-                            )
+                            print(f'Warning: Glyph clipped, exceeds descent property: "{char}"')
                     try:
                         self._blit(
                             bitmap,
@@ -240,8 +225,6 @@ class TextBox(bitmap_label.Label):
         line_spacing: Optional[float] = None,
         scale: Optional[int] = None,
     ) -> None:
-        # pylint: disable=too-many-branches, too-many-statements, too-many-locals
-
         # Store all the instance variables
         if font is not None:
             self._font = font
@@ -255,7 +238,7 @@ class TextBox(bitmap_label.Label):
         self._text = self._replace_tabs(text)
 
         # Check for empty string
-        if (text == "") or (
+        if (not text) or (
             text is None
         ):  # If empty string, just create a zero-sized bounding box and that's it.
             self._bounding_box = (
@@ -319,9 +302,7 @@ class TextBox(bitmap_label.Label):
                 or self._bitmap.width != self._width
                 or self._bitmap.height != self._height
             ):
-                new_bitmap = displayio.Bitmap(
-                    self._width, self._height, len(self._palette)
-                )
+                new_bitmap = displayio.Bitmap(self._width, self._height, len(self._palette))
                 self._bitmap = new_bitmap
             else:
                 self._bitmap.fill(0)
@@ -357,9 +338,7 @@ class TextBox(bitmap_label.Label):
                 # the bitmap_label
                 for _ in self._local_group:
                     self._local_group.pop(0)
-                self._local_group.append(
-                    self._tilegrid
-                )  # add the bitmap's tilegrid to the group
+                self._local_group.append(self._tilegrid)  # add the bitmap's tilegrid to the group
 
             self._bounding_box = (
                 self._tilegrid.x + self._padding_left,
@@ -419,8 +398,6 @@ class TextBox(bitmap_label.Label):
 
     @align.setter
     def align(self, align: int) -> None:
-        if align not in (TextBox.ALIGN_LEFT, TextBox.ALIGN_CENTER, TextBox.ALIGN_RIGHT):
-            raise ValueError(
-                "Align must be one of: ALIGN_LEFT, ALIGN_CENTER, ALIGN_RIGHT"
-            )
+        if align not in {TextBox.ALIGN_LEFT, TextBox.ALIGN_CENTER, TextBox.ALIGN_RIGHT}:
+            raise ValueError("Align must be one of: ALIGN_LEFT, ALIGN_CENTER, ALIGN_RIGHT")
         self._align = align

@@ -27,6 +27,7 @@ __version__ = "0.0.0+auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_Display_Text.git"
 
 import displayio
+
 from adafruit_display_text import LabelBase
 
 try:
@@ -37,12 +38,12 @@ except ImportError:
 
 try:
     from typing import Optional, Tuple
+
     from fontio import FontProtocol
 except ImportError:
     pass
 
 
-# pylint: disable=too-many-instance-attributes
 class Label(LabelBase):
     """A label displaying a string of text that is stored in a bitmap.
     Note: This ``bitmap_label.py`` library utilizes a :py:class:`~displayio.Bitmap`
@@ -125,8 +126,6 @@ class Label(LabelBase):
         line_spacing: Optional[float] = None,
         scale: Optional[int] = None,
     ) -> None:
-        # pylint: disable=too-many-branches, too-many-statements, too-many-locals
-
         # Store all the instance variables
         if font is not None:
             self._font = font
@@ -143,7 +142,7 @@ class Label(LabelBase):
             self._text = None  # save a None value since text string is not saved
 
         # Check for empty string
-        if (text == "") or (
+        if (not text) or (
             text is None
         ):  # If empty string, just create a zero-sized bounding box and that's it.
             self._bounding_box = (
@@ -199,11 +198,7 @@ class Label(LabelBase):
 
             # Create the Bitmap unless it can be reused
             new_bitmap = None
-            if (
-                self._bitmap is None
-                or self._bitmap.width != box_x
-                or self._bitmap.height != box_y
-            ):
+            if self._bitmap is None or self._bitmap.width != box_x or self._bitmap.height != box_y:
                 new_bitmap = displayio.Bitmap(box_x, box_y, len(self._palette))
                 self._bitmap = new_bitmap
             else:
@@ -240,20 +235,16 @@ class Label(LabelBase):
                 # the bitmap_label
                 for _ in self._local_group:
                     self._local_group.pop(0)
-                self._local_group.append(
-                    self._tilegrid
-                )  # add the bitmap's tilegrid to the group
+                self._local_group.append(self._tilegrid)  # add the bitmap's tilegrid to the group
 
             # Set TileGrid properties based on label_direction
             if self._label_direction != self._prev_label_direction:
                 tg1 = self._tilegrid
-                tg1.transpose_xy, tg1.flip_x, tg1.flip_y = self._DIR_MAP[
-                    self._label_direction
-                ]
+                tg1.transpose_xy, tg1.flip_x, tg1.flip_y = self._DIR_MAP[self._label_direction]
 
             # Update bounding_box values.  Note: To be consistent with label.py,
             # this is the bounding box for the text only, not including the background.
-            if self._label_direction in ("UPR", "DWR"):
+            if self._label_direction in {"UPR", "DWR"}:
                 if self._label_direction == "UPR":
                     top = self._padding_right
                     left = self._padding_top
@@ -292,8 +283,6 @@ class Label(LabelBase):
     def _text_bounding_box(
         self, text: str, font: FontProtocol
     ) -> Tuple[int, int, int, int, int, int]:
-        # pylint: disable=too-many-locals,too-many-branches
-
         bbox = font.get_bounding_box()
         if len(bbox) == 4:
             ascender_max, descender_max = bbox[1], -bbox[3]
@@ -322,7 +311,7 @@ class Label(LabelBase):
                 my_glyph = font.get_glyph(ord(char))
 
                 if my_glyph is None:  # Error checking: no glyph found
-                    print("Glyph not found: {}".format(repr(char)))
+                    print(f"Glyph not found: {repr(char)}")
                 else:
                     if newlines:
                         xposition = x_start  # reset to left column
@@ -353,9 +342,9 @@ class Label(LabelBase):
         final_box_height_tight = bottom - top
         final_y_offset_tight = -top + y_offset_tight
 
-        final_box_height_loose = (lines - 1) * self._line_spacing_ypixels(
-            font, line_spacing
-        ) + (ascender_max + descender_max)
+        final_box_height_loose = (lines - 1) * self._line_spacing_ypixels(font, line_spacing) + (
+            ascender_max + descender_max
+        )
         final_y_offset_loose = ascender_max
 
         # return (final_box_width, final_box_height, left, final_y_offset)
@@ -369,7 +358,6 @@ class Label(LabelBase):
             final_y_offset_loose,
         )
 
-    # pylint: disable = too-many-branches
     def _place_text(
         self,
         bitmap: displayio.Bitmap,
@@ -381,8 +369,6 @@ class Label(LabelBase):
         # when copying glyph bitmaps (this is important for slanted text
         # where rectangular glyph boxes overlap)
     ) -> Tuple[int, int, int, int]:
-        # pylint: disable=too-many-arguments, too-many-locals
-
         # placeText - Writes text into a bitmap at the specified location.
         #
         # Note: scale is pushed up to Group level
@@ -406,7 +392,7 @@ class Label(LabelBase):
                 my_glyph = font.get_glyph(ord(char))
 
                 if my_glyph is None:  # Error checking: no glyph found
-                    print("Glyph not found: {}".format(repr(char)))
+                    print(f"Glyph not found: {repr(char)}")
                 else:
                     if xposition == x_start:
                         if left is None:
@@ -437,19 +423,11 @@ class Label(LabelBase):
                         y_clip = -y_blit_target  # clip this amount from top of bitmap
                         y_blit_target = 0  # draw the clipped bitmap at y=0
                         if self._verbose:
-                            print(
-                                'Warning: Glyph clipped, exceeds Ascent property: "{}"'.format(
-                                    char
-                                )
-                            )
+                            print(f'Warning: Glyph clipped, exceeds Ascent property: "{char}"')
 
                     if (y_blit_target + my_glyph.height) > bitmap.height:
                         if self._verbose:
-                            print(
-                                'Warning: Glyph clipped, exceeds descent property: "{}"'.format(
-                                    char
-                                )
-                            )
+                            print(f'Warning: Glyph clipped, exceeds descent property: "{char}"')
 
                     self._blit(
                         bitmap,
@@ -481,8 +459,6 @@ class Label(LabelBase):
         skip_index: int = None,  # palette index that will not be copied
         # (for example: the background color of a glyph)
     ) -> None:
-        # pylint: disable=no-self-use, too-many-arguments
-
         if hasattr(bitmap, "blit"):  # if bitmap has a built-in blit function, call it
             # this function should perform its own input checks
             bitmap.blit(

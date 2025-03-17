@@ -27,10 +27,12 @@ __version__ = "0.0.0+auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_Display_Text.git"
 
 import adafruit_ticks
+
 from adafruit_display_text import bitmap_label
 
 try:
     from typing import Optional
+
     from fontio import FontProtocol
 except ImportError:
     pass
@@ -50,7 +52,6 @@ class ScrollingLabel(bitmap_label.Label):
     :param int current_index: The index of the first visible character in the label.
      Default is 0, the first character. Will increase while scrolling."""
 
-    # pylint: disable=too-many-arguments
     def __init__(
         self,
         font: FontProtocol,
@@ -58,7 +59,7 @@ class ScrollingLabel(bitmap_label.Label):
         text: Optional[str] = "",
         animate_time: Optional[float] = 0.3,
         current_index: Optional[int] = 0,
-        **kwargs
+        **kwargs,
     ) -> None:
         super().__init__(font, **kwargs)
         self.animate_time = animate_time
@@ -67,7 +68,7 @@ class ScrollingLabel(bitmap_label.Label):
         self.max_characters = max_characters
 
         if text and text[-1] != " ":
-            text = "{} ".format(text)
+            text = f"{text} "
         self._full_text = text
 
         self.update()
@@ -99,14 +100,11 @@ class ScrollingLabel(bitmap_label.Label):
                 _showing_string_start = self.full_text[self.current_index :]
                 _showing_string_end = "{}".format(
                     self.full_text[
-                        : (self.current_index + self.max_characters)
-                        % len(self.full_text)
+                        : (self.current_index + self.max_characters) % len(self.full_text)
                     ]
                 )
 
-                _showing_string = "{}{}".format(
-                    _showing_string_start, _showing_string_end
-                )
+                _showing_string = f"{_showing_string_start}{_showing_string_end}"
             super()._set_text(_showing_string, self.scale)
             self.current_index += 1
             self._last_animate_time = _now
@@ -140,7 +138,7 @@ class ScrollingLabel(bitmap_label.Label):
     @full_text.setter
     def full_text(self, new_text: str) -> None:
         if new_text and new_text[-1] != " ":
-            new_text = "{} ".format(new_text)
+            new_text = f"{new_text} "
         if new_text != self._full_text:
             self._full_text = new_text
             self.current_index = 0

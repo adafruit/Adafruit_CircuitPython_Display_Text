@@ -4,6 +4,7 @@
 import board
 import displayio
 import terminalio
+
 from adafruit_display_text.text_box import TextBox
 
 main_group = displayio.Group()

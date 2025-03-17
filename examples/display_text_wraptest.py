@@ -5,8 +5,10 @@
 This example illustrates how to use the wrap_text_to_lines
 helper function.
 """
+
 import board
 import terminalio
+
 from adafruit_display_text import label, wrap_text_to_lines
 
 # use built in display (PyPortal, PyGamer, PyBadge, CLUE, etc.)

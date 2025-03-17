@@ -10,6 +10,7 @@ WRAP_WIDTH.
 import board
 import displayio
 import terminalio
+
 from adafruit_display_text import label, wrap_text_to_pixels
 
 WRAP_WIDTH = 140

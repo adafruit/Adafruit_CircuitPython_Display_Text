@@ -13,7 +13,8 @@ __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_Display_Text.git"
 from displayio import Group, Palette
 
 try:
-    from typing import Optional, List, Tuple
+    from typing import List, Optional, Tuple
+
     from fontio import FontProtocol
 except ImportError:
     pass
@@ -26,8 +27,6 @@ def wrap_text_to_pixels(
     indent0: str = "",
     indent1: str = "",
 ) -> List[str]:
-    # pylint: disable=too-many-branches, too-many-locals, too-many-nested-blocks, too-many-statements
-
     """wrap_text_to_pixels function
     A helper that will return a list of lines with word-break wrapping.
     Leading and trailing whitespace in your string will be removed. If
@@ -92,9 +91,7 @@ def wrap_text_to_pixels(
                         > max_width
                     ):
                         if cur_part:
-                            word_parts.append(
-                                "".join(partial) + leadchar + cur_part + "-"
-                            )
+                            word_parts.append("".join(partial) + leadchar + cur_part + "-")
 
                         else:
                             word_parts.append("".join(partial))
@@ -111,20 +108,19 @@ def wrap_text_to_pixels(
                 width = measure(word_parts[-1])
                 if firstword:
                     firstword = False
+            elif firstword:
+                partial.append(word)
+                firstword = False
+                width += wwidth
+            elif width + swidth + wwidth < max_width:
+                if index > 0:
+                    partial.append(" ")
+                partial.append(word)
+                width += wwidth + swidth
             else:
-                if firstword:
-                    partial.append(word)
-                    firstword = False
-                    width += wwidth
-                elif width + swidth + wwidth < max_width:
-                    if index > 0:
-                        partial.append(" ")
-                    partial.append(word)
-                    width += wwidth + swidth
-                else:
-                    lines.append("".join(partial))
-                    partial = [indent1, word]
-                    width = measure(indent1) + wwidth
+                lines.append("".join(partial))
+                partial = [indent1, word]
+                width = measure(indent1) + wwidth
             if newline:
                 newline = False
 
@@ -162,7 +158,7 @@ def wrap_text_to_lines(string: str, max_chars: int) -> List[str]:
                 the_lines.append(the_line)
             parts = []
             for part in chunks(w, max_chars - 1):
-                parts.append("{}-".format(part))
+                parts.append(f"{part}-")
             the_lines.extend(parts[:-1])
             the_line = parts[-1][:-1]
             continue
@@ -186,8 +182,6 @@ def wrap_text_to_lines(string: str, max_chars: int) -> List[str]:
 
 
 class LabelBase(Group):
-    # pylint: disable=too-many-instance-attributes
-
     """Superclass that all other types of labels will extend. This contains
     all of the properties and functions that work the same way in all labels.
 
@@ -247,8 +241,6 @@ class LabelBase(Group):
         label_direction: str = "LTR",
         verbose: bool = False,
     ) -> None:
-        # pylint: disable=too-many-arguments, too-many-locals
-
         super().__init__(x=x, y=y, scale=1)
 
         self._font = font
@@ -316,7 +308,7 @@ class LabelBase(Group):
         return self._font
 
     def _set_font(self, new_font: FontProtocol) -> None:
-        raise NotImplementedError("{} MUST override '_set_font'".format(type(self)))
+        raise NotImplementedError(f"{type(self)} MUST override '_set_font'")
 
     @font.setter
     def font(self, new_font: FontProtocol) -> None:
@@ -343,9 +335,7 @@ class LabelBase(Group):
         return self._background_color
 
     def _set_background_color(self, new_color):
-        raise NotImplementedError(
-            "{} MUST override '_set_background_color'".format(type(self))
-        )
+        raise NotImplementedError(f"{type(self)} MUST override '_set_background_color'")
 
     @background_color.setter
     def background_color(self, new_color: int) -> None:
@@ -404,7 +394,7 @@ class LabelBase(Group):
         self.anchored_position = self._anchored_position  # update the anchored_position
 
     def _set_text(self, new_text: str, scale: int) -> None:
-        raise NotImplementedError("{} MUST override '_set_text'".format(type(self)))
+        raise NotImplementedError(f"{type(self)} MUST override '_set_text'")
 
     @property
     def text(self) -> str:
@@ -440,9 +430,7 @@ class LabelBase(Group):
         return self._line_spacing
 
     def _set_line_spacing(self, new_line_spacing: float) -> None:
-        raise NotImplementedError(
-            "{} MUST override '_set_line_spacing'".format(type(self))
-        )
+        raise NotImplementedError(f"{type(self)} MUST override '_set_line_spacing'")
 
     @line_spacing.setter
     def line_spacing(self, new_line_spacing: float) -> None:
@@ -454,14 +442,10 @@ class LabelBase(Group):
         return self._label_direction
 
     def _set_label_direction(self, new_label_direction: str) -> None:
-        raise NotImplementedError(
-            "{} MUST override '_set_label_direction'".format(type(self))
-        )
+        raise NotImplementedError(f"{type(self)} MUST override '_set_label_direction'")
 
     def _get_valid_label_directions(self) -> Tuple[str, ...]:
-        raise NotImplementedError(
-            "{} MUST override '_get_valid_label_direction'".format(type(self))
-        )
+        raise NotImplementedError(f"{type(self)} MUST override '_get_valid_label_direction'")
 
     @label_direction.setter
     def label_direction(self, new_label_direction: str) -> None:
