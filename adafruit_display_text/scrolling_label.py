@@ -156,7 +156,7 @@ class ScrollingLabel(bitmap_label.Label):
     @text.setter
     def text(self, new_text):
         self.full_text = new_text
-    
+
     @property
     def max_characters(self):
         """The maximum number of characters to display on screen.
