@@ -168,8 +168,9 @@ class ScrollingLabel(bitmap_label.Label):
     @max_characters.setter
     def max_characters(self, new_max_characters):
         """Recalculate the full text based on the new max characters.
-           This is necessary to correctly handle the potential space at the end of
-           the text.
+        
+        This is necessary to correctly handle the potential space at the end of
+        the text.
         """
         if new_max_characters != self._max_characters:
             self._max_characters = new_max_characters
