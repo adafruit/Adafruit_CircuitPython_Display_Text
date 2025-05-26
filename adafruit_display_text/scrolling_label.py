@@ -67,7 +67,7 @@ class ScrollingLabel(bitmap_label.Label):
         self._last_animate_time = -1
         self._max_characters = max_characters
 
-        if text and text[-1] != " " and len(text) > max_characters::
+        if text and text[-1] != " " and len(text) > max_characters:
             text = f"{text} "
         self._full_text = text
 
