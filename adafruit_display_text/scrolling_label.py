@@ -71,7 +71,7 @@ class ScrollingLabel(bitmap_label.Label):
             text = f"{text} "
         self._full_text = text
 
-        self.update()
+        self.update(True)
 
     def update(self, force: bool = False) -> None:
         """Attempt to update the display. If ``animate_time`` has elapsed since
