@@ -264,7 +264,7 @@ class TextBox(bitmap_label.Label):
             # Calculate both "tight" and "loose" bounding box dimensions to match label for
             # anchor_position calculations
             (
-                box_x,
+                box_x,  # noqa: F841, var assigned not used
                 tight_box_y,
                 x_offset,
                 tight_y_offset,
@@ -288,8 +288,6 @@ class TextBox(bitmap_label.Label):
                 y_offset = loose_y_offset
 
             # Calculate the background size including padding
-            tight_box_x = box_x
-            box_x = box_x + self._padding_left + self._padding_right
             box_y = box_y + self._padding_top + self._padding_bottom
 
             if self.dynamic_height:
@@ -343,8 +341,8 @@ class TextBox(bitmap_label.Label):
             self._bounding_box = (
                 self._tilegrid.x + self._padding_left,
                 self._tilegrid.y + self._padding_top,
-                tight_box_x,
-                tight_box_y,
+                self.width,
+                self.height,
             )
 
         if (
