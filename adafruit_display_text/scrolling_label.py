@@ -65,13 +65,13 @@ class ScrollingLabel(bitmap_label.Label):
         self.animate_time = animate_time
         self._current_index = current_index
         self._last_animate_time = -1
-        self.max_characters = max_characters
+        self._max_characters = max_characters
 
-        if text and text[-1] != " ":
+        if text and text[-1] != " " and len(text) > max_characters:
             text = f"{text} "
         self._full_text = text
 
-        self.update()
+        self.update(True)
 
     def update(self, force: bool = False) -> None:
         """Attempt to update the display. If ``animate_time`` has elapsed since
@@ -137,7 +137,7 @@ class ScrollingLabel(bitmap_label.Label):
 
     @full_text.setter
     def full_text(self, new_text: str) -> None:
-        if new_text and new_text[-1] != " ":
+        if new_text and new_text[-1] != " " and len(new_text) > self.max_characters:
             new_text = f"{new_text} "
         if new_text != self._full_text:
             self._full_text = new_text
@@ -156,3 +156,22 @@ class ScrollingLabel(bitmap_label.Label):
     @text.setter
     def text(self, new_text):
         self.full_text = new_text
+
+    @property
+    def max_characters(self):
+        """The maximum number of characters to display on screen.
+
+        :return int: The maximum character length of this label.
+        """
+        return self._max_characters
+
+    @max_characters.setter
+    def max_characters(self, new_max_characters):
+        """Recalculate the full text based on the new max characters.
+
+        This is necessary to correctly handle the potential space at the end of
+        the text.
+        """
+        if new_max_characters != self._max_characters:
+            self._max_characters = new_max_characters
+            self.full_text = self.full_text
