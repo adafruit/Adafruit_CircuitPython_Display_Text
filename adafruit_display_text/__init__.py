@@ -11,6 +11,7 @@ __version__ = "0.0.0+auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_Display_Text.git"
 
 from displayio import Group, Palette
+from micropython import const
 
 try:
     from typing import List, Optional, Tuple
@@ -218,6 +219,17 @@ class LabelBase(Group):
      subclass documentation for the possible values.
     :param bool verbose: print debugging information in some internal functions. Default to False
     """
+
+    # Anchor point constants for anchor_label method.
+    ANCHOR_TOP_LEFT = const((0.0, 0.0))
+    ANCHOR_TOP_CENTER = const((0.5, 0.0))
+    ANCHOR_TOP_RIGHT = const((1.0, 0.0))
+    ANCHOR_CENTER_LEFT = const((0.0, 0.5))
+    ANCHOR_CENTER = const((0.5, 0.5))
+    ANCHOR_CENTER_RIGHT = const((1.0, 0.5))
+    ANCHOR_BOTTOM_LEFT = const((0.0, 1.0))
+    ANCHOR_BOTTOM_CENTER = const((0.5, 1.0))
+    ANCHOR_BOTTOM_RIGHT = const((1.0, 1.0))
 
     def __init__(
         self,
@@ -456,3 +468,33 @@ class LabelBase(Group):
 
     def _replace_tabs(self, text: str) -> str:
         return text if text.find("\t") < 0 else self._tab_text.join(text.split("\t"))
+
+    def anchor_label(self, anchor: Tuple[float, float], width: int, height: int) -> None:
+        """Position the label on screen using the given anchor and display size.
+
+        :param anchor: One of the predefined anchor constants (e.g., ANCHOR_TOP_LEFT, ANCHOR_CENTER)
+        :param width: Width of the display in pixels
+        :param height: Height of the display in pixels
+        """
+        if anchor not in {
+            LabelBase.ANCHOR_TOP_LEFT,
+            LabelBase.ANCHOR_TOP_CENTER,
+            LabelBase.ANCHOR_TOP_RIGHT,
+            LabelBase.ANCHOR_CENTER_LEFT,
+            LabelBase.ANCHOR_CENTER,
+            LabelBase.ANCHOR_CENTER_RIGHT,
+            LabelBase.ANCHOR_BOTTOM_LEFT,
+            LabelBase.ANCHOR_BOTTOM_CENTER,
+            LabelBase.ANCHOR_BOTTOM_RIGHT,
+        }:
+            raise ValueError(
+                "Anchor must be one of: ANCHOR_TOP_LEFT, ANCHOR_TOP_CENTER, ANCHOR_TOP_RIGHT,\n"
+                "ANCHOR_CENTER_LEFT, ANCHOR_CENTER, ANCHOR_CENTER_RIGHT,\n"
+                "ANCHOR_BOTTOM_LEFT, ANCHOR_BOTTOM_CENTER, ANCHOR_BOTTOM_RIGHT."
+            )
+
+        self.anchor_point = anchor
+        self.anchored_position = (
+            int(anchor[0] * width),
+            int(anchor[1] * height),
+        )
