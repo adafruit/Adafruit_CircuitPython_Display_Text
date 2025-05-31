@@ -9,6 +9,7 @@ import time
 
 import board
 import displayio
+import fourwire
 from adafruit_bitmap_font import bitmap_font
 
 from adafruit_display_text import label
@@ -42,7 +43,7 @@ else:
         spi.configure(baudrate=32000000)
     spi.unlock()
 
-    display_bus = displayio.FourWire(
+    display_bus = fourwire.FourWire(
         spi,
         command=tft_dc,
         chip_select=tft_cs,
