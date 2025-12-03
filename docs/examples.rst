@@ -133,6 +133,15 @@ Wrap Pixel Test
     :caption: examples/display_text_wrap_pixels_test.py
     :linenos:
 
+AccentLabel Example
+-------------------
+
+Illustrates the AccentLabel feature
+
+.. literalinclude:: ../examples/display_text_accent_label_simpletest.py
+    :caption: examples/display_text_accent_label_simpletest.py
+    :linenos:
+
 Library Features Example
 ------------------------
 
