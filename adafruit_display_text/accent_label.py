@@ -33,10 +33,8 @@ class AccentLabel(BitmapLabel):
       Indexes 2 and above can be used for accent colors.
     """
 
-    def __init__(
-        self, font: FontProtocol, color_palette: Palette, save_text: bool = True, **kwargs
-    ) -> None:
-        super().__init__(font, save_text, **kwargs)
+    def __init__(self, font: FontProtocol, color_palette: Palette, **kwargs) -> None:
+        super().__init__(font, True, **kwargs)
 
         if len(color_palette) <= 2:
             raise ValueError(
