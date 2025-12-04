@@ -17,22 +17,26 @@ display = supervisor.runtime.display
 
 main_group = displayio.Group()
 
-accent_palette = displayio.Palette(4)
+accent_palette = displayio.Palette(6)
 accent_palette[2] = 0x000000
 accent_palette[3] = 0xDDDD00
+accent_palette[4] = 0xFFFFFF
+accent_palette[5] = 0x652F8F
 
-quote_lbl = AccentLabel(terminalio.FONT, color_palette=accent_palette, text="", color=0xAAAAAA)
-quote_lbl.anchor_point = (0, 0)
-quote_lbl.anchored_position = (4, 4)
-main_group.append(quote_lbl)
+accent_lbl = AccentLabel(terminalio.FONT, color_palette=accent_palette, text="", color=0xAAAAAA)
+accent_lbl.anchor_point = (0, 0)
+accent_lbl.anchored_position = (4, 4)
+main_group.append(accent_lbl)
 display.root_group = main_group
 
 text = "CircuitPython is amazing!"
-start_index = text.find("amazing!")
-end_index = start_index + len("amazing!")
+accent_lbl.text = text
 
-quote_lbl.text = text
-quote_lbl.add_accent_range(start_index, end_index, 2, 3)
+time.sleep(1)
+accent_lbl.add_accent_to_substring("CircuitPython", 4, 5)
+time.sleep(2)
+accent_lbl.remove_accent_from_substring("CircuitPython")
+accent_lbl.add_accent_to_substring("amazing!", 2, 3)
 
 while True:
     time.sleep(1)

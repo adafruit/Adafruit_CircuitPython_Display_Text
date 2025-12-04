@@ -67,20 +67,65 @@ class AccentLabel(BitmapLabel):
         self._accent_ranges.append((start, end, foreground_color, background_color))
         self._reset_text(text=str(self._text))
 
-    def remove_accent_range(self, start, end, foreground_color, background_color):
+    def remove_accent_range(self, start):
         """
-        Remove the accent for the specified range and colors.
+        Remove the accent that starts at the specified index within the text.
 
         :param start: The start index of the range of accented text, inclusive.
-        :param end: The end index of the range of accented text, exclusive.
-        :param foreground_color: The color index within ``color_palette`` used for
-          the accent foreground color.
-        :param background_color: The color index within ``color_palette`` used for
-          the accent background color.
         :return: None
         """
-        self._accent_ranges.remove((start, end, foreground_color, background_color))
+        for accent_range in reversed(self._accent_ranges):
+            if accent_range[0] == start:
+                self._accent_ranges.remove(accent_range)
         self._reset_text(text=str(self._text))
+
+    def add_accent_to_substring(self, substring, foreground_color, background_color, start=0):
+        """
+        Add accent to the first occurrence of ``substring`` found in the labels text,
+        starting from ``start``.
+
+        :param substring: the substring to accent within the text.
+        :param foreground_color: The color index within ``color_palette`` to use for
+          the accent foreground color.
+        :param background_color: The color index within ``color_palette`` to use for
+          the accent background color.
+        :param start: The index within text to start searching for the substring.
+          Defaults is 0 to search the whole text.
+        :return: True if the substring was found, False otherwise.
+        """
+
+        index = self._text.find(substring, start)
+        if index != -1:
+            self.add_accent_range(index, index + len(substring), foreground_color, background_color)
+            return True
+        else:
+            return False
+
+    def remove_accent_from_substring(self, substring, start=0):
+        """
+        Remove the accent for the first instance of the specified ``substring``
+         starting at ``start``.
+
+        :param substring: the substring to accent within the text.
+        :param start: The index within text to start searching for the substring.
+          Defaults is 0 to search the whole text.
+        :return: True if the substring was found, False otherwise.
+        """
+
+        index = self._text.find(substring, start)
+        if index != -1:
+            self.remove_accent_range(index)
+            return True
+        else:
+            return False
+
+    @property
+    def accent_ranges(self):
+        """
+        The list of ranges that are accented.
+        :return: List of Tuples containing (start, end, foreground_color, background_color).
+        """
+        return self._accent_ranges
 
     def clear_accent_ranges(self):
         """
