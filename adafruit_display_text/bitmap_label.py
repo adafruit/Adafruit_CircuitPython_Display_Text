@@ -51,6 +51,7 @@ ACCENT_START = const(0)
 ACCENT_END = const(1)
 ACCENT_FG = const(2)
 ACCENT_BG = const(3)
+ACCENT_TYPE = const(4)
 
 
 class Label(LabelBase):
@@ -191,8 +192,7 @@ class Label(LabelBase):
         # outline handling vars
         self._outline_size = outline_size
         self._outline_color = outline_color
-        if self._outline_color is not None:
-            self._init_outline_stamp(outline_size)
+        self._init_outline_stamp(outline_size)
 
         self._save_text = save_text
         self._text = self._replace_tabs(self._text)
@@ -289,6 +289,10 @@ class Label(LabelBase):
             tight_box_x = box_x
             box_x = box_x + self._padding_left + self._padding_right
             box_y = box_y + self._padding_top + self._padding_bottom
+
+            if self._outline_color is not None:
+                box_x += self._outline_size * 2
+                box_y += self._outline_size * 2
 
             # Create the Bitmap unless it can be reused
             new_bitmap = None
@@ -487,7 +491,9 @@ class Label(LabelBase):
                 my_glyph = font.get_glyph(ord(char))
                 if self._tmp_glyph_bitmap is None and len(self._accent_ranges) > 0:
                     self._tmp_glyph_bitmap = displayio.Bitmap(
-                        my_glyph.bitmap.width, my_glyph.bitmap.height, len(self._palette)
+                        my_glyph.width + self.outline_size * 2,
+                        my_glyph.height + self.outline_size * 2,
+                        len(self._palette),
                     )
 
                 if my_glyph is None:  # Error checking: no glyph found
@@ -529,58 +535,110 @@ class Label(LabelBase):
                             print(f'Warning: Glyph clipped, exceeds descent property: "{char}"')
 
                     accented = False
+                    accent_type = "foreground_background"
                     if len(self._accent_ranges) > 0:
                         for accent_range in self._accent_ranges:
-                            if accent_range[ACCENT_START] <= char_idx < accent_range[ACCENT_END]:
-                                self._tmp_glyph_bitmap.fill(accent_range[ACCENT_BG])
+                            if (
+                                accent_range[ACCENT_START]
+                                <= (self.current_index + char_idx) % len(self._full_text)
+                                < accent_range[ACCENT_END]
+                            ):
+                                accent_type = accent_range[ACCENT_TYPE]
+                                if accent_range[ACCENT_TYPE] == "foreground_background":
+                                    self._tmp_glyph_bitmap.fill(accent_range[ACCENT_BG])
 
-                                bitmaptools.blit(
-                                    self._tmp_glyph_bitmap,
-                                    my_glyph.bitmap,
-                                    0,
-                                    0,
-                                    skip_source_index=0,
-                                )
-                                bitmaptools.replace_color(
-                                    self._tmp_glyph_bitmap, 1, accent_range[ACCENT_FG]
-                                )
-                                accented = True
+                                    bitmaptools.blit(
+                                        self._tmp_glyph_bitmap,
+                                        my_glyph.bitmap,
+                                        0,
+                                        0,
+                                        x1=glyph_offset_x,
+                                        y1=y_clip,
+                                        x2=glyph_offset_x + my_glyph.width,
+                                        y2=my_glyph.height,
+                                        skip_source_index=0,
+                                    )
+                                    bitmaptools.replace_color(
+                                        self._tmp_glyph_bitmap, 1, accent_range[ACCENT_FG]
+                                    )
+                                    accented = True
+                                elif accent_range[ACCENT_TYPE] == "outline":
+                                    self._tmp_glyph_bitmap.fill(0)
+                                    bitmaptools.blit(
+                                        self._tmp_glyph_bitmap,
+                                        my_glyph.bitmap,
+                                        self._outline_size,
+                                        self._outline_size,
+                                        x1=glyph_offset_x,
+                                        y1=y_clip,
+                                        x2=glyph_offset_x + my_glyph.width,
+                                        y2=my_glyph.height,
+                                        skip_source_index=0,
+                                    )
+                                    self._add_outline(self._tmp_glyph_bitmap)
+                                    bitmaptools.replace_color(
+                                        self._tmp_glyph_bitmap, 1, accent_range[ACCENT_FG]
+                                    )
+                                    bitmaptools.replace_color(
+                                        self._tmp_glyph_bitmap, 2, accent_range[ACCENT_BG]
+                                    )
+                                    accented = True
+
+                                # only one accent range can effect a given character
                                 break
 
-                    self._blit(
-                        bitmap,
-                        max(xposition + my_glyph.dx, 0),
-                        y_blit_target,
-                        my_glyph.bitmap if not accented else self._tmp_glyph_bitmap,
-                        x_1=glyph_offset_x,
-                        y_1=y_clip,
-                        x_2=glyph_offset_x + my_glyph.width,
-                        y_2=my_glyph.height,
-                        skip_index=skip_index
-                        if not accented
-                        else None,  # do not copy over any 0 background pixels if not accented
-                    )
+                    if accented:
+                        bitmaptools.blit(
+                            bitmap,
+                            self._tmp_glyph_bitmap,
+                            max(xposition + my_glyph.dx, 0),
+                            y_blit_target,
+                        )
+                    else:
+                        try:
+                            self._blit(
+                                bitmap,
+                                max(xposition + my_glyph.dx, 0),
+                                y_blit_target,
+                                my_glyph.bitmap if not accented else self._tmp_glyph_bitmap,
+                                x_1=glyph_offset_x,
+                                y_1=y_clip,
+                                x_2=glyph_offset_x + my_glyph.width,
+                                y_2=my_glyph.height,
+                                skip_index=skip_index
+                                if not accented
+                                else None,  # do not copy any 0 background pixels if not accented
+                            )
+                        except ValueError:
+                            # It's possible to overshoot the width of the bitmap if max_characters
+                            # is enabled and outline is used on at least some of the text.
+                            # In this case just skip any characters that fall outside the
+                            # max_characters box size without accounting for outline size.
+                            pass
 
-                    xposition = xposition + my_glyph.shift_x
+                    if accented and accent_type == "outline":
+                        xposition = xposition + my_glyph.shift_x + self._outline_size
+                    else:
+                        xposition = xposition + my_glyph.shift_x
 
-        self._add_outline()
+        self._add_outline(self.bitmap)
         # bounding_box
         return left, top, right - left, bottom - top
 
-    def _add_outline(self):
+    def _add_outline(self, bitmap):
         """
         Blit the outline into the labels Bitmap. Will blit self._stamp_source for each
         pixel of the foreground color but skip the foreground color when we blit,
         creating an outline.
         :return: None
         """
-        if self._outline_color is not None:
-            for y in range(self.bitmap.height):
-                for x in range(self.bitmap.width):
-                    if self.bitmap[x, y] == 1:
+        if bitmap is not self.bitmap or self._outline_color is not None:
+            for y in range(bitmap.height):
+                for x in range(bitmap.width):
+                    if bitmap[x, y] == 1:
                         try:
                             bitmaptools.blit(
-                                self.bitmap,
+                                bitmap,
                                 self._stamp_source,
                                 x - self._outline_size,
                                 y - self._outline_size,
@@ -855,7 +913,9 @@ class Label(LabelBase):
             scale=self.scale,
         )
 
-    def add_accent_range(self, start, end, foreground_color, background_color):
+    def add_accent_range(
+        self, start, end, foreground_color, background_color, accent_type="foreground_background"
+    ):
         """
         Set a range of text to get accented with the specified colors.
 
@@ -865,9 +925,12 @@ class Label(LabelBase):
           the accent foreground color.
         :param background_color: The color index within ``color_palette`` to use for
           the accent background color.
+        :param accent_type: The type of accent to use, either "foreground_background" or "outline"
         :return: None
         """
-        self._accent_ranges.append((start, end, foreground_color, background_color))
+        if accent_type not in {"foreground_background", "outline"}:
+            raise ValueError("accent_type must be either 'foreground_background' or 'outline'")
+        self._accent_ranges.append((start, end, foreground_color, background_color, accent_type))
         self._reset_text(text=str(self._text))
 
     def remove_accent_range(self, start):
@@ -882,7 +945,14 @@ class Label(LabelBase):
                 self._accent_ranges.remove(accent_range)
         self._reset_text(text=str(self._text))
 
-    def add_accent_to_substring(self, substring, foreground_color, background_color, start=0):
+    def add_accent_to_substring(
+        self,
+        substring,
+        foreground_color,
+        background_color,
+        accent_type="foreground_background",
+        start=0,
+    ):
         """
         Add accent to the first occurrence of ``substring`` found in the labels text,
         starting from ``start``.
@@ -892,14 +962,18 @@ class Label(LabelBase):
           the accent foreground color.
         :param background_color: The color index within ``color_palette`` to use for
           the accent background color.
+        :param accent_type: The type of accent to use, either "foreground_background" or "outline"
         :param start: The index within text to start searching for the substring.
           Defaults is 0 to search the whole text.
         :return: True if the substring was found, False otherwise.
         """
-
-        index = self._text.find(substring, start)
+        if accent_type not in {"foreground_background", "outline"}:
+            raise ValueError("accent_type must be either 'foreground_background' or 'outline'")
+        index = self._full_text.find(substring, start)
         if index != -1:
-            self.add_accent_range(index, index + len(substring), foreground_color, background_color)
+            self.add_accent_range(
+                index, index + len(substring), foreground_color, background_color, accent_type
+            )
             return True
         else:
             return False
@@ -915,7 +989,7 @@ class Label(LabelBase):
         :return: True if the substring was found, False otherwise.
         """
 
-        index = self._text.find(substring, start)
+        index = self._full_text.find(substring, start)
         if index != -1:
             self.remove_accent_range(index)
             return True

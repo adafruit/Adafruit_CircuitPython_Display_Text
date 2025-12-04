@@ -25,6 +25,15 @@ Basic example of scrolling 'marquee' text
     :caption: examples/display_text_scrolling_label.py
     :linenos:
 
+Accent Scrolling Label Example
+------------------------------
+
+Advanced example of scrolling 'marquee' text including different accents
+
+.. literalinclude:: ../examples/display_text_accent_scrolling_example.py
+    :caption: examples/display_text_accent_scrolling_example.py
+    :linenos:
+
 Outline Example
 ---------------
 
