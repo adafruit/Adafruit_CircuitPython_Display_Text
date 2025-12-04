@@ -16,10 +16,10 @@ Simple test using bitmap_label to display text
     :caption: examples/display_text_bitmap_label_simpletest.py
     :linenos:
 
-ScrollingLabel Simple Test
----------------------------
+Scrolling Label Example
+-----------------------
 
-Simple test using scrolling_label to display text
+Basic example of scrolling 'marquee' text
 
 .. literalinclude:: ../examples/display_text_scrolling_label.py
     :caption: examples/display_text_scrolling_label.py

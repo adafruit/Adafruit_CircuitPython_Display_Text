@@ -27,6 +27,7 @@ Implementation Notes
 __version__ = "0.0.0+auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_Display_Text.git"
 
+import adafruit_ticks
 import displayio
 from micropython import const
 
@@ -66,10 +67,16 @@ class Label(LabelBase):
     glyph (if its one line), or the (number of lines * linespacing + M)/2. That is,
     it will try to have it be center-left as close as possible.
 
+    Optionally supports:
+      - Accented ranges of text with different colors
+      - Outline stroke around the text
+      - Fixed-width scrolling "marquee"
+
     :param font: A font class that has ``get_bounding_box`` and ``get_glyph``.
       Must include a capital M for measuring character size.
     :type font: ~fontio.FontProtocol
-    :param str text: Text to display
+    :param str text: The full text to show in the label. If this is longer than
+     ``max_characters`` then the label will scroll to show everything.
     :param int|Tuple(int, int, int) color: Color of all text in HEX or RGB
     :param int|Tuple(int, int, int)|None background_color: Color of the background, use `None`
      for transparent
@@ -97,6 +104,20 @@ class Label(LabelBase):
      configurations possibles ``LTR``-Left-To-Right ``RTL``-Right-To-Left
      ``UPD``-Upside Down ``UPR``-Upwards ``DWR``-Downwards. It defaults to ``LTR``
     :param bool verbose: print debugging information in some internal functions. Default to False
+    :param Optional[Union[Tuple, int]] outline_color: The color of the outline stroke
+      as RGB tuple, or hex.
+    :param int outline_size: The size in pixels of the outline stroke.
+      Defaults to 1 pixel.
+    :param Optional[displayio.Palette] color_palette: The palette to use for the Label.
+      Indexes 0, 1, and 2 will be filled with background, foreground, and outline colors
+      automatically. Indexes 3 and above can be used for accent colors.
+    :param Optional[int] max_characters: The number of characters that sets the fixed-width.
+      Default is None for unlimited width and no scrolling
+
+    :param float animate_time: The number of seconds in between scrolling animation
+     frames. Default is 0.3 seconds.
+    :param int current_index: The index of the first visible character in the label.
+     Default is 0, the first character. Will increase while scrolling.
 
     """
 
@@ -116,6 +137,9 @@ class Label(LabelBase):
         color_palette: Optional[displayio.Palette] = None,
         outline_color: Optional[int] = None,
         outline_size: int = 1,
+        max_characters: Optional[int] = None,
+        animate_time: float = 0.3,
+        current_index: int = 0,
         **kwargs,
     ) -> None:
         self._bitmap = None
@@ -132,6 +156,11 @@ class Label(LabelBase):
             kwargs["padding_right"] = outline_size + 0
 
         super().__init__(font, **kwargs)
+
+        self.animate_time = animate_time
+        self._current_index = current_index
+        self._last_animate_time = -1
+        self._max_characters = max_characters
 
         if color_palette is not None:
             if len(color_palette) <= 3:
@@ -168,13 +197,16 @@ class Label(LabelBase):
         self._save_text = save_text
         self._text = self._replace_tabs(self._text)
 
-        # call the text updater with all the arguments.
-        self._reset_text(
-            font=font,
-            text=self._text,
-            line_spacing=self._line_spacing,
-            scale=self.scale,
-        )
+        if "text" in kwargs:
+            text = kwargs["text"]
+        else:
+            text = ""
+        if self._max_characters is not None:
+            if text and text[-1] != " " and len(text) > max_characters:
+                text = f"{text} "
+        self._full_text = text
+
+        self.update(True)
 
     def _init_outline_stamp(self, outline_size):
         self._outline_size = outline_size
@@ -687,6 +719,107 @@ class Label(LabelBase):
         """
         return self._bitmap
 
+    def update(self, force: bool = False) -> None:
+        """Attempt to update the display. If ``animate_time`` has elapsed since
+        previews animation frame then move the characters over by 1 index.
+        Must be called in the main loop of user code.
+
+        :param bool force: whether to ignore ``animation_time`` and force the update.
+         Default is False.
+        :return: None
+        """
+        _now = adafruit_ticks.ticks_ms()
+        if force or adafruit_ticks.ticks_less(
+            self._last_animate_time + int(self.animate_time * 1000), _now
+        ):
+            if self._max_characters is None:
+                self._set_text(self._full_text, self.scale)
+                self._last_animate_time = _now
+                return
+
+            if len(self.full_text) <= self.max_characters:
+                if self._text != self.full_text:
+                    self._set_text(self.full_text, self.scale)
+                self._last_animate_time = _now
+                return
+
+            if self.current_index + self.max_characters <= len(self.full_text):
+                _showing_string = self.full_text[
+                    self.current_index : self.current_index + self.max_characters
+                ]
+            else:
+                _showing_string_start = self.full_text[self.current_index :]
+                _showing_string_end = "{}".format(
+                    self.full_text[
+                        : (self.current_index + self.max_characters) % len(self.full_text)
+                    ]
+                )
+
+                _showing_string = f"{_showing_string_start}{_showing_string_end}"
+            self._set_text(_showing_string, self.scale)
+            self.current_index += 1
+            self._last_animate_time = _now
+
+            return
+
+    @property
+    def current_index(self) -> int:
+        """Index of the first visible character.
+
+        :return int: The current index
+        """
+        return self._current_index
+
+    @current_index.setter
+    def current_index(self, new_index: int) -> None:
+        if self.full_text:
+            self._current_index = new_index % len(self.full_text)
+        else:
+            self._current_index = 0
+
+    @property
+    def full_text(self) -> str:
+        """The full text to be shown. If it's longer than ``max_characters`` then
+        scrolling will occur as needed.
+
+        :return str: The full text of this label.
+        """
+        return self._full_text
+
+    @full_text.setter
+    def full_text(self, new_text: str) -> None:
+        """
+        User code should use the ``text`` property instead of this.
+        """
+        if self._max_characters is not None:
+            if new_text and new_text[-1] != " " and len(new_text) > self.max_characters:
+                new_text = f"{new_text} "
+            if new_text != self._full_text:
+                self._full_text = new_text
+                self.current_index = 0
+                self.update(True)
+        else:
+            self._full_text = new_text
+
+    @property
+    def max_characters(self):
+        """The maximum number of characters to display on screen.
+
+        :return int: The maximum character length of this label.
+        """
+        return self._max_characters
+
+    @max_characters.setter
+    def max_characters(self, new_max_characters):
+        """Recalculate the full text based on the new max characters.
+
+        This is necessary to correctly handle the potential space at the end of
+        the text.
+        """
+        if new_max_characters != self._max_characters:
+            self._max_characters = new_max_characters
+            self.full_text = self.full_text
+
     @property
     def outline_color(self):
         """Color of the outline to draw around the text. Or None for no outline."""
@@ -806,3 +939,17 @@ class Label(LabelBase):
         """
         self._accent_ranges = []
         self._reset_text(text=str(self._text))
+
+    @property
+    def text(self):
+        """The full text to be shown. If it's longer than ``max_characters`` then
+        scrolling will occur as needed.
+
+        :return str: The full text of this label.
+        """
+        return self.full_text
+
+    @text.setter
+    def text(self, new_text):
+        self.full_text = new_text
+        self.update(True)
