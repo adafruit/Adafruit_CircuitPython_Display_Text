@@ -133,6 +133,15 @@ Wrap Pixel Test
     :caption: examples/display_text_wrap_pixels_test.py
     :linenos:
 
+Accent Example
+-------------------
+
+Demonstrates the accent feature
+
+.. literalinclude:: ../examples/display_text_accent_example.py
+    :caption: examples/display_text_accent_example.py
+    :linenos:
+
 Library Features Example
 ------------------------
 
