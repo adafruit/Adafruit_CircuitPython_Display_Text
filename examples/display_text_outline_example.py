@@ -1,17 +1,19 @@
 # SPDX-FileCopyrightText: 2023 Tim C
 # SPDX-License-Identifier: MIT
 
-import board
+import supervisor
 import terminalio
 
-from adafruit_display_text import outlined_label
+from adafruit_display_text.bitmap_label import Label
 
-if board.DISPLAY.width <= 150:
+display = supervisor.runtime.display
+
+if display.width <= 150:
     text = "Hello\nworld"
 else:
     text = "Hello world"
 
-text_area = outlined_label.OutlinedLabel(
+text_area = Label(
     terminalio.FONT,
     text=text,
     color=0xFF00FF,
@@ -25,6 +27,6 @@ text_area = outlined_label.OutlinedLabel(
 )
 text_area.anchor_point = (0, 0)
 text_area.anchored_position = (10, 10)
-board.DISPLAY.root_group = text_area
+display.root_group = text_area
 while True:
     pass

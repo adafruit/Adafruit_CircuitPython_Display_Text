@@ -10,7 +10,7 @@
 Text graphics handling for CircuitPython, including text boxes
 
 
-* Author(s): Kevin Matocha
+* Author(s): Kevin Matocha, Tim Cocks
 
 Implementation Notes
 --------------------
@@ -114,28 +114,56 @@ class Label(LabelBase):
         font: FontProtocol,
         save_text: bool = True,
         color_palette: Optional[displayio.Palette] = None,
+        outline_color: Optional[int] = None,
+        outline_size: int = 1,
         **kwargs,
     ) -> None:
         self._bitmap = None
         self._tilegrid = None
         self._prev_label_direction = None
 
+        if "padding_top" not in kwargs:
+            kwargs["padding_top"] = outline_size + 0
+        if "padding_bottom" not in kwargs:
+            kwargs["padding_bottom"] = outline_size + 2
+        if "padding_left" not in kwargs:
+            kwargs["padding_left"] = outline_size + 0
+        if "padding_right" not in kwargs:
+            kwargs["padding_right"] = outline_size + 0
+
         super().__init__(font, **kwargs)
 
         if color_palette is not None:
-            if len(color_palette) <= 2:
+            if len(color_palette) <= 3:
                 raise ValueError(
-                    "color_palette should be at least 3 colors to "
-                    "provide enough for normal and accented text. "
+                    "color_palette should be at least 4 colors to "
+                    "provide enough for normal, accented, and outlined text. "
                     "color_palette argument can be omitted if not "
                     "using accents."
                 )
             self._palette = color_palette
             self.color = self._color
             self.background_color = self._background_color
+        else:
+            _background_color = self._palette[0]
+            _foreground_color = self._palette[1]
+            _background_is_transparent = self._palette.is_transparent(0)
+            self._palette = displayio.Palette(3)
+            self._palette[0] = _background_color
+            self._palette[1] = _foreground_color
+            self._palette[2] = outline_color if outline_color is not None else 0x999999
+            if _background_is_transparent:
+                self._palette.make_transparent(0)
 
+        # accent handling vars
         self._accent_ranges = []
         self._tmp_glyph_bitmap = None
+
+        # outline handling vars
+        self._outline_size = outline_size
+        self._outline_color = outline_color
+        if self._outline_color is not None:
+            self._init_outline_stamp(outline_size)
 
         self._save_text = save_text
         self._text = self._replace_tabs(self._text)
@@ -147,6 +175,11 @@ class Label(LabelBase):
             line_spacing=self._line_spacing,
             scale=self.scale,
         )
+
+    def _init_outline_stamp(self, outline_size):
+        self._outline_size = outline_size
+        self._stamp_source = displayio.Bitmap((outline_size * 2) + 1, (outline_size * 2) + 1, 3)
+        self._stamp_source.fill(2)
 
     def _reset_text(
         self,
@@ -498,8 +531,35 @@ class Label(LabelBase):
 
                     xposition = xposition + my_glyph.shift_x
 
+        self._add_outline()
         # bounding_box
         return left, top, right - left, bottom - top
+
+    def _add_outline(self):
+        """
+        Blit the outline into the labels Bitmap. Will blit self._stamp_source for each
+        pixel of the foreground color but skip the foreground color when we blit,
+        creating an outline.
+        :return: None
+        """
+        if self._outline_color is not None:
+            for y in range(self.bitmap.height):
+                for x in range(self.bitmap.width):
+                    if self.bitmap[x, y] == 1:
+                        try:
+                            bitmaptools.blit(
+                                self.bitmap,
+                                self._stamp_source,
+                                x - self._outline_size,
+                                y - self._outline_size,
+                                skip_dest_index=1,
+                            )
+                        except ValueError as value_error:
+                            raise ValueError(
+                                "Padding must be big enough to fit outline_size "
+                                "all the way around the text. "
+                                "Try using either larger padding sizes, or smaller outline_size."
+                            ) from value_error
 
     def _blit(
         self,
@@ -626,6 +686,41 @@ class Label(LabelBase):
         :rtype: displayio.Bitmap
         """
         return self._bitmap
+
+    @property
+    def outline_color(self):
+        """Color of the outline to draw around the text. Or None for no outline."""
+
+        return self._palette[2] if self._outline_color is not None else None
+
+    @outline_color.setter
+    def outline_color(self, new_outline_color):
+        if new_outline_color is not None:
+            self._palette[2] = new_outline_color
+        else:
+            self._outline_color = None
+
+    @property
+    def outline_size(self):
+        """Stroke size of the outline to draw around the text."""
+        return self._outline_size
+
+    @outline_size.setter
+    def outline_size(self, new_outline_size):
+        self._outline_size = new_outline_size
+
+        self._padding_top = new_outline_size + 0
+        self._padding_bottom = new_outline_size + 2
+        self._padding_left = new_outline_size + 0
+        self._padding_right = new_outline_size + 0
+
+        self._init_outline_stamp(new_outline_size)
+        self._reset_text(
+            font=self._font,
+            text=self._text,
+            line_spacing=self._line_spacing,
+            scale=self.scale,
+        )
 
     def add_accent_range(self, start, end, foreground_color, background_color):
         """

@@ -25,13 +25,13 @@ Simple test using scrolling_label to display text
     :caption: examples/display_text_scrolling_label.py
     :linenos:
 
-OutlinedLabel Simple Test
--------------------------
+Outline Example
+---------------
 
-Simple test using outlined_label to display text with a stroke outline
+Basic example of outlined text
 
-.. literalinclude:: ../examples/display_text_outlined_label_simpletest.py
-    :caption: examples/display_text_outlined_label_simpletest.py
+.. literalinclude:: ../examples/display_text_outline_example.py
+    :caption: examples/display_text_outline_example.py
     :linenos:
 
 Label vs Bitmap_label Comparison
