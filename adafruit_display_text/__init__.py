@@ -111,7 +111,7 @@ def wrap_text_to_pixels(
                 word_range = (word_start_idx, word_start_idx + len(word))
                 for outline_range in outline_accent_ranges:
                     overlap = count_overlap(word_range, (outline_range[0], outline_range[1]))
-                    wwidth += overlap * outline_range[2]
+                    wwidth += overlap * (outline_range[2] * 2)
 
             char_index += len(word)
 
