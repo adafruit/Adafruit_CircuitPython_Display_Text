@@ -587,13 +587,28 @@ class Label(LabelBase):
                                 # only one accent range can effect a given character
                                 break
 
+                    if (
+                        not accented
+                        and self._has_outline_accent()
+                        or accented
+                        and accent_type == "foreground_background"
+                    ):
+                        y_blit_target += self._outline_size
+
                     if accented:
-                        bitmaptools.blit(
-                            bitmap,
-                            self._tmp_glyph_bitmap,
-                            max(xposition + my_glyph.dx, 0),
-                            y_blit_target,
-                        )
+                        try:
+                            bitmaptools.blit(
+                                bitmap,
+                                self._tmp_glyph_bitmap,
+                                max(xposition + my_glyph.dx, 0),
+                                y_blit_target,
+                            )
+                        except ValueError:
+                            # It's possible to overshoot the width of the bitmap if max_characters
+                            # is enabled and outline is used on at least some of the text.
+                            # In this case just skip any characters that fall outside the
+                            # max_characters box size without accounting for outline size.
+                            pass
                     else:
                         try:
                             self._blit(
@@ -650,6 +665,12 @@ class Label(LabelBase):
                                 "all the way around the text. "
                                 "Try using either larger padding sizes, or smaller outline_size."
                             ) from value_error
+
+    def _has_outline_accent(self):
+        for accent in self._accent_ranges:
+            if accent[ACCENT_TYPE] == "outline":
+                return True
+        return False
 
     def _blit(
         self,
@@ -777,14 +798,14 @@ class Label(LabelBase):
         """
         return self._bitmap
 
-    def update(self, force: bool = False) -> None:
+    def update(self, force: bool = False) -> bool:
         """Attempt to update the display. If ``animate_time`` has elapsed since
         previews animation frame then move the characters over by 1 index.
         Must be called in the main loop of user code.
 
         :param bool force: whether to ignore ``animation_time`` and force the update.
          Default is False.
-        :return: None
+        :return: bool updated: whether anything changed and the display needs to be refreshed.
         """
         _now = adafruit_ticks.ticks_ms()
         if force or adafruit_ticks.ticks_less(
@@ -815,10 +836,13 @@ class Label(LabelBase):
 
                 _showing_string = f"{_showing_string_start}{_showing_string_end}"
             self._set_text(_showing_string, self.scale)
-            self.current_index += 1
+            if not force:
+                self.current_index += 1
             self._last_animate_time = _now
 
-            return
+            return True
+
+        return False
 
     @property
     def current_index(self) -> int:

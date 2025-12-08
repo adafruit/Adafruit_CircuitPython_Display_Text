@@ -12,5 +12,8 @@ scrolling_label = Label(terminalio.FONT, text=text, max_characters=20, animate_t
 scrolling_label.x = 10
 scrolling_label.y = 10
 display.root_group = scrolling_label
+display.auto_refresh = False
+display.refresh()
 while True:
-    scrolling_label.update()
+    if scrolling_label.update():
+        display.refresh()

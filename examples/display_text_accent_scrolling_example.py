@@ -33,5 +33,8 @@ display.root_group = scrolling_label
 scrolling_label.add_accent_to_substring("CircuitPython", 5, 6)
 scrolling_label.add_accent_to_substring("awesome!", 3, 4, "outline")
 
+display.auto_refresh = False
+display.refresh()
 while True:
-    scrolling_label.update()
+    if scrolling_label.update():
+        display.refresh()
