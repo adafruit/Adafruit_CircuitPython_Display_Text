@@ -401,7 +401,8 @@ class Label(LabelBase):
         newlines = 0
         line_spacing = self._line_spacing
 
-        for char in text:
+        for char_index in range(len(text)):
+            char = text[char_index]
             if char == "\n":  # newline
                 newlines += 1
 
@@ -425,6 +426,11 @@ class Label(LabelBase):
                             left = min(left, my_glyph.dx)
                     xright = xposition + my_glyph.width + my_glyph.dx
                     xposition += my_glyph.shift_x
+
+                    for accent in self.accent_ranges:
+                        if accent[ACCENT_TYPE] == "outline":
+                            if accent[ACCENT_START] <= char_index < accent[ACCENT_END]:
+                                xposition += self.outline_size
 
                     right = max(right, xposition, xright)
 
