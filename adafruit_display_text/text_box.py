@@ -89,7 +89,7 @@ class TextBox(bitmap_label.Label):
             font,
         )
 
-        super(bitmap_label.Label, self).__init__(font, **kwargs)
+        super().__init__(font, **kwargs)
 
         self._text = "\n".join(self.lines)
         self._text = self._replace_tabs(self._text)
