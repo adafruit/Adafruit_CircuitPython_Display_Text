@@ -16,22 +16,31 @@ Simple test using bitmap_label to display text
     :caption: examples/display_text_bitmap_label_simpletest.py
     :linenos:
 
-ScrollingLabel Simple Test
----------------------------
+Scrolling Label Example
+-----------------------
 
-Simple test using scrolling_label to display text
+Basic example of scrolling 'marquee' text
 
 .. literalinclude:: ../examples/display_text_scrolling_label.py
     :caption: examples/display_text_scrolling_label.py
     :linenos:
 
-OutlinedLabel Simple Test
--------------------------
+Accent Scrolling Label Example
+------------------------------
 
-Simple test using outlined_label to display text with a stroke outline
+Advanced example of scrolling 'marquee' text including different accents
 
-.. literalinclude:: ../examples/display_text_outlined_label_simpletest.py
-    :caption: examples/display_text_outlined_label_simpletest.py
+.. literalinclude:: ../examples/display_text_accent_scrolling_example.py
+    :caption: examples/display_text_accent_scrolling_example.py
+    :linenos:
+
+Outline Example
+---------------
+
+Basic example of outlined text
+
+.. literalinclude:: ../examples/display_text_outline_example.py
+    :caption: examples/display_text_outline_example.py
     :linenos:
 
 Label vs Bitmap_label Comparison
@@ -131,6 +140,15 @@ Wrap Pixel Test
 
 .. literalinclude:: ../examples/display_text_wrap_pixels_test.py
     :caption: examples/display_text_wrap_pixels_test.py
+    :linenos:
+
+Accent Example
+-------------------
+
+Demonstrates the accent feature
+
+.. literalinclude:: ../examples/display_text_accent_example.py
+    :caption: examples/display_text_accent_example.py
     :linenos:
 
 Library Features Example

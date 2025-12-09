@@ -26,6 +26,7 @@ def wrap_text_to_pixels(
     font: Optional[FontProtocol] = None,
     indent0: str = "",
     indent1: str = "",
+    outline_accent_ranges: Optional[List[Tuple[int, int, int]]] = None,
 ) -> List[str]:
     """wrap_text_to_pixels function
     A helper that will return a list of lines with word-break wrapping.
@@ -39,7 +40,8 @@ def wrap_text_to_pixels(
     :type font: ~fontio.FontProtocol
     :param str indent0: Additional character(s) to add to the first line.
     :param str indent1: Additional character(s) to add to all other lines.
-
+    :param list outline_accent_ranges: List of outline accent ranges in the form
+      of tuple (range_start, range_end, outline_size).
     :return: A list of the lines resulting from wrapping the
         input text at ``max_width`` pixels size
     :rtype: List[str]
@@ -62,15 +64,57 @@ def wrap_text_to_pixels(
                     total_len += this_glyph.shift_x
             return total_len
 
+    def count_overlap(range1, range2):
+        """count_overlap function
+        Counts how many numbers overlap between two given ranges.
+        Both ranges are treated as inclusive on both endpoints.
+
+        :param range1: The first range as a tuple of (start, end).
+        :type range1: tuple[int, int]
+        :param range2: The second range as a tuple of (start, end).
+        :type range2: tuple[int, int]
+
+        :return: The number of overlapping integers between the two ranges.
+            Returns 0 if there is no overlap.
+        :rtype: int
+
+        """
+        start1, end1 = range1
+        start2, end2 = range2
+
+        # Find the overlap boundaries
+        overlap_start = max(start1, start2)
+        overlap_end = min(end1, end2)
+
+        # If there's no overlap, return 0
+        if overlap_start > overlap_end:
+            return 0
+
+        # Count includes both endpoints
+        return overlap_end - overlap_start + 1
+
     lines = []
     partial = [indent0]
     width = measure(indent0)
     swidth = measure(" ")
     firstword = True
-    for line_in_input in string.split("\n"):
+    char_index = 0
+    for line_index in range(len(string.split("\n"))):
+        line_in_input = string.split("\n")[line_index]
         newline = True
-        for index, word in enumerate(line_in_input.split(" ")):
+
+        for word_index in range(len(line_in_input.split(" "))):
+            word = line_in_input.split(" ")[word_index]
             wwidth = measure(word)
+            if outline_accent_ranges is not None:
+                word_start_idx = string.find(word, char_index)
+                word_range = (word_start_idx, word_start_idx + len(word))
+                for outline_range in outline_accent_ranges:
+                    overlap = count_overlap(word_range, (outline_range[0], outline_range[1]))
+                    wwidth += overlap * (outline_range[2] * 2)
+
+            char_index += len(word)
+
             word_parts = []
             cur_part = ""
 
@@ -113,7 +157,7 @@ def wrap_text_to_pixels(
                 firstword = False
                 width += wwidth
             elif width + swidth + wwidth < max_width:
-                if index > 0:
+                if word_index > 0:
                     partial.append(" ")
                 partial.append(word)
                 width += wwidth + swidth
