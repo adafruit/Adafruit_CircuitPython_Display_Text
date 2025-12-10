@@ -9,4 +9,4 @@ warnings.warn(
     "outlined_label.OutlinedLabel is deprecated, adafruit_display_text.bitmap_label.Label"
     " now supports outline functionality with the same API, it should be used instead."
 )
-OutlineLabel = BitmapLabel
+OutlinedLabel = BitmapLabel
