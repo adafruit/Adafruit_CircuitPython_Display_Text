@@ -63,7 +63,12 @@ class TextBox(bitmap_label.Label):
     DYNAMIC_HEIGHT = const(-1)
 
     def __init__(
-        self, font: FontProtocol, width: int, height: int, align=ALIGN_LEFT, **kwargs
+        self,
+        font: FontProtocol,
+        width: int,
+        height: int,
+        align=ALIGN_LEFT,
+        **kwargs,
     ) -> None:
         self._bitmap = None
         self._tilegrid = None
@@ -238,23 +243,9 @@ class TextBox(bitmap_label.Label):
         self._text = self._replace_tabs(text)
 
         # Check for empty string
-        if (not text) or (
-            text is None
-        ):  # If empty string, just create a zero-sized bounding box and that's it.
-            self._bounding_box = (
-                0,
-                0,
-                0,  # zero width with text == ""
-                0,  # zero height with text == ""
-            )
-            # Clear out any items in the self._local_group Group, in case this is an
-            # update to the bitmap_label
-            for _ in self._local_group:
-                self._local_group.pop(0)
-
-            # Free the bitmap and tilegrid since they are removed
-            self._bitmap = None
-            self._tilegrid = None
+        if (not text) or (text is None):
+            # clear the existing bitmap and keep it
+            self._bitmap.fill(0)
 
         else:  # The text string is not empty, so create the Bitmap and TileGrid and
             # append to the self Group
