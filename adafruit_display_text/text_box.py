@@ -95,7 +95,7 @@ class TextBox(bitmap_label.Label):
         )
 
         text_empty = False
-        if kwargs.get("text", "") == "":
+        if not kwargs.get("text", ""):
             text_empty = True
             kwargs["text"] = " "
 
