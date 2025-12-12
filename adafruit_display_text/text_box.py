@@ -94,19 +94,24 @@ class TextBox(bitmap_label.Label):
             font,
         )
 
-        if not kwargs.get("text", ""):
+        text_empty = False
+        if kwargs.get("text", "") == "":
+            text_empty = True
             kwargs["text"] = " "
 
         super().__init__(font, **kwargs)
 
-        self._text = "\n".join(self.lines)
-        self._text = self._replace_tabs(self._text)
-        self._original_text = self._text
+        if text_empty:
+            self._full_text = ""
+
+        self._full_text = "\n".join(self.lines)
+        self._full_text = self._replace_tabs(self._full_text)
+        self._original_text = self._full_text
 
         # call the text updater with all the arguments.
         self._reset_text(
             font=font,
-            text=self._text,
+            text=self._full_text,
             line_spacing=self._line_spacing,
             scale=self.scale,
         )
