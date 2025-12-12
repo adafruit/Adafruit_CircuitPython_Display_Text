@@ -383,11 +383,11 @@ class TextBox(bitmap_label.Label):
         self.lines = wrap_text_to_pixels(
             text, self._width - self._padding_left - self._padding_right, self.font
         )
-        self._text = self._replace_tabs(text)
-        self._original_text = self._text
-        self._text = "\n".join(self.lines)
+        self._full_text = self._replace_tabs(text)
+        self._original_text = self._full_text
+        self._full_text = "\n".join(self.lines)
 
-        self._set_text(self._text, self.scale)
+        self._set_text(self._full_text, self.scale)
 
     @property
     def align(self):

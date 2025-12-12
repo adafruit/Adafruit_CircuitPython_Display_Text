@@ -1057,3 +1057,10 @@ class Label(LabelBase):
     def text(self, new_text):
         self.full_text = new_text
         self.update(True)
+
+    @property
+    def tilegrid(self) -> displayio.TileGrid:
+        """
+        The TileGrid that contains the Bitmap for this Label.
+        """
+        return self._tilegrid
