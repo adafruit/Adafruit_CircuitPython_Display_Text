@@ -54,6 +54,8 @@ class TextBox(bitmap_label.Label):
     :param height: The height of the TextBox in pixels.
     :param align: How to align the text within the box,
       valid values are ``ALIGN_LEFT``, ``ALIGN_CENTER``, ``ALIGN_RIGHT``.
+    :param bool show_when_empty: Whether to show the background box
+      when there is no text. True to show when empty, False to hide.
     """
 
     ALIGN_LEFT = const(0)
@@ -63,12 +65,19 @@ class TextBox(bitmap_label.Label):
     DYNAMIC_HEIGHT = const(-1)
 
     def __init__(
-        self, font: FontProtocol, width: int, height: int, align=ALIGN_LEFT, **kwargs
+        self,
+        font: FontProtocol,
+        width: int,
+        height: int,
+        align=ALIGN_LEFT,
+        show_when_empty=False,
+        **kwargs,
     ) -> None:
         self._bitmap = None
         self._tilegrid = None
         self._prev_label_direction = None
         self._width = width
+        self._show_when_empty = show_when_empty
 
         if height != TextBox.DYNAMIC_HEIGHT:
             self._height = height
@@ -238,23 +247,26 @@ class TextBox(bitmap_label.Label):
         self._text = self._replace_tabs(text)
 
         # Check for empty string
-        if (not text) or (
-            text is None
-        ):  # If empty string, just create a zero-sized bounding box and that's it.
-            self._bounding_box = (
-                0,
-                0,
-                0,  # zero width with text == ""
-                0,  # zero height with text == ""
-            )
-            # Clear out any items in the self._local_group Group, in case this is an
-            # update to the bitmap_label
-            for _ in self._local_group:
-                self._local_group.pop(0)
+        if (not text) or (text is None):
+            if not self._show_when_empty:
+                # If empty string, just create a zero-sized bounding box and that's it.
+                self._bounding_box = (
+                    0,
+                    0,
+                    0,  # zero width with text == ""
+                    0,  # zero height with text == ""
+                )
+                # Clear out any items in the self._local_group Group, in case this is an
+                # update to the bitmap_label
+                for _ in self._local_group:
+                    self._local_group.pop(0)
 
-            # Free the bitmap and tilegrid since they are removed
-            self._bitmap = None
-            self._tilegrid = None
+                # Free the bitmap and tilegrid since they are removed
+                self._bitmap = None
+                self._tilegrid = None
+            else:
+                # clear the existing bitmap and keep it
+                self._bitmap.fill(0)
 
         else:  # The text string is not empty, so create the Bitmap and TileGrid and
             # append to the self Group
@@ -399,3 +411,14 @@ class TextBox(bitmap_label.Label):
         if align not in {TextBox.ALIGN_LEFT, TextBox.ALIGN_CENTER, TextBox.ALIGN_RIGHT}:
             raise ValueError("Align must be one of: ALIGN_LEFT, ALIGN_CENTER, ALIGN_RIGHT")
         self._align = align
+
+    @property
+    def show_when_empty(self):
+        """
+        Whether to show the background box when there is no text
+        """
+        return self._show_when_empty
+
+    @show_when_empty.setter
+    def show_when_empty(self, value: bool) -> None:
+        self._show_when_empty = value
