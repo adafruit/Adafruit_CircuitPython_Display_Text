@@ -94,6 +94,9 @@ class TextBox(bitmap_label.Label):
             font,
         )
 
+        if not kwargs.get("text", ""):
+            kwargs["text"] = " "
+
         super().__init__(font, **kwargs)
 
         self._text = "\n".join(self.lines)
