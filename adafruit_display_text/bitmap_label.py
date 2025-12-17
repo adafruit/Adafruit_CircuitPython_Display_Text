@@ -147,14 +147,15 @@ class Label(LabelBase):
         self._tilegrid = None
         self._prev_label_direction = None
 
-        if "padding_top" not in kwargs:
-            kwargs["padding_top"] = outline_size + 0
-        if "padding_bottom" not in kwargs:
-            kwargs["padding_bottom"] = outline_size + 2
-        if "padding_left" not in kwargs:
-            kwargs["padding_left"] = outline_size + 0
-        if "padding_right" not in kwargs:
-            kwargs["padding_right"] = outline_size + 0
+        if outline_color is not None:
+            if "padding_top" not in kwargs:
+                kwargs["padding_top"] = outline_size
+            if "padding_bottom" not in kwargs:
+                kwargs["padding_bottom"] = outline_size
+            if "padding_left" not in kwargs:
+                kwargs["padding_left"] = outline_size
+            if "padding_right" not in kwargs:
+                kwargs["padding_right"] = outline_size
 
         super().__init__(font, **kwargs)
 
@@ -930,10 +931,10 @@ class Label(LabelBase):
     def outline_size(self, new_outline_size):
         self._outline_size = new_outline_size
 
-        self._padding_top = new_outline_size + 0
-        self._padding_bottom = new_outline_size + 2
-        self._padding_left = new_outline_size + 0
-        self._padding_right = new_outline_size + 0
+        self._padding_bottom = max(self._padding_bottom, self.outline_size)
+        self._padding_top = max(self._padding_top, self.outline_size)
+        self._padding_left = max(self._padding_left, self.outline_size)
+        self._padding_right = max(self._padding_right, self.outline_size)
 
         self._init_outline_stamp(new_outline_size)
         self._reset_text(
@@ -960,6 +961,12 @@ class Label(LabelBase):
         """
         if accent_type not in {"foreground_background", "outline"}:
             raise ValueError("accent_type must be either 'foreground_background' or 'outline'")
+
+        if accent_type == "outline":
+            self._padding_bottom = max(self._padding_bottom, self.outline_size)
+            self._padding_top = max(self._padding_top, self.outline_size)
+            self._padding_left = max(self._padding_left, self.outline_size)
+            self._padding_right = max(self._padding_right, self.outline_size)
         self._accent_ranges.append((start, end, foreground_color, background_color, accent_type))
         self._reset_text(text=str(self._text))
 
