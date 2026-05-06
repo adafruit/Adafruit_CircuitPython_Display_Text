@@ -1060,6 +1060,8 @@ class Label(LabelBase):
 
     @text.setter
     def text(self, new_text):
+        if new_text == self.full_text:
+            return
         self.full_text = new_text
         self.update(True)
 
