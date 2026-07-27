@@ -119,18 +119,19 @@ def wrap_text_to_pixels(
             cur_part = ""
 
             if wwidth > max_width:
-                for char in word:
+                for char_offset, char in enumerate(word):
                     if newline:
                         extraspace = 0
                         leadchar = ""
                     else:
                         extraspace = swidth
                         leadchar = " "
+                    hyphen_width = measure("-") if char_offset < len(word) - 1 else 0
                     if (
                         measure("".join(partial))
                         + measure(cur_part)
                         + measure(char)
-                        + measure("-")
+                        + hyphen_width
                         + extraspace
                         > max_width
                     ):
