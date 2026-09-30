@@ -248,6 +248,10 @@ class Label(LabelBase):
             top = right = left = 0
             bottom = 0
 
+        # Load every glyph in one pass rather than one per character
+        if hasattr(self._font, "load_glyphs"):
+            self._font.load_glyphs({ord(c) for c in new_text if c != "\n"})
+
         for character in new_text:
             if character == "\n":
                 y += int(self._height * self._line_spacing)
