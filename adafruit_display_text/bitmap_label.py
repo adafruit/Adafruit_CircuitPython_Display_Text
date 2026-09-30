@@ -258,6 +258,10 @@ class Label(LabelBase):
         else:  # The text string is not empty, so create the Bitmap and TileGrid and
             # append to the self Group
 
+            # Load every glyph in one pass rather than one per character
+            if hasattr(self._font, "load_glyphs"):
+                self._font.load_glyphs({ord(c) for c in text if c != "\n"})
+
             # Calculate the text bounding box
 
             # Calculate both "tight" and "loose" bounding box dimensions to match label for
